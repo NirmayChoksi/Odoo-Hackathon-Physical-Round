@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS products (
   sales_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
   cost_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
   description TEXT,
+  image_url VARCHAR(500) NULL,
+  short_description VARCHAR(255) NULL,
   is_recurring BOOLEAN DEFAULT TRUE,
   status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
   created_by INT NULL,
@@ -100,6 +102,50 @@ CREATE TABLE IF NOT EXISTS recurring_plans (
   status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS product_plans (
+  product_plan_id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  plan_id INT NOT NULL,
+  is_default BOOLEAN DEFAULT FALSE,
+  status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_product_plans_product FOREIGN KEY (product_id) REFERENCES products(product_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_product_plans_plan FOREIGN KEY (plan_id) REFERENCES recurring_plans(plan_id)
+    ON DELETE CASCADE,
+  CONSTRAINT uq_product_plan UNIQUE (product_id, plan_id)
+);
+
+CREATE TABLE IF NOT EXISTS carts (
+  cart_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  status ENUM('ACTIVE', 'CHECKED_OUT', 'ABANDONED') DEFAULT 'ACTIVE',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_carts_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS cart_items (
+  cart_item_id INT AUTO_INCREMENT PRIMARY KEY,
+  cart_id INT NOT NULL,
+  product_id INT NOT NULL,
+  plan_id INT NOT NULL,
+  variant_id INT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  unit_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  total_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_cart_items_cart FOREIGN KEY (cart_id) REFERENCES carts(cart_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_cart_items_product FOREIGN KEY (product_id) REFERENCES products(product_id),
+  CONSTRAINT fk_cart_items_plan FOREIGN KEY (plan_id) REFERENCES recurring_plans(plan_id),
+  CONSTRAINT fk_cart_items_variant FOREIGN KEY (variant_id) REFERENCES product_variants(variant_id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS quotation_templates (
@@ -166,7 +212,7 @@ CREATE TABLE IF NOT EXISTS quotation_template_items (
 
 CREATE TABLE IF NOT EXISTS subscriptions (
   subscription_id INT AUTO_INCREMENT PRIMARY KEY,
-  subscription_number VARCHAR(50) NOT NULL UNIQUE,
+  subscription_number VARCHAR(50) NULL UNIQUE COMMENT 'Auto-generated on insert as SO + padded next id (wireframe: SOxxx / Subxxx style)',
   customer_id INT NOT NULL,
   plan_id INT NOT NULL,
   template_id INT NULL,
@@ -187,6 +233,9 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     ON DELETE SET NULL,
   CONSTRAINT fk_subscriptions_created_by FOREIGN KEY (created_by) REFERENCES users(user_id)
 );
+
+-- Existing DBs created before nullable subscription_number: relax so INSERT can omit it (trigger fills SOxxx).
+ALTER TABLE subscriptions MODIFY COLUMN subscription_number VARCHAR(50) NULL;
 
 CREATE TABLE IF NOT EXISTS subscription_items (
   subscription_item_id INT AUTO_INCREMENT PRIMARY KEY,

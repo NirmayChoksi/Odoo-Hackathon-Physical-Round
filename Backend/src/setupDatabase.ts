@@ -36,6 +36,13 @@ async function setupDatabase(): Promise<void> {
     console.log("Executing SQL file content...");
     await connection.query(sqlContent);
 
+    // Triggers contain semicolons inside BEGIN…END; mysql2 splits on ";" when multipleStatements is true.
+    // Run trigger DDL as its own one-shot query (no DELIMITER — that is mysql CLI only).
+    const triggersPath = path.join(__dirname, "../subscription_triggers.sql");
+    const triggerSql = fs.readFileSync(triggersPath, "utf8").trim();
+    await connection.query("DROP TRIGGER IF EXISTS before_insert_subscription");
+    await connection.query(triggerSql);
+
     console.log(`Database "${DB_NAME}" and all tables created successfully.`);
   } catch (error) {
     console.error("Error while creating database/tables:", error);
