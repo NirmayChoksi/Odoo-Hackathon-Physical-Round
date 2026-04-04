@@ -1,118 +1,239 @@
 <div class="internal-container">
-  <!-- Navigation Header -->
   <nav class="internal-nav">
-    <div class="nav-links w-full flex justify-between items-center px-4 py-2 bg-surface-container-low border-b border-outline-variant">
-      <div class="flex gap-4">
-        @for(item of navItems(); track item.label) {
-          <a href="#" class="nav-link px-4 py-2 font-medium" [class.nav-link--active]="item.active"
-          [style.color]="item.active ? 'var(--color-primary)' : 'var(--color-on-surface)'">
+    <div class="nav-brand">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
+    </div>
+    <div class="nav-links">
+      @for (item of navItems(); track item.label) {
+        @if (item.isDropdown) {
+          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
+            <button
+              type="button"
+              class="nav-link nav-dropdown-btn"
+              [class.nav-link--active]="item.active"
+              (click)="toggleConfig($event)">
+              {{ item.label }}
+              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
+            </button>
+            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
+              @for (sub of item.dropdownItems; track sub.label) {
+                <a [routerLink]="sub.path" class="dropdown-item">{{ sub.label }}</a>
+              }
+            </div>
+          </div>
+        } @else {
+          <a
+            [routerLink]="item.path"
+            class="nav-link"
+            [class.nav-link--active]="item.active"
+            (click)="onNavClick(item)">
             {{ item.label }}
           </a>
         }
-      </div>
+      }
+    </div>
+    <div class="nav-profile">
+      <a routerLink="/login" class="profile-btn">
+        <span class="material-symbols-outlined">person</span>
+        My Profile
+      </a>
     </div>
   </nav>
 
-  <!-- Main Content Body -->
-  <main class="internal-content p-6">
-    
-    <!-- Action Bar & Status -->
-    <div class="action-bar flex justify-between items-center mb-8 border-b border-outline-variant pb-4">
-      <div class="action-left flex gap-3 items-center">
-        <!-- New Button is standard, outline for secondary actions like send/confirm -->
-        <button class="btn-new" (click)="onSave()">New</button>
-        <div class="action-icons">
-          <button class="icon-btn tooltip" title="Delete">
+  <main class="internal-content sf-main">
+    <header class="sf-page-head">
+      <nav class="sf-breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/subscriptions" class="sf-breadcrumb__link">Subscriptions</a>
+        <span class="material-symbols-outlined sf-breadcrumb__sep" aria-hidden="true">chevron_right</span>
+        <span class="sf-breadcrumb__current">New subscription</span>
+      </nav>
+      <div class="sf-page-head__row">
+        <div>
+          <h1 class="sf-title">New subscription</h1>
+          <p class="sf-subtitle">Create a subscription, add lines, then send or confirm.</p>
+        </div>
+        <div class="sf-number-chip">
+          <span class="sf-number-chip__label">Number</span>
+          <span class="sf-number-chip__value">{{ subscriptionNumber() }}</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="sf-toolbar">
+      <div class="sf-toolbar__left">
+        <a routerLink="/subscriptions" class="sf-btn sf-btn--ghost">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Back to list
+        </a>
+        <span class="sf-toolbar__divider" aria-hidden="true"></span>
+        <button type="button" class="sf-btn sf-btn--primary" (click)="onSave()">
+          <span class="material-symbols-outlined">save</span>
+          Save
+        </button>
+        <div class="sf-toolbar__icons">
+          <button type="button" class="icon-btn" title="Delete">
             <span class="material-symbols-outlined">delete</span>
           </button>
-          <button class="icon-btn tooltip" title="Print">
+          <button type="button" class="icon-btn" title="Print">
             <span class="material-symbols-outlined">print</span>
           </button>
         </div>
-        <button class="btn btn-outline" (click)="onSend()">Send</button>
-        <button class="btn btn-outline" (click)="onConfirm()">Confirm</button>
+        <button type="button" class="sf-btn sf-btn--outline" (click)="onSend()">Send</button>
+        <button type="button" class="sf-btn sf-btn--outline" (click)="onConfirm()">Confirm</button>
       </div>
-      <div class="status-workflow flex gap-4">
-         @for(status of statusFlow(); track status) {
-            <!-- Changed the dynamic style to match a simpler text conditional style similar to the status pills -->
-            <div class="status-pill border border-outline-variant px-4 py-1 rounded-full text-sm font-semibold transition-colors"
-                 [ngClass]="currentStatus() === status ? 'border-primary text-primary bg-primary/10' : 'text-on-surface-variant bg-surface-container-highest'">
-                 {{ status }}
-            </div>
-         }
-      </div>
+      <ol class="sf-stepper" aria-label="Workflow status">
+        @for (status of statusFlow(); track status; let i = $index) {
+          <li
+            class="sf-stepper__item"
+            [class.sf-stepper__item--done]="isStepComplete(status)"
+            [class.sf-stepper__item--current]="isStepCurrent(status)">
+            @if (i > 0) {
+              <span class="sf-stepper__connector" aria-hidden="true"></span>
+            }
+            <span class="sf-stepper__dot"></span>
+            <span class="sf-stepper__label">{{ status }}</span>
+          </li>
+        }
+      </ol>
     </div>
 
-    <!-- Form Section -->
-    <div class="form-container">
-        <h2 class="text-2xl font-bold mb-6 text-primary flex items-center gap-2">
-            Subscription Number
-            <span class="text-on-surface text-xl font-normal border-b border-outline-variant pb-1">{{ subscriptionNumber() }}</span>
-        </h2>
-
-        <!-- Use a grid layout and space out items -->
-        <div class="grid grid-cols-2 gap-x-12 gap-y-6 mb-8 mt-4">
-            <div class="col-left flex flex-col gap-4">
-                 <app-select [label]="'Customer'" [options]="customerOptions()" [placeholder]="'Select or type existing...'"></app-select>
-                 <app-select [label]="'Quotation template'" [options]="templateOptions()" [placeholder]="'Select Template'"></app-select>
-            </div>
-            <div class="col-right flex flex-col gap-4">
-                 <app-input [label]="'Expiration'" [type]="'text'"></app-input>
-                 <app-select [label]="'Recurring Plan'" [options]="recurringPlanOptions()" [placeholder]="'Select Plan'"></app-select>
-                 <app-select [label]="'Payment Term'" [options]="paymentTermOptions()" [placeholder]="'Select Payment Term'"></app-select>
-            </div>
+    <section class="sf-card" aria-labelledby="sf-details-heading">
+      <div class="sf-card__header">
+        <h2 id="sf-details-heading" class="sf-card__title">Subscription details</h2>
+      </div>
+      <div class="sf-fields">
+        <div class="sf-fields__col fields-section">
+          <div class="field-row">
+            <label class="field-label" for="sf-customer">Customer</label>
+            <select
+              id="sf-customer"
+              class="sf-control sf-control--select"
+              [value]="customerId()"
+              (change)="customerId.set($any($event.target).value)">
+              <option value="" disabled>Select or search customer</option>
+              @for (opt of customerOptions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="sf-template">Quotation template</label>
+            <select
+              id="sf-template"
+              class="sf-control sf-control--select"
+              [value]="templateId()"
+              (change)="templateId.set($any($event.target).value)">
+              <option value="" disabled>Select template</option>
+              @for (opt of templateOptions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
         </div>
-
-        <!-- Custom tabs section -->
-        <div class="tabs-container mt-12 bg-surface-container-low border border-outline-variant rounded-xl p-4">
-            <!-- Tabs -->
-            <div class="tabs mb-4 flex gap-2 border-b border-outline-variant">
-                 <button class="px-6 py-2 rounded-t-lg transition-colors font-medium border-x border-t border-transparent"
-                         [ngClass]="activeTab() === 'order-lines' ? 'border-outline-variant bg-surface-container text-primary font-bold' : 'text-on-surface hover:bg-surface-container-highest'"
-                         (click)="onTabClick('order-lines')">
-                     Order Lines
-                 </button>
-                 <button class="px-6 py-2 rounded-t-lg transition-colors font-medium border-x border-t border-transparent"
-                         [ngClass]="activeTab() === 'other-info' ? 'border-outline-variant bg-surface-container text-primary font-bold' : 'text-on-surface hover:bg-surface-container-highest'"
-                         (click)="onTabClick('other-info')">
-                     Other info
-                 </button>
-            </div>
-
-            <!-- Tab Content -->
-            <div class="tab-content" *ngIf="activeTab() === 'order-lines'">
-                 <div class="data-container border border-outline-variant rounded-lg overflow-hidden mt-4">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Unit Price</th>
-                                <th>Discount</th>
-                                <th>Taxes</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for(line of orderLines(); track line.product) {
-                                <tr class="data-row">
-                                    <td class="text-primary font-medium">{{ line.product }}</td>
-                                    <td>{{ line.quantity }}</td>
-                                    <td>{{ line.unitPrice | currency:'INR' }}</td>
-                                    <td>{{ line.discount }}%</td>
-                                    <td>{{ line.taxes }}%</td>
-                                    <td class="font-semibold">{{ line.amount | currency:'INR' }}</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                 </div>
-            </div>
-            <div class="tab-content p-4" *ngIf="activeTab() === 'other-info'">
-                <p class="text-on-surface-variant">Other configuration info would be here.</p>
-            </div>
+        <div class="sf-fields__col fields-section">
+          <div class="field-row">
+            <label class="field-label" for="sf-expiration">Expiration</label>
+            <input
+              id="sf-expiration"
+              type="text"
+              class="sf-control"
+              placeholder="e.g. 2026-12-31"
+              [ngModel]="expiration()"
+              (ngModelChange)="expiration.set($event)" />
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="sf-plan">Recurring plan</label>
+            <select
+              id="sf-plan"
+              class="sf-control sf-control--select"
+              [value]="recurringPlanId()"
+              (change)="recurringPlanId.set($any($event.target).value)">
+              <option value="" disabled>Select plan</option>
+              @for (opt of recurringPlanOptions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="sf-payment-term">Payment term</label>
+            <select
+              id="sf-payment-term"
+              class="sf-control sf-control--select"
+              [value]="paymentTermId()"
+              (change)="paymentTermId.set($any($event.target).value)">
+              <option value="" disabled>Select payment term</option>
+              @for (opt of paymentTermOptions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
         </div>
+      </div>
+    </section>
 
-    </div>
+    <section class="sf-card sf-card--tabs" aria-labelledby="sf-lines-heading">
+      <div class="sf-card__header sf-card__header--tabs">
+        <h2 id="sf-lines-heading" class="sf-card__title">Lines &amp; additional info</h2>
+        <p class="sf-card__subtitle">Switch tabs to edit order lines or other subscription data.</p>
+      </div>
+      <div class="sf-tabs" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          class="sf-tab"
+          [attr.aria-selected]="activeTab() === 'order-lines'"
+          [class.sf-tab--active]="activeTab() === 'order-lines'"
+          (click)="onTabClick('order-lines')">
+          Order lines
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="sf-tab"
+          [attr.aria-selected]="activeTab() === 'other-info'"
+          [class.sf-tab--active]="activeTab() === 'other-info'"
+          (click)="onTabClick('other-info')">
+          Other info
+        </button>
+      </div>
+
+      @if (activeTab() === 'order-lines') {
+        <div class="sf-tab-panel sf-tab-panel--lines" role="tabpanel">
+          <div class="sf-lines-table-wrap">
+            <table class="data-table sf-lines-table">
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Unit price</th>
+                  <th scope="col">Discount</th>
+                  <th scope="col">Taxes</th>
+                  <th class="col-amount" scope="col">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (line of orderLines(); track line.product) {
+                  <tr class="data-row">
+                    <td class="col-product">{{ line.product }}</td>
+                    <td>{{ line.quantity }}</td>
+                    <td>{{ line.unitPrice | currency: 'INR' }}</td>
+                    <td>{{ line.discount }}%</td>
+                    <td>{{ line.taxes }}%</td>
+                    <td class="col-amount">{{ line.amount | currency: 'INR' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <p class="sf-tab-hint">Add products from catalog in a future iteration; sample row shown.</p>
+        </div>
+      }
+
+      @if (activeTab() === 'other-info') {
+        <div class="sf-tab-panel sf-tab-panel--padded" role="tabpanel">
+          <p class="sf-placeholder">Internal notes, delivery address, and custom fields can live here.</p>
+        </div>
+      }
+    </section>
   </main>
 </div>

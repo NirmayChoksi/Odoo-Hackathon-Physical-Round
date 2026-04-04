@@ -42,7 +42,7 @@
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="action-left">
-        <button type="button" class="btn-new" (click)="onNew()">
+        <button class="btn-new" (click)="onNew()">
           <span class="material-symbols-outlined">add</span>
           New
         </button>
@@ -67,13 +67,14 @@
       <div class="title-group">
         <input
           type="text"
-          name="recurring_name"
+          id="planName"
           class="title-input"
           placeholder="Recurring Name"
           [ngModel]="planName()"
           (ngModelChange)="planName.set($event)" />
       </div>
 
+      <!-- Fields Section -->
       <div class="fields-section">
 
         <!-- Billing Period Row -->

@@ -3,6 +3,14 @@ import type { RowDataPacket, ResultSetHeader } from "mysql2";
 import type { UserRow, PasswordResetRow } from './auth.types';
 
 export const authRepository = {
+  async findRoleIdByName(roleName: string): Promise<number | null> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      'SELECT role_id FROM roles WHERE role_name = ? LIMIT 1',
+      [roleName]
+    );
+    return rows.length > 0 ? Number(rows[0].role_id) : null;
+  },
+
   async findUserByEmail(email: string): Promise<UserRow | null> {
     const [users] = await pool.query<RowDataPacket[]>('SELECT * FROM users WHERE email = ?', [email]);
     return users.length > 0 ? (users[0] as UserRow) : null;

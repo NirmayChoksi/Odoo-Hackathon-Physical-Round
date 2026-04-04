@@ -8,6 +8,24 @@ import type { SignupBody, LoginBody, ResetPasswordBody, VerifyResetBody } from '
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
+/** Public signup role: `DEFAULT_SIGNUP_ROLE_ID` or lookup by `DEFAULT_SIGNUP_ROLE_NAME` (default: External User). */
+async function resolveSignupRoleId(): Promise<number> {
+  const envId = process.env.DEFAULT_SIGNUP_ROLE_ID?.trim();
+  if (envId) {
+    const parsed = parseInt(envId, 10);
+    if (!Number.isNaN(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+
+  const roleName = process.env.DEFAULT_SIGNUP_ROLE_NAME?.trim() || 'External User';
+  const roleId = await authRepository.findRoleIdByName(roleName);
+  if (roleId === null) {
+    throw fail(`Signup role "${roleName}" is not configured in the database.`, 500);
+  }
+  return roleId;
+}
+
 export const authService = {
   async signup(data: SignupBody) {
     const { email, password, full_name, phone } = data;
@@ -22,8 +40,7 @@ export const authService = {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password!, salt);
 
-    // Default role_id = 3 (Portal User)
-    const roleId = 3;
+    const roleId = await resolveSignupRoleId();
 
     await authRepository.createUser({
       full_name,

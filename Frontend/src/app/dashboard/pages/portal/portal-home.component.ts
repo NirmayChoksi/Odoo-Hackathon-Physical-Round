@@ -4,13 +4,11 @@ import { Router } from '@angular/router';
 import { NavbarComponent } from '../../../external/shared/navbar/navbar';
 import { MOCK_PRODUCTS, Product } from '../../../external/mock-products';
 import { ButtonComponent } from '../../../components/button/button';
-import { CardComponent } from '../../../components/card/card';
-import { BadgeComponent } from '../../../components/badge/badge';
 
 @Component({
   selector: 'app-portal-home',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, ButtonComponent, CardComponent, BadgeComponent],
+  imports: [CommonModule, NavbarComponent, ButtonComponent],
   templateUrl: './portal-home.component.html',
   styleUrl: './portal-home.component.css',
 })

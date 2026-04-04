@@ -1,6 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 export interface Subscription {
   number: string;
@@ -14,7 +14,7 @@ export interface Subscription {
 @Component({
   selector: 'app-subscriptions',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink],
   templateUrl: './subscriptions.html',
   styleUrl: './subscriptions.css'
 })

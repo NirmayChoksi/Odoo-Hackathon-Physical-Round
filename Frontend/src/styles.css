@@ -55,6 +55,11 @@ body {
   margin: 0;
 }
 
+/* Long subscription form: focused inputs scroll with space below sticky internal nav */
+body:has(app-subscription-form) {
+  scroll-padding-top: 5.5rem;
+}
+
 /* Internal dashboard — same palette as global */
 .internal-container {
   --pal-deep: #03122f;

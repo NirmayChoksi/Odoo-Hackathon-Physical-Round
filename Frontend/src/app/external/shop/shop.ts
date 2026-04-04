@@ -5,14 +5,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ecommerceCommands } from '../ecommerce-navigation';
 import { ButtonComponent } from '../../components/button/button';
 import { CardComponent } from '../../components/card/card';
-import { InputComponent } from '../../components/input/input';
 import { CATEGORIES, MOCK_PRODUCTS } from '../mock-products';
 import { NavbarComponent } from '../shared/navbar/navbar';
 
 @Component({
   selector: 'app-shop',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent, InputComponent, CardComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, CardComponent, ButtonComponent],
   templateUrl: './shop.html',
   styleUrl: './shop.css'
 })

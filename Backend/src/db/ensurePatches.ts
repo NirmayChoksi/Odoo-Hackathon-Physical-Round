@@ -1,7 +1,11 @@
 import fs from "fs";
 import path from "path";
 import type { RowDataPacket } from "mysql2";
+import type { Pool } from "mysql2/promise";
 import { pool } from "../config/db";
+
+/** mysql2 Pool or Connection — both implement .query for index DDL */
+export type DbQueryable = Pick<Pool, "query">;
 
 async function tableExists(tableName: string): Promise<boolean> {
   const [rows] = await pool.query<RowDataPacket[]>(
@@ -81,6 +85,85 @@ function projectRootFromHere(): string {
   return path.join(__dirname, "..", "..");
 }
 
+async function indexExistsOn(db: DbQueryable, tableName: string, indexName: string): Promise<boolean> {
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT 1 AS o FROM information_schema.statistics
+     WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ? LIMIT 1`,
+    [tableName, indexName]
+  );
+  return rows.length > 0;
+}
+
+async function tableExistsOn(db: DbQueryable, tableName: string): Promise<boolean> {
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT 1 AS o FROM information_schema.tables
+     WHERE table_schema = DATABASE() AND table_name = ? LIMIT 1`,
+    [tableName]
+  );
+  return rows.length > 0;
+}
+
+/**
+ * Composite and lookup indexes aligned with internal/external repositories (JOINs, filters, ORDER BY).
+ * InnoDB already indexes FK child columns; these add multi-column paths and nullable lookup columns.
+ * Safe to call on every server start.
+ */
+export async function ensurePerformanceIndexes(db: DbQueryable = pool): Promise<void> {
+  const specs: Array<{ table: string; name: string; sql: string }> = [
+    {
+      table: "carts",
+      name: "idx_carts_user_status_updated",
+      sql: "CREATE INDEX idx_carts_user_status_updated ON carts (user_id, status, updated_at)"
+    },
+    {
+      table: "cart_items",
+      name: "idx_cart_items_cart_product_plan",
+      sql: "CREATE INDEX idx_cart_items_cart_product_plan ON cart_items (cart_id, product_id, plan_id)"
+    },
+    {
+      table: "subscriptions",
+      name: "idx_subscriptions_status_subscription",
+      sql: "CREATE INDEX idx_subscriptions_status_subscription ON subscriptions (status, subscription_id)"
+    },
+    {
+      table: "invoices",
+      name: "idx_invoices_status_due",
+      sql: "CREATE INDEX idx_invoices_status_due ON invoices (status, due_date)"
+    },
+    {
+      table: "payments",
+      name: "idx_payments_status_paydate",
+      sql: "CREATE INDEX idx_payments_status_paydate ON payments (payment_status, payment_date)"
+    },
+    {
+      table: "products",
+      name: "idx_products_status_created",
+      sql: "CREATE INDEX idx_products_status_created ON products (status, created_at)"
+    },
+    {
+      table: "customers",
+      name: "idx_customers_email",
+      sql: "CREATE INDEX idx_customers_email ON customers (email)"
+    },
+    {
+      table: "audit_logs",
+      name: "idx_audit_logs_created_at",
+      sql: "CREATE INDEX idx_audit_logs_created_at ON audit_logs (created_at)"
+    },
+    {
+      table: "audit_logs",
+      name: "idx_audit_logs_user_created",
+      sql: "CREATE INDEX idx_audit_logs_user_created ON audit_logs (user_id, created_at)"
+    }
+  ];
+
+  for (const { table, name, sql } of specs) {
+    if (!(await tableExistsOn(db, table))) continue;
+    if (await indexExistsOn(db, table, name)) continue;
+    await db.query(sql);
+  }
+}
+
 /** Apply idempotent SQL patches. Safe to call on every server start. */
 export async function ensureDbPatches(): Promise<void> {
   const preSchemaDir = path.join(projectRootFromHere(), "sql", "pre-schema");
@@ -97,6 +180,8 @@ export async function ensureDbPatches(): Promise<void> {
   await ensureProductsLegacyColumns();
 
   await pool.query(PRODUCT_PLANS_DDL);
+
+  await ensurePerformanceIndexes();
 
   const patchesDir = path.join(projectRootFromHere(), "sql", "patches");
   if (!fs.existsSync(patchesDir)) {

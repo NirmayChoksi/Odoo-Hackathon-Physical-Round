@@ -68,6 +68,10 @@ async function setupDatabase(): Promise<void> {
     await connection.query("DROP TRIGGER IF EXISTS before_insert_subscription");
     await connection.query(triggerSql);
 
+    const { ensurePerformanceIndexes } = await import("./db/ensurePatches");
+    console.log("Ensuring performance indexes...");
+    await ensurePerformanceIndexes(connection);
+
     console.log(`Database "${DB_NAME}" and all tables created successfully.`);
   } catch (error) {
     console.error("Error while creating database/tables:", error);
