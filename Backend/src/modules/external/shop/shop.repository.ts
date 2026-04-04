@@ -17,6 +17,7 @@ interface ProductListRow extends RowDataPacket {
   short_description: string | null;
   image_url: string | null;
   description: string | null;
+  terms_and_conditions?: string | null;
   default_plan_id: number | null;
   default_plan_name: string | null;
   plan_price: string | null;
@@ -164,6 +165,7 @@ export const shopRepository = {
         p.short_description,
         p.image_url,
         p.description,
+        p.terms_and_conditions,
         rp.plan_id AS default_plan_id,
         rp.plan_name AS default_plan_name,
         rp.price AS plan_price,
@@ -202,6 +204,7 @@ export const shopRepository = {
       billing_period: p.billing_period,
       display_price: String(p.display_price),
       created_at: p.created_at,
+      terms_and_conditions: p.terms_and_conditions ?? null,
       variants: varRows.map((v) => ({
         variant_id: v.variant_id,
         attribute_name: v.attribute_name,
@@ -236,4 +239,75 @@ export const shopRepository = {
       is_default: Boolean(r.is_default),
     }));
   },
+
+  async listVariants(productId: number) {
+    const [varRows] = await pool.query<RowDataPacket[]>(
+      `SELECT variant_id, attribute_name, attribute_value, extra_price, status
+       FROM product_variants WHERE product_id = :id AND status = 'ACTIVE' ORDER BY variant_id`,
+      { id: productId }
+    );
+    return varRows.map((v) => ({
+      variant_id: v.variant_id,
+      attribute_name: v.attribute_name,
+      attribute_value: v.attribute_value,
+      extra_price: String(v.extra_price),
+      status: v.status
+    }));
+  },
+
+  async listFeatured(limit = 8): Promise<ShopProduct[]> {
+    const [rows] = await pool.query<ProductListRow[]>(
+      `
+      SELECT
+        p.product_id,
+        p.product_name,
+        p.product_type,
+        p.sales_price,
+        p.short_description,
+        p.image_url,
+        p.description,
+        rp.plan_id AS default_plan_id,
+        rp.plan_name AS default_plan_name,
+        rp.price AS plan_price,
+        rp.billing_period,
+        CAST(COALESCE(rp.price, p.sales_price) AS DECIMAL(12,2)) AS display_price,
+        p.created_at,
+        0 AS total_count
+      FROM products p
+      LEFT JOIN product_plans pp
+        ON pp.product_id = p.product_id AND pp.status = 'ACTIVE' AND pp.is_default = 1
+      LEFT JOIN recurring_plans rp
+        ON rp.plan_id = pp.plan_id AND rp.status = 'ACTIVE'
+      WHERE p.status = 'ACTIVE'
+      ORDER BY p.created_at DESC
+      LIMIT :lim
+    `,
+      { lim: limit }
+    );
+    return rows.map((r) => ({
+      product_id: r.product_id,
+      product_name: r.product_name,
+      product_type: r.product_type,
+      sales_price: r.sales_price,
+      short_description: r.short_description,
+      image_url: r.image_url,
+      description: r.description,
+      default_plan_id: r.default_plan_id,
+      default_plan_name: r.default_plan_name,
+      plan_price: r.plan_price,
+      billing_period: r.billing_period,
+      display_price: String(r.display_price),
+      created_at: r.created_at
+    }));
+  },
+
+  async getProductImages(productId: number): Promise<{ image_url: string | null; sort_order: number }[]> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT image_url FROM products WHERE product_id = :id AND status = 'ACTIVE' LIMIT 1`,
+      { id: productId }
+    );
+    const url = rows[0]?.image_url != null ? String(rows[0].image_url) : null;
+    if (!url) return [];
+    return [{ image_url: url, sort_order: 0 }];
+  }
 };

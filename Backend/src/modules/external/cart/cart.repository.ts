@@ -1,6 +1,27 @@
-import type { RowDataPacket, ResultSetHeader } from "mysql2";
-import { pool } from "../../config/db";
+import type { ResultSetHeader, RowDataPacket } from "mysql2";
+import { pool } from "../../../config/db";
 import type { CartItemRow } from "./cart.types";
+
+export interface CartMeta extends RowDataPacket {
+  cart_id: number;
+  applied_discount_id: number | null;
+  payment_method: string | null;
+  selected_address_id: number | null;
+}
+
+export interface CartItemFullRow extends RowDataPacket {
+  cart_item_id: number;
+  cart_id: number;
+  product_id: number;
+  plan_id: number;
+  variant_id: number | null;
+  quantity: number;
+  unit_price: string;
+  extra_price: string;
+  tax_amount: string;
+  discount_amount: string;
+  total_price: string;
+}
 
 export const cartRepository = {
   async getActiveCartId(userId: number): Promise<number | null> {
@@ -24,6 +45,41 @@ export const cartRepository = {
     const existing = await this.getActiveCartId(userId);
     if (existing) return existing;
     return this.createCart(userId);
+  },
+
+  async getCartMeta(cartId: number): Promise<CartMeta | null> {
+    const [rows] = await pool.query<CartMeta[]>(
+      `SELECT cart_id, applied_discount_id, payment_method, selected_address_id FROM carts WHERE cart_id = :id LIMIT 1`,
+      { id: cartId }
+    );
+    return rows[0] ?? null;
+  },
+
+  async setSelectedAddress(cartId: number, addressId: number | null): Promise<void> {
+    await pool.query(
+      `UPDATE carts SET selected_address_id = :a, updated_at = CURRENT_TIMESTAMP WHERE cart_id = :id`,
+      { a: addressId, id: cartId }
+    );
+  },
+
+  async setAppliedDiscount(cartId: number, discountId: number | null): Promise<void> {
+    await pool.query(`UPDATE carts SET applied_discount_id = :d, updated_at = CURRENT_TIMESTAMP WHERE cart_id = :id`, {
+      d: discountId,
+      id: cartId
+    });
+  },
+
+  async setPaymentMethod(cartId: number, method: string | null): Promise<void> {
+    await pool.query(`UPDATE carts SET payment_method = :m, updated_at = CURRENT_TIMESTAMP WHERE cart_id = :id`, {
+      m: method,
+      id: cartId
+    });
+  },
+
+  async markCheckedOut(cartId: number): Promise<void> {
+    await pool.query(`UPDATE carts SET status = 'CHECKED_OUT', updated_at = CURRENT_TIMESTAMP WHERE cart_id = :id`, {
+      id: cartId
+    });
   },
 
   async findLine(
@@ -50,11 +106,19 @@ export const cartRepository = {
     variantId: number | null,
     quantity: number,
     unitPrice: number,
+    extraPrice: number,
+    taxAmount: number,
+    discountAmount: number,
     totalPrice: number
   ): Promise<number> {
     const [res] = await pool.query<ResultSetHeader>(
-      `INSERT INTO cart_items (cart_id, product_id, plan_id, variant_id, quantity, unit_price, total_price)
-       VALUES (:cartId, :productId, :planId, :variantId, :quantity, :unitPrice, :totalPrice)`,
+      `INSERT INTO cart_items (
+        cart_id, product_id, plan_id, variant_id, quantity,
+        unit_price, extra_price, tax_amount, discount_amount, total_price
+      ) VALUES (
+        :cartId, :productId, :planId, :variantId, :quantity,
+        :unitPrice, :extraPrice, :taxAmount, :discountAmount, :totalPrice
+      )`,
       {
         cartId,
         productId,
@@ -62,18 +126,43 @@ export const cartRepository = {
         variantId,
         quantity,
         unitPrice,
+        extraPrice,
+        taxAmount,
+        discountAmount,
         totalPrice
       }
     );
     return res.insertId;
   },
 
-  async updateLineQuantity(cartItemId: number, quantity: number, unitPrice: number): Promise<void> {
-    const total = unitPrice * quantity;
+  async updateLinePricing(
+    cartItemId: number,
+    fields: {
+      product_id: number;
+      plan_id: number;
+      variant_id: number | null;
+      quantity: number;
+      unit_price: number;
+      extra_price: number;
+      tax_amount: number;
+      discount_amount: number;
+      total_price: number;
+    }
+  ): Promise<void> {
     await pool.query(
-      `UPDATE cart_items SET quantity = :quantity, total_price = :total, updated_at = CURRENT_TIMESTAMP
-       WHERE cart_item_id = :cartItemId`,
-      { quantity, total, cartItemId }
+      `UPDATE cart_items SET
+        product_id = :product_id,
+        plan_id = :plan_id,
+        variant_id = :variant_id,
+        quantity = :quantity,
+        unit_price = :unit_price,
+        extra_price = :extra_price,
+        tax_amount = :tax_amount,
+        discount_amount = :discount_amount,
+        total_price = :total_price,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE cart_item_id = :cartItemId`,
+      { ...fields, cartItemId }
     );
   },
 
@@ -95,15 +184,22 @@ export const cartRepository = {
     return rows.length > 0;
   },
 
-  async getLineForPricing(cartItemId: number, userId: number): Promise<{ unit_price: string } | null> {
-    const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT ci.unit_price FROM cart_items ci
+  async getItemFull(cartItemId: number, userId: number): Promise<CartItemFullRow | null> {
+    const [rows] = await pool.query<CartItemFullRow[]>(
+      `SELECT ci.* FROM cart_items ci
        INNER JOIN carts c ON c.cart_id = ci.cart_id AND c.user_id = :userId AND c.status = 'ACTIVE'
        WHERE ci.cart_item_id = :cartItemId LIMIT 1`,
       { cartItemId, userId }
     );
-    const r = rows[0];
-    return r ? { unit_price: String(r.unit_price) } : null;
+    return rows[0] ?? null;
+  },
+
+  async listItemsRaw(cartId: number): Promise<CartItemFullRow[]> {
+    const [rows] = await pool.query<CartItemFullRow[]>(
+      `SELECT * FROM cart_items WHERE cart_id = :cartId ORDER BY cart_item_id`,
+      { cartId }
+    );
+    return rows;
   },
 
   async listItemsWithDetails(cartId: number): Promise<CartItemRow[]> {
@@ -116,6 +212,9 @@ export const cartRepository = {
         ci.variant_id,
         ci.quantity,
         ci.unit_price,
+        ci.extra_price,
+        ci.tax_amount,
+        ci.discount_amount,
         ci.total_price,
         p.product_name,
         rp.plan_name,
@@ -127,7 +226,7 @@ export const cartRepository = {
       ORDER BY ci.cart_item_id ASC`,
       { cartId }
     );
-    return rows.map((r) => ({
+    return rows.map((r: RowDataPacket) => ({
       cart_item_id: r.cart_item_id,
       cart_id: r.cart_id,
       product_id: r.product_id,
@@ -135,6 +234,9 @@ export const cartRepository = {
       variant_id: r.variant_id,
       quantity: r.quantity,
       unit_price: String(r.unit_price),
+      extra_price: String(r.extra_price),
+      tax_amount: String(r.tax_amount),
+      discount_amount: String(r.discount_amount),
       total_price: String(r.total_price),
       product_name: r.product_name,
       plan_name: r.plan_name,

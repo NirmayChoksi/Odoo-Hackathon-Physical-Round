@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import type { AddCartItemBody, UpdateCartItemBody } from "./cart.types";
+import type { AddCartItemBody, ApplyDiscountBody, UpdateCartItemBody } from "./cart.types";
 
 function num(v: unknown): number | undefined {
   if (v === undefined || v === null || v === "") return undefined;
@@ -35,9 +35,36 @@ export function parseAddCartItem(req: Request): { ok: true; value: AddCartItemBo
 
 export function parseUpdateCartItem(req: Request): { ok: true; value: UpdateCartItemBody } | { ok: false; errors: string[] } {
   const b = req.body as Record<string, unknown>;
+  const errors: string[] = [];
   const quantity = num(b.quantity);
   if (quantity === undefined || !Number.isInteger(quantity) || quantity < 1) {
-    return { ok: false, errors: ["quantity must be a positive integer"] };
+    errors.push("quantity must be a positive integer");
   }
-  return { ok: true, value: { quantity } };
+  const planId = num(b.planId);
+  if (b.planId !== undefined && planId !== undefined && (!Number.isInteger(planId) || planId < 1)) {
+    errors.push("planId must be a positive integer");
+  }
+  let variantId: number | null | undefined = undefined;
+  if (b.variantId !== undefined) {
+    if (b.variantId === null) variantId = null;
+    else {
+      const v = num(b.variantId);
+      if (v === undefined || !Number.isInteger(v) || v < 1) errors.push("variantId must be positive or null");
+      else variantId = v;
+    }
+  }
+  if (errors.length) return { ok: false, errors };
+  const out: UpdateCartItemBody = { quantity: quantity! };
+  if (planId !== undefined) out.planId = planId;
+  if (variantId !== undefined) out.variantId = variantId;
+  return { ok: true, value: out };
+}
+
+export function parseApplyDiscount(req: Request): { ok: true; value: ApplyDiscountBody } | { ok: false; errors: string[] } {
+  const b = req.body as Record<string, unknown>;
+  const raw = b.code ?? b.discountCode;
+  if (typeof raw !== "string" || !raw.trim()) {
+    return { ok: false, errors: ["code is required"] };
+  }
+  return { ok: true, value: { code: raw.trim() } };
 }

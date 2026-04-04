@@ -39,9 +39,13 @@ CREATE TABLE IF NOT EXISTS customers (
   billing_address TEXT,
   shipping_address TEXT,
   tax_number VARCHAR(50),
+  portal_user_id INT NULL,
   status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_customers_portal_user FOREIGN KEY (portal_user_id) REFERENCES users(user_id)
+    ON DELETE SET NULL,
+  UNIQUE KEY uq_customers_portal_user (portal_user_id)
 );
 
 CREATE TABLE IF NOT EXISTS contacts (
@@ -66,6 +70,7 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT,
   image_url VARCHAR(500) NULL,
   short_description VARCHAR(255) NULL,
+  terms_and_conditions TEXT NULL,
   is_recurring BOOLEAN DEFAULT TRUE,
   status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
   created_by INT NULL,
@@ -119,35 +124,6 @@ CREATE TABLE IF NOT EXISTS product_plans (
   CONSTRAINT uq_product_plan UNIQUE (product_id, plan_id)
 );
 
-CREATE TABLE IF NOT EXISTS carts (
-  cart_id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  status ENUM('ACTIVE', 'CHECKED_OUT', 'ABANDONED') DEFAULT 'ACTIVE',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_carts_user FOREIGN KEY (user_id) REFERENCES users(user_id)
-    ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS cart_items (
-  cart_item_id INT AUTO_INCREMENT PRIMARY KEY,
-  cart_id INT NOT NULL,
-  product_id INT NOT NULL,
-  plan_id INT NOT NULL,
-  variant_id INT NULL,
-  quantity INT NOT NULL DEFAULT 1,
-  unit_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-  total_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_cart_items_cart FOREIGN KEY (cart_id) REFERENCES carts(cart_id)
-    ON DELETE CASCADE,
-  CONSTRAINT fk_cart_items_product FOREIGN KEY (product_id) REFERENCES products(product_id),
-  CONSTRAINT fk_cart_items_plan FOREIGN KEY (plan_id) REFERENCES recurring_plans(plan_id),
-  CONSTRAINT fk_cart_items_variant FOREIGN KEY (variant_id) REFERENCES product_variants(variant_id)
-    ON DELETE SET NULL
-);
-
 CREATE TABLE IF NOT EXISTS quotation_templates (
   template_id INT AUTO_INCREMENT PRIMARY KEY,
   template_name VARCHAR(150) NOT NULL,
@@ -175,6 +151,7 @@ CREATE TABLE IF NOT EXISTS taxes (
 CREATE TABLE IF NOT EXISTS discounts (
   discount_id INT AUTO_INCREMENT PRIMARY KEY,
   discount_name VARCHAR(150) NOT NULL,
+  coupon_code VARCHAR(100) NULL,
   discount_type ENUM('FIXED', 'PERCENTAGE') NOT NULL,
   discount_value DECIMAL(12,2) NOT NULL,
   minimum_purchase DECIMAL(12,2) DEFAULT 0.00,
@@ -187,7 +164,65 @@ CREATE TABLE IF NOT EXISTS discounts (
   status ENUM('ACTIVE', 'INACTIVE', 'EXPIRED') DEFAULT 'ACTIVE',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_discounts_created_by FOREIGN KEY (created_by) REFERENCES users(user_id)
+  CONSTRAINT fk_discounts_created_by FOREIGN KEY (created_by) REFERENCES users(user_id),
+  UNIQUE KEY uq_discounts_coupon_code (coupon_code)
+);
+
+CREATE TABLE IF NOT EXISTS user_addresses (
+  address_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  full_name VARCHAR(150) NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  address_line1 VARCHAR(255) NOT NULL,
+  address_line2 VARCHAR(255),
+  city VARCHAR(100) NOT NULL,
+  state VARCHAR(100) NOT NULL,
+  postal_code VARCHAR(20) NOT NULL,
+  country VARCHAR(100) NOT NULL,
+  is_default BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_user_addresses_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS carts (
+  cart_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  status ENUM('ACTIVE', 'CHECKED_OUT', 'ABANDONED') DEFAULT 'ACTIVE',
+  applied_discount_id INT NULL,
+  payment_method VARCHAR(100) NULL,
+  selected_address_id INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_carts_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_carts_discount FOREIGN KEY (applied_discount_id) REFERENCES discounts(discount_id)
+    ON DELETE SET NULL,
+  CONSTRAINT fk_carts_selected_address FOREIGN KEY (selected_address_id) REFERENCES user_addresses(address_id)
+    ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS cart_items (
+  cart_item_id INT AUTO_INCREMENT PRIMARY KEY,
+  cart_id INT NOT NULL,
+  product_id INT NOT NULL,
+  plan_id INT NOT NULL,
+  variant_id INT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  unit_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  extra_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  tax_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  discount_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  total_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_cart_items_cart FOREIGN KEY (cart_id) REFERENCES carts(cart_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_cart_items_product FOREIGN KEY (product_id) REFERENCES products(product_id),
+  CONSTRAINT fk_cart_items_plan FOREIGN KEY (plan_id) REFERENCES recurring_plans(plan_id),
+  CONSTRAINT fk_cart_items_variant FOREIGN KEY (variant_id) REFERENCES product_variants(variant_id)
+    ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS quotation_template_items (
@@ -373,3 +408,8 @@ INSERT IGNORE INTO roles (role_id, role_name, description) VALUES
 (1, 'Admin', 'Full system control and configuration'),
 (2, 'Internal User', 'Limited operational access'),
 (3, 'Portal User', 'Customer/subscriber access');
+
+INSERT INTO discounts (discount_name, coupon_code, discount_type, discount_value, minimum_purchase, minimum_quantity, status)
+SELECT 'Welcome 10', 'SAVE10', 'PERCENTAGE', 10, 0, 1, 'ACTIVE'
+FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM discounts WHERE coupon_code = 'SAVE10' LIMIT 1);

@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import { fail, success } from "../../utils/apiResponse";
-import { getValidatedBody } from "../../middlewares/validate.middleware";
-import type { AddCartItemBody, UpdateCartItemBody } from "./cart.types";
+import { fail, success } from "../../../utils/apiResponse";
+import { getValidatedBody } from "../../../middlewares/validate.middleware";
+import type { AddCartItemBody, ApplyDiscountBody, UpdateCartItemBody } from "./cart.types";
 import { cartService } from "./cart.service";
 
 export const cartController = {
@@ -22,8 +22,8 @@ export const cartController = {
       throw fail("Invalid cartItemId", 400);
     }
     const body = getValidatedBody<UpdateCartItemBody>(req);
-    await cartService.updateQuantity(req.userId!, cartItemId, body.quantity);
-    res.json(success({ cart_item_id: cartItemId, quantity: body.quantity }));
+    await cartService.updateItem(req.userId!, cartItemId, body);
+    res.json(success({ cart_item_id: cartItemId, updated: true }));
   },
 
   async removeItem(req: Request, res: Response): Promise<void> {
@@ -33,6 +33,17 @@ export const cartController = {
     }
     await cartService.removeItem(req.userId!, cartItemId);
     res.json(success({ removed: true, cart_item_id: cartItemId }));
+  },
+
+  async applyDiscount(req: Request, res: Response): Promise<void> {
+    const body = getValidatedBody<ApplyDiscountBody>(req);
+    const r = await cartService.applyDiscount(req.userId!, body.code);
+    res.json(success(r));
+  },
+
+  async removeDiscount(req: Request, res: Response): Promise<void> {
+    await cartService.removeDiscount(req.userId!);
+    res.json(success({ removed: true }));
   },
 
   async count(req: Request, res: Response): Promise<void> {

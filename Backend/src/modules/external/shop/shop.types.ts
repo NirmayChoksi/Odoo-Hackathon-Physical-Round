@@ -44,6 +44,7 @@ export interface ProductPlan {
 }
 
 export interface ShopProductDetail extends ShopProduct {
+  terms_and_conditions: string | null;
   variants: Array<{
     variant_id: number;
     attribute_name: string;

@@ -16,5 +16,17 @@ export const shopService = {
 
   getProductPlans(productId: number) {
     return shopRepository.getPlansForProduct(productId);
+  },
+
+  getProductVariants(productId: number) {
+    return shopRepository.listVariants(productId);
+  },
+
+  listFeatured(limit?: number) {
+    return shopRepository.listFeatured(limit ?? 8);
+  },
+
+  getProductImages(productId: number) {
+    return shopRepository.getProductImages(productId);
   }
 };
