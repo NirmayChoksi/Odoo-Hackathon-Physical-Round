@@ -7,7 +7,6 @@ import { CheckoutComponent } from './external/checkout/checkout';
 import { AccountComponent } from './external/account/account';
 
 export const routes: Routes = [
-<<<<<<< Updated upstream
   { path: 'login', loadComponent: () => import('./auth/login/login').then(m => m.Login) },
   { path: 'signup', loadComponent: () => import('./auth/signup/signup').then(m => m.Signup) },
   { path: 'reset-password', loadComponent: () => import('./auth/reset-password/reset-password').then(m => m.ResetPassword) },
@@ -16,13 +15,11 @@ export const routes: Routes = [
   { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
-=======
-  { path: '',         component: HomeComponent },
-  { path: 'shop',     component: ShopComponent },
+  { path: '', component: HomeComponent },
+  { path: 'shop', component: ShopComponent },
   { path: 'shop/:id', component: ProductComponent },
-  { path: 'cart',     component: CartComponent },
+  { path: 'cart', component: CartComponent },
   { path: 'checkout', component: CheckoutComponent },
-  { path: 'account',  component: AccountComponent },
-  { path: '**',       redirectTo: '' }
->>>>>>> Stashed changes
+  { path: 'account', component: AccountComponent },
+  { path: '**', redirectTo: '' }
 ];
