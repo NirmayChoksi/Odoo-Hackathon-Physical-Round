@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar';
-import { CartService } from '../services/cart.service';
+import { CartService, CartItem } from '../services/cart.service';
 import { ButtonComponent } from '../../components/button/button';
 import { InputComponent } from '../../components/input/input';
 import { ecommerceCommands } from '../ecommerce-navigation';
@@ -32,6 +32,8 @@ export class CheckoutComponent implements OnInit {
   finalTotal = signal(0);
   finalSubtotal = signal(0);
   finalTaxes = signal(0);
+  finalDiscountAmount = signal(0);
+  finalItems = signal<CartItem[]>([]);
 
   get items() { return this.cartService.items; }
   get subtotal() { return this.cartService.subtotal; }
@@ -52,12 +54,18 @@ export class CheckoutComponent implements OnInit {
     this.step.set('payment');
   }
 
+  goToOrder() {
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'order', this.finalOrderNumber()));
+  }
+
   processPayment() {
     // Snapshot the order values
     this.finalOrderNumber.set('S' + Math.floor(Math.random() * 10000).toString().padStart(4, '0'));
     this.finalSubtotal.set(this.subtotal());
     this.finalTaxes.set(this.taxes());
     this.finalTotal.set(this.total());
+    this.finalDiscountAmount.set(this.cartService.discountAmount());
+    this.finalItems.set([...this.items()]);
 
     // Clear cart and go to success
     this.cartService.clearCart();
