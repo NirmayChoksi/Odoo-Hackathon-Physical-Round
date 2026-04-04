@@ -27,7 +27,7 @@
                 <span class="cart-item__variant">Variant: {{ item.variantName }}</span>
               }
               <span class="cart-item__plan">Plan: {{ item.planDuration }}</span>
-              <app-button variant="ghost" size="sm" label="Remove" (click)="removeItem(item.id)"></app-button>
+              <button type="button" class="sf-btn sf-btn--ghost sf-btn--sm" (click)="removeItem(item.id)">Remove</button>
             </div>
 
             <div class="cart-item__actions">
@@ -65,8 +65,8 @@
         </div>
 
         <div class="discount-form">
-          <app-input placeholder="Discount code" [value]="discountCode" (valueChange)="onDiscountInput($event)"></app-input>
-          <app-button variant="secondary" label="Apply" (click)="applyDiscount()"></app-button>
+          <input type="text" class="sf-control" placeholder="Discount code" [value]="discountCode" (input)="onDiscountInput($any($event.target).value)" />
+          <button type="button" class="sf-btn sf-btn--outline" (click)="applyDiscount()">Apply</button>
         </div>
         
         @if (discountMessage) {
@@ -74,7 +74,7 @@
         }
 
         <div style="margin-top: 24px;">
-          <app-button variant="primary" [fullWidth]="true" size="lg" label="Checkout" (click)="goToCheckout()"></app-button>
+          <button type="button" class="sf-btn sf-btn--primary sf-btn--full sf-btn--lg" (click)="goToCheckout()">Checkout</button>
         </div>
       </div>
     </div>
@@ -85,7 +85,7 @@
       <h2>Your cart is empty</h2>
       <p>Looks like you haven't added any products to your cart yet.</p>
       <div style="margin-top:24px">
-        <app-button variant="primary" label="Continue Shopping" (click)="continueShopping()"></app-button>
+        <button type="button" class="sf-btn sf-btn--primary" (click)="continueShopping()">Continue Shopping</button>
       </div>
     </div>
   }
