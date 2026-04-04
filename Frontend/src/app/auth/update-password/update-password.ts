@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { AuthStore } from '../auth.store';
 
 @Component({
   selector: 'app-update-password',
@@ -13,6 +14,7 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 export class UpdatePassword {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private authStore = inject(AuthStore);
 
   password = signal('');
   confirmPassword = signal('');
@@ -59,20 +61,29 @@ export class UpdatePassword {
 
     if (!this.formValid) return;
 
+    const token = this.route.snapshot.queryParamMap.get('token');
+    const email = this.route.snapshot.queryParamMap.get('email');
+
+    if (!token || !email) {
+      this.errorMessage.set('Invalid or missing password reset token.');
+      return;
+    }
+
     this.isLoading.set(true);
     try {
-      // Simulate network request to update password
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const res = await this.authStore.verifyReset(email, token, this.password());
       
-      this.successMessage.set('Password successfully updated!');
-      
-      // Redirect to login after a short delay
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 2000);
+      if (res.success) {
+        this.successMessage.set('Password successfully updated!');
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      } else {
+        this.errorMessage.set(res.error || 'Failed to update password');
+      }
 
     } catch (e) {
-      this.errorMessage.set('Failed to update password');
+      this.errorMessage.set('An unexpected error occurred. Failed to update password');
     } finally {
       this.isLoading.set(false);
     }

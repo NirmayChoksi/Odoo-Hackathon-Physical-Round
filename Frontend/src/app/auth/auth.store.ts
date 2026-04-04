@@ -95,6 +95,23 @@ export const AuthStore = signalStore(
         return { success: false, error: errorMsg };
       }
     },
+    async verifyReset(email: string, token: string, newPassword: string): Promise<{success: boolean, error?: string}> {
+      patchState(store, { isLoading: true, error: null });
+      try {
+        await firstValueFrom(
+          http.post<any>('/api/auth/verify-reset', { email, token, newPassword })
+        );
+        patchState(store, { isLoading: false });
+        return { success: true };
+      } catch (err) {
+        let errorMsg = 'Failed to update password';
+        if (err instanceof HttpErrorResponse) {
+          errorMsg = err.error?.error || err.error?.message || err.error || err.message;
+        }
+        patchState(store, { error: errorMsg, isLoading: false });
+        return { success: false, error: errorMsg };
+      }
+    },
     
     logout() {
       localStorage.removeItem('token');
