@@ -19,14 +19,14 @@ export class ProductComponent implements OnInit {
   private router = inject(Router);
   public cartService = inject(CartService);
   public productStore = inject(ProductStore);
-  
+
   readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
 
   selectedImageIndex = signal(0);
-  selectedPlanIndex  = signal(0);
-  selectedVariant    = signal<ProductVariant | null>(null);
-  quantity           = signal(1);
-  addedToCart        = signal(false);
+  selectedPlanIndex = signal(0);
+  selectedVariant = signal<ProductVariant | null>(null);
+  quantity = signal(1);
+  addedToCart = signal(false);
 
   /** Per-unit price: plan price + variant extra. Falls back to display_price when no plans. */
   currentPrice = computed(() => {
@@ -57,17 +57,17 @@ export class ProductComponent implements OnInit {
       : '/api/external/shop';
   }
 
-  constructor() {}
+  constructor() { }
 
   async ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     await this.productStore.loadProduct(this.apiTargetBase(), id);
-    
+
     const variants = this.productStore.variants();
     if (variants.length > 0) {
       this.selectedVariant.set(variants[0]);
     }
-    
+
     const plans = this.productStore.plans();
     const defaultPlanIndex = plans.findIndex(p => p.is_default);
     if (defaultPlanIndex !== -1) {
@@ -75,8 +75,16 @@ export class ProductComponent implements OnInit {
     }
   }
 
-  selectImage(i: number)   { this.selectedImageIndex.set(i); }
-  selectPlan(i: number)    { this.selectedPlanIndex.set(i); }
+  selectImage(i: number) { this.selectedImageIndex.set(i); }
+  prevImage() {
+    const imgs = this.productStore.images();
+    this.selectedImageIndex.update(i => (i > 0 ? i - 1 : imgs.length - 1));
+  }
+  nextImage() {
+    const imgs = this.productStore.images();
+    this.selectedImageIndex.update(i => (i < imgs.length - 1 ? i + 1 : 0));
+  }
+  selectPlan(i: number) { this.selectedPlanIndex.set(i); }
   selectVariant(v: ProductVariant) { this.selectedVariant.set(v); }
   increment() { this.quantity.update(q => q + 1); }
   decrement() { this.quantity.update(q => (q > 1 ? q - 1 : 1)); }
@@ -84,7 +92,7 @@ export class ProductComponent implements OnInit {
   addToCart() {
     const product = this.productStore.product();
     if (!product) return;
-    
+
     const plans = this.productStore.plans();
     const plan = plans[this.selectedPlanIndex()];
     const imgUrl = this.productStore.images()[0] || 'https://placehold.co/600x400/e2e8f0/64748b?text=Product';

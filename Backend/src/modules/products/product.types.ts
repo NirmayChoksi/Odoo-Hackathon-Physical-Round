@@ -7,7 +7,7 @@ export interface ProductRow extends RowDataPacket {
   sales_price: string;
   cost_price: string;
   description: string | null;
-  image_url: string | null;
+  image_urls: string | null;
   short_description: string | null;
   is_recurring: 0 | 1;
   status: string;

@@ -15,7 +15,7 @@ interface ProductListRow extends RowDataPacket {
   product_type: string;
   sales_price: string;
   short_description: string | null;
-  image_url: string | null;
+  image_urls: string | null;
   description: string | null;
   terms_and_conditions?: string | null;
   default_plan_id: number | null;
@@ -80,7 +80,7 @@ export const shopRepository = {
         p.product_type,
         p.sales_price,
         p.short_description,
-        p.image_url,
+        p.image_urls,
         p.description,
         rp.plan_id AS default_plan_id,
         rp.plan_name AS default_plan_name,
@@ -107,7 +107,7 @@ export const shopRepository = {
       product_type: r.product_type,
       sales_price: r.sales_price,
       short_description: r.short_description,
-      image_url: r.image_url,
+      image_urls: r.image_urls ? r.image_urls.split(',') : [],
       description: r.description,
       default_plan_id: r.default_plan_id,
       default_plan_name: r.default_plan_name,
@@ -163,7 +163,7 @@ export const shopRepository = {
         p.product_type,
         p.sales_price,
         p.short_description,
-        p.image_url,
+        p.image_urls,
         p.description,
         p.terms_and_conditions,
         rp.plan_id AS default_plan_id,
@@ -196,7 +196,7 @@ export const shopRepository = {
       product_type: p.product_type,
       sales_price: p.sales_price,
       short_description: p.short_description,
-      image_url: p.image_url,
+      image_urls: p.image_urls ? p.image_urls.split(',') : [],
       description: p.description,
       default_plan_id: p.default_plan_id,
       default_plan_name: p.default_plan_name,
@@ -264,7 +264,7 @@ export const shopRepository = {
         p.product_type,
         p.sales_price,
         p.short_description,
-        p.image_url,
+        p.image_urls,
         p.description,
         rp.plan_id AS default_plan_id,
         rp.plan_name AS default_plan_name,
@@ -290,7 +290,7 @@ export const shopRepository = {
       product_type: r.product_type,
       sales_price: r.sales_price,
       short_description: r.short_description,
-      image_url: r.image_url,
+      image_urls: r.image_urls ? r.image_urls.split(',') : [],
       description: r.description,
       default_plan_id: r.default_plan_id,
       default_plan_name: r.default_plan_name,

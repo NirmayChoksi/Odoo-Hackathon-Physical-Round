@@ -33,7 +33,7 @@ export interface ShopProductDetail {
   product_type: string;
   sales_price: string;
   short_description: string | null;
-  image_url: string | null;
+  image_urls: string[] | null;
   description: string | null;
   default_plan_id: number | null;
   default_plan_name: string | null;
@@ -100,8 +100,8 @@ export const ProductStore = signalStore(
           .filter((u): u is string => !!u);
         const images = rawImgs.length > 0
           ? rawImgs
-          : product.image_url
-            ? [product.image_url]
+          : product.image_urls
+            ? product.image_urls
             : [PLACEHOLDER_IMG];
 
         updateState(store, '[Product] Load Success', {

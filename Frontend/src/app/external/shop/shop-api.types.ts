@@ -23,7 +23,7 @@ export interface ShopProductRow {
   product_type: string;
   sales_price: string;
   short_description: string | null;
-  image_url: string | null;
+  image_urls: string[] | null;
   description: string | null;
   default_plan_id: number | null;
   default_plan_name: string | null;
@@ -79,13 +79,13 @@ export function toShopProductCard(row: ShopProductRow): ShopProductCard {
   const display = Number.parseFloat(String(row.display_price));
   const fallback = Number.parseFloat(String(row.sales_price));
   const price = Number.isFinite(display) ? display : Number.isFinite(fallback) ? fallback : 0;
-  const img = row.image_url?.trim();
+  const img = row.image_urls ? row.image_urls : [SHOP_PLACEHOLDER_IMAGE];
   return {
     id: row.product_id,
     name: row.product_name,
     category: row.product_type,
     description: row.short_description?.trim() || row.description?.trim() || '',
-    images: img ? [img] : [SHOP_PLACEHOLDER_IMAGE],
+    images: img,
     displayPrice: price,
     billingPeriodLabel: row.billing_period,
     planName: row.default_plan_name,

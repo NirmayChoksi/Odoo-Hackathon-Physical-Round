@@ -18,7 +18,7 @@ export interface ShopProduct {
   product_type: string;
   sales_price: string;
   short_description: string | null;
-  image_url: string | null;
+  image_urls: string[] | null;
   description: string | null;
   default_plan_id: number | null;
   default_plan_name: string | null;
