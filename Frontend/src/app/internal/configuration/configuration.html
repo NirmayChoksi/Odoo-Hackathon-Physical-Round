@@ -1,0 +1,104 @@
+<div class="internal-container">
+
+  <nav class="internal-nav">
+    <div class="nav-brand">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
+    </div>
+    <div class="nav-links">
+      @for (item of navItems(); track item.label) {
+        @if (item.isDropdown) {
+          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
+            <button
+              type="button"
+              class="nav-link nav-dropdown-btn"
+              [class.nav-link--active]="item.active"
+              (click)="toggleConfig($event)">
+              {{ item.label }}
+              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
+            </button>
+            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
+              @for (sub of item.dropdownItems; track sub.label) {
+                <a [routerLink]="sub.path" class="dropdown-item" [class.dropdown-item--current]="sub.path === '/configuration'">
+                  {{ sub.label }}
+                </a>
+              }
+            </div>
+          </div>
+        } @else {
+          <a
+            [routerLink]="item.path"
+            class="nav-link"
+            [class.nav-link--active]="item.active"
+            (click)="onNavClick(item)">
+            {{ item.label }}
+          </a>
+        }
+      }
+    </div>
+    <div class="nav-profile">
+      <a routerLink="/login" class="profile-btn">
+        <span class="material-symbols-outlined">person</span>
+        My Profile
+      </a>
+    </div>
+  </nav>
+
+  <main class="internal-content">
+    <div class="action-bar">
+      <div class="action-left">
+        <a class="btn-new" routerLink="/attribute/new">
+          <span class="material-symbols-outlined">add</span>
+          New
+        </a>
+        <div class="action-icons">
+          <button type="button" class="icon-btn" (click)="onDelete()" title="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+          <button type="button" class="icon-btn" (click)="onGridAction()" title="Filter">
+            <span class="material-symbols-outlined">tune</span>
+          </button>
+        </div>
+      </div>
+      <div class="action-search-wrap">
+        <div class="search-bar search-bar--mockup">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="search bar"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)" />
+        </div>
+      </div>
+      <div class="action-right-spacer" aria-hidden="true"></div>
+    </div>
+
+    <div class="config-panel">
+      <div class="config-panel-inner">
+        <table class="config-grid-table" aria-label="Configuration list">
+          <thead>
+            <tr>
+              <th class="col-check"></th>
+              <th>Attribute Name</th>
+              <th>Value</th>
+              <th>Extra price</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredRows(); track row.id) {
+              <tr>
+                <td class="col-check"><input type="checkbox" /></td>
+                <td>{{ row.attributeName }}</td>
+                <td>{{ row.value }}</td>
+                <td>{{ row.extraPrice }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="config-hint">
+        For example: attribute name is <strong>brand</strong>, value is <strong>color</strong>, along with extra price.
+      </p>
+    </div>
+  </main>
+</div>

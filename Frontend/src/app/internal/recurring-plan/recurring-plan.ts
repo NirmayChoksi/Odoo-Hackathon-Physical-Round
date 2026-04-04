@@ -14,11 +14,24 @@ export class RecurringPlanComponent {
 
   // Navigation State
   navItems = signal([
-    { label: 'Subscriptions', active: false },
-    { label: 'Products', active: false },
-    { label: 'Reporting', active: false },
-    { label: 'Users/Contacts', active: false },
-    { label: 'Recurring Plan', active: true }
+    { label: 'Subscriptions', active: false, path: '/subscriptions' },
+    { label: 'Products', active: false, path: '/products' },
+    { label: 'Reporting', active: false, path: '/reporting' },
+    { label: 'Users/Contacts', active: false, path: '/users' },
+    { 
+      label: 'Configuration', 
+      active: true, 
+      isDropdown: true,
+      dropdownItems: [
+        { label: 'Overview', path: '/configuration' },
+        { label: 'Attribute', path: '/attribute' },
+        { label: 'Recurring Plan', path: '/recurring-plan' },
+        { label: 'Quotation Template', path: '/quotation-template' },
+        { label: 'Payment term', path: '/payment-term' },
+        { label: 'Discount', path: '/discount' },
+        { label: 'Taxes', path: '/taxes' }
+      ]
+    }
   ]);
 
   // Form State
@@ -38,6 +51,8 @@ export class RecurringPlanComponent {
     { product: 'demo', variant: '', price: 'eg. 4 rs per week', minQty: '1 qty' }
   ]);
 
+  isConfigOpen = signal(false);
+
   onNew() {
     alert('Create New Plan');
   }
@@ -48,6 +63,18 @@ export class RecurringPlanComponent {
 
   onSave() {
     alert('Save Plan');
+  }
+
+  toggleConfig(event: Event) {
+    event.stopPropagation();
+    this.isConfigOpen.set(!this.isConfigOpen());
+  }
+
+  // Close dropdown when clicking elsewhere
+  constructor() {
+    window.addEventListener('click', () => {
+      this.isConfigOpen.set(false);
+    });
   }
 
   onSubscriptionClick() {

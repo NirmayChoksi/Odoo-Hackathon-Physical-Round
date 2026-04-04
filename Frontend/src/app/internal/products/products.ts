@@ -1,30 +1,26 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-discount',
+  selector: 'app-products',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterLink, 
-    FormsModule
-  ],
-  templateUrl: './discount.html',
-  styleUrl: './discount.css'
+  imports: [CommonModule, RouterLink, FormsModule],
+  templateUrl: './products.html',
+  styleUrl: './products.css'
 })
-export class DiscountComponent {
-  
+export class ProductsComponent {
+
   // Navigation State
   navItems = signal([
     { label: 'Subscriptions', active: false, path: '/subscriptions' },
-    { label: 'Products', active: false, path: '/products' },
+    { label: 'Products', active: true, path: '/products' },
     { label: 'Reporting', active: false, path: '/reporting' },
     { label: 'Users/Contacts', active: false, path: '/users' },
     { 
       label: 'Configuration', 
-      active: true, 
+      active: false, 
       isDropdown: true,
       dropdownItems: [
         { label: 'Overview', path: '/configuration' },
@@ -39,29 +35,23 @@ export class DiscountComponent {
   ]);
 
   // Form State
-  discountName = signal<string>('');
-  discountType = signal<string>('Percentage');
-  minimumPurchase = signal<number | null>(null);
-  minimumQuantity = signal<number | null>(null);
-  products = signal<string>('');
-  
-  startDate = signal<string>('');
-  endDate = signal<string>('');
-  limitUsage = signal<boolean>(false);
-  limitUsageCount = signal<number | null>(null);
+  productName = signal<string>('');
+  salesPrice = signal<number | null>(null);
+  category = signal<string>('Services');
+  internalReference = signal<string>('');
 
-  discountTypes = ['Fixed Price', 'Percentage'];
+  categories = ['Services', 'Consumable', 'Storable Product'];
 
   onNew() {
-    alert('Create New Discount');
+    alert('Create New Product');
   }
 
   onDelete() {
-    alert('Delete Discount');
+    alert('Delete Product');
   }
 
   onSave() {
-    alert('Save Discount');
+    alert('Save Product');
   }
 
   isConfigOpen = signal(false);

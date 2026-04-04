@@ -30,7 +30,7 @@ export class BadgeComponent {
     switch (this.variant()) {
       case 'success': return 'bg-green-400';
       case 'warning': return 'bg-yellow-400';
-      case 'error': return 'bg-red-400';
+      case 'error': return 'bg-[#f1916d]';
       case 'info': return 'bg-blue-400';
       default: return 'bg-primary';
     }
@@ -58,7 +58,7 @@ export class BadgeComponent {
         classes += '!bg-yellow-400/10 !text-yellow-400 border !border-yellow-400/20 ';
         break;
       case 'error':
-        classes += '!bg-error-container !text-on-error-container border !border-error/20 ';
+        classes += '!bg-[#f1916d]/15 !text-[#f1916d] border !border-[#f1916d]/35 ';
         break;
       case 'info':
         classes += '!bg-blue-400/10 !text-blue-400 border !border-blue-400/20 ';

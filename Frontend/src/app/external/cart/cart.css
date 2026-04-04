@@ -146,7 +146,6 @@
   padding: 32px;
   border-radius: var(--shape-corner-large);
   border: 1px solid var(--color-primary);
-  /* The wireframe shows a red border for the box */
 }
 .summary-row {
   display: flex;
@@ -156,7 +155,7 @@
   color: var(--color-on-surface);
 }
 .summary-row--discount {
-  color: #ff5252; /* red error/discount */
+  color: var(--color-primary);
 }
 .summary-divider {
   height: 1px;
@@ -178,7 +177,7 @@
 .discount-msg {
   font-size: 0.85rem;
   margin-top: 8px;
-  color: #ff5252;
+  color: var(--color-primary);
 }
 .discount-msg--success {
   color: #4caf50;

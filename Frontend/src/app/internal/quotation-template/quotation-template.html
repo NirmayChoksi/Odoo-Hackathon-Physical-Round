@@ -7,9 +7,25 @@
     </div>
     <div class="nav-links">
       @for(item of navItems(); track item.label) {
-        <a href="#" class="nav-link" [class.nav-link--active]="item.active">
-          {{ item.label }}
-        </a>
+        @if(item.isDropdown) {
+          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
+            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active" (click)="toggleConfig($event)">
+              {{ item.label }}
+              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
+            </button>
+            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
+              @for(sub of item.dropdownItems; track sub.label) {
+                <a [routerLink]="sub.path" class="dropdown-item">
+                  {{ sub.label }}
+                </a>
+              }
+            </div>
+          </div>
+        } @else {
+          <a [routerLink]="item.path" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item)">
+            {{ item.label }}
+          </a>
+        }
       }
     </div>
     <div class="nav-profile">
@@ -26,29 +42,31 @@
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="action-left">
-        <button class="btn-new" (click)="onNew()">
-          <span class="material-symbols-outlined">add</span>
+        <button type="button" class="btn-new" (click)="onNew()">
           New
         </button>
         <div class="action-icons">
-          <button class="icon-btn" (click)="onDelete()" title="Delete">
+          <button type="button" class="icon-btn" (click)="onDelete()" title="Delete">
             <span class="material-symbols-outlined">delete</span>
           </button>
-          <button class="icon-btn" (click)="onSave()" title="Save">
+          <button type="button" class="icon-btn" (click)="onSave()" title="Save">
             <span class="material-symbols-outlined">save</span>
           </button>
         </div>
       </div>
       <div class="action-right">
-        <div class="breadcrumbs">
-          <span class="breadcrumb-item">Subscription</span>
+        <div class="search-box">
+          <span class="material-symbols-outlined">search</span>
+          <input type="text" placeholder="Search quotation templates..." />
         </div>
       </div>
     </div>
 
     <!-- Quotation Template Form Container -->
     <div class="form-container">
-      <h2 class="form-title">Quotation Template</h2>
+      <div class="title-group">
+        <input type="text" class="title-input" placeholder="Template Name" [ngModel]="'Quotation Template'" />
+      </div>
       
       <div class="form-content">
         <div class="form-group row-group">
@@ -85,13 +103,13 @@
       </div>
 
       <!-- Products Table -->
-      <div class="data-container mt-4">
+      <div class="table-wrapper">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Product</th>
-              <th>Description</th>
-              <th>Quantity</th>
+              <th class="table-header">Product</th>
+              <th class="table-header">Description</th>
+              <th class="table-header">Quantity</th>
             </tr>
           </thead>
           <tbody>

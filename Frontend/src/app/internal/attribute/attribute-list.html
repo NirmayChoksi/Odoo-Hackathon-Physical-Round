@@ -1,5 +1,5 @@
 <div class="internal-container">
-  
+
   <!-- Navigation Header -->
   <nav class="internal-nav">
     <div class="nav-brand">
@@ -29,7 +29,7 @@
       }
     </div>
     <div class="nav-profile">
-      <a [routerLink]="accountLink()" class="profile-btn">
+      <a routerLink="/login" class="profile-btn">
         <span class="material-symbols-outlined">person</span>
         My Profile
       </a>
@@ -38,76 +38,56 @@
 
   <!-- Main Content Body -->
   <main class="internal-content">
-    
+
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="action-left">
-        <button class="btn-new" (click)="onNewSubscription()">
+        <button class="btn-new" routerLink="/attribute/new">
           <span class="material-symbols-outlined">add</span>
           New
         </button>
         <div class="action-icons">
-          <button class="icon-btn" (click)="onDelete()" title="Delete">
+          <button class="icon-btn" title="Delete">
             <span class="material-symbols-outlined">delete</span>
           </button>
-          <button class="icon-btn" (click)="onSettings()" title="Configuration">
-            <span class="material-symbols-outlined">settings</span>
+          <button class="icon-btn" title="Save">
+            <span class="material-symbols-outlined">save</span>
           </button>
         </div>
       </div>
       <div class="action-right">
-        <div class="search-box">
-          <span class="material-symbols-outlined">search</span>
+        <div class="search-bar">
+          <span class="material-symbols-outlined search-icon">search</span>
           <input 
             type="text" 
-            placeholder="Search subscriptions, customers..." 
-            (input)="onSearch($event)"
-            title="Search bar" />
+            placeholder="search bar" 
+            class="search-input"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)" />
         </div>
       </div>
     </div>
 
-    <!-- Data Table Container -->
-    <div class="data-container">
-      <table class="data-table">
+    <!-- Attribute List Table -->
+    <div class="table-wrapper">
+      <table class="list-table">
         <thead>
           <tr>
-            <th class="col-check"><input type="checkbox" /></th>
-            <th>Number</th>
-            <th>Customer</th>
-            <th>Next Invoice</th>
-            <th>Recurring</th>
-            <th>Plan</th>
-            <th>Status</th>
+            <th class="checkbox-cell"><input type="checkbox" /></th>
+            <th class="table-header">Name</th>
+            <th class="table-header">Values</th>
           </tr>
         </thead>
         <tbody>
-          @for(sub of filteredSubscriptions(); track sub.number) {
-            <tr class="data-row">
-              <td class="col-check"><input type="checkbox" /></td>
-              <td class="col-number">{{ sub.number }}</td>
-              <td>{{ sub.customer }}</td>
-              <td>{{ sub.nextInvoice }}</td>
-              <td class="col-recurring">{{ sub.recurring }}</td>
-              <td>
-                <span class="badge-plan">{{ sub.plan }}</span>
-              </td>
-              <td>
-                <span class="status-pill" [attr.data-status]="sub.status">
-                  {{ sub.status }}
-                </span>
-              </td>
+          @for(attr of attributes(); track attr.id) {
+            <tr [routerLink]="['/attribute', attr.id]">
+              <td class="checkbox-cell"><input type="checkbox" (click)="$event.stopPropagation()" /></td>
+              <td class="accent-text">{{ attr.name }}</td>
+              <td>{{ attr.values }}</td>
             </tr>
           }
         </tbody>
       </table>
-      
-      @if(filteredSubscriptions().length === 0) {
-        <div class="empty-state">
-           <span class="material-symbols-outlined emoji">search_off</span>
-           <p>No subscriptions found matching your criteria</p>
-        </div>
-      }
     </div>
 
   </main>

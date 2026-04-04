@@ -42,69 +42,59 @@
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="action-left">
-        <button type="button" class="btn-new" (click)="onNew()">
+        <button class="btn-new" (click)="onNew()">
           New
         </button>
         <div class="action-icons">
-          <button type="button" class="icon-btn" (click)="onDelete()" title="Delete">
+          <button class="icon-btn" (click)="onDelete()" title="Delete">
             <span class="material-symbols-outlined">delete</span>
           </button>
-          <button type="button" class="icon-btn" (click)="onSave()" title="Save">
+          <button class="icon-btn" (click)="onSave()" title="Save">
             <span class="material-symbols-outlined">save</span>
           </button>
         </div>
       </div>
-      <div class="action-right">
-        <div class="search-box">
-          <span class="material-symbols-outlined">search</span>
-          <input type="text" placeholder="Search taxes..." />
-        </div>
-      </div>
     </div>
 
-    <!-- Tax Form Container -->
+    <!-- Attribute Form Container -->
     <div class="form-container">
 
-      <!-- Tax Name — large editable title -->
+      <!-- Attribute Name — large editable title -->
       <div class="title-group">
         <input
           type="text"
-          id="taxName"
+          id="attributeName"
           class="title-input"
-          placeholder="Tax Name"
-          [ngModel]="taxName()"
-          (ngModelChange)="taxName.set($event)" />
+          placeholder="Attribute Name"
+          [ngModel]="attributeName()"
+          (ngModelChange)="attributeName.set($event)" />
       </div>
 
-      <!-- Fields Section -->
-      <div class="fields-section">
-
-        <!-- Tax Computation Row -->
-        <div class="field-row">
-          <label class="field-label" for="taxComputation">Tax Computation</label>
-          <select
-            id="taxComputation"
-            class="field-select"
-            [value]="taxComputation()"
-            (change)="taxComputation.set($any($event.target).value)">
-            @for(type of computationTypes; track type) {
-              <option [value]="type">{{ type }}</option>
-            }
-          </select>
+      <!-- Values Table Section -->
+      <div class="values-section">
+        <div class="section-label-container">
+          <span class="section-label">Attribute Values</span>
         </div>
-
-        <!-- Amount Row -->
-        <div class="field-row">
-          <label class="field-label" for="taxAmount">Amount</label>
-          <input
-            type="number"
-            id="taxAmount"
-            class="field-input"
-            [ngModel]="amount()"
-            (ngModelChange)="amount.set($event)"
-            placeholder="" />
+        
+        <div class="table-wrapper">
+          <table class="values-table">
+            <thead>
+              <tr>
+                <th class="table-header">Value</th>
+                <th class="table-header">Default Extra Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(row of attributeValues(); track $index) {
+                <tr>
+                  <td><input type="text" [(ngModel)]="row.value" placeholder="e.g. odoo" class="table-input" /></td>
+                  <td><input type="text" [(ngModel)]="row.extraPrice" placeholder="e.g. 20 R.s" class="table-input" /></td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
-
+        <button class="add-row-btn" (click)="addValueRow()">+ Add Value</button>
       </div>
 
     </div>

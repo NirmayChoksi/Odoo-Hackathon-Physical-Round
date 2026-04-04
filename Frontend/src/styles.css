@@ -3,20 +3,49 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 :root {
-  --color-primary: #ffb59a;
-  --color-on-primary: #1a1a1a;
-  --color-secondary: #10b981; /* Emerald/Green for capsules */
-  --color-on-secondary: #ffffff;
+  /* Brand palette */
+  --pal-deep: #03122f;
+  --pal-navy: #19305c;
+  --pal-purple: #413b61;
+  --pal-lavender: #ae7dac;
+  --pal-blush: #f3dadf;
+  --pal-coral: #f1916d;
 
-  --color-surface: #0f1115;
-  --color-on-surface: #f8fafc;
-  --color-on-surface-variant: #94a3b8;
+  --color-primary: #f1916d !important;
+  --color-on-primary: #ffffff !important;
+  --color-secondary: #413b61 !important;
+  --color-on-secondary: #f3dadf !important;
 
-  --color-outline: #334155;
-  --color-outline-variant: #1e293b;
+  --color-sketch-accent: #f1916d;
+  --color-sketch-dotted: rgba(241, 145, 109, 0.4);
+
+  --color-surface: #03122f;
+  --color-on-surface: #f3dadf;
+  --color-on-surface-variant: #ae7dac;
+
+  --color-outline: rgba(174, 125, 172, 0.45);
+  --color-outline-variant: rgba(174, 125, 172, 0.25);
+
+  --color-surface-container-low: #03122f;
+  --color-surface-container: #19305c;
+  --color-surface-container-high: #2a3358;
+  --color-surface-container-highest: #413b61;
+
+  --color-error: #f1916d;
+  --color-on-error: #ffffff;
 
   --font-headline: 'Epilogue', sans-serif;
   --font-body: 'Inter', sans-serif;
+}
+
+@theme {
+  --color-primary: #f1916d;
+  --color-on-primary: #ffffff;
+  --color-secondary: #413b61;
+  --color-surface: #03122f;
+  --color-on-surface: #f3dadf;
+  --color-outline: rgba(174, 125, 172, 0.45);
+  --color-error: #f1916d;
 }
 
 body {
@@ -24,6 +53,110 @@ body {
   background-color: var(--color-surface);
   color: var(--color-on-surface);
   margin: 0;
+}
+
+/* Internal dashboard — same palette as global */
+.internal-container {
+  --pal-deep: #03122f;
+  --pal-navy: #19305c;
+  --pal-purple: #413b61;
+  --pal-lavender: #ae7dac;
+  --pal-blush: #f3dadf;
+  --pal-coral: #f1916d;
+
+  --color-primary: #f1916d;
+  --color-on-primary: #ffffff;
+  --color-background: #03122f;
+  --color-surface-low: #19305c;
+  --color-surface-mid: #413b61;
+  --color-text: #f3dadf;
+  --color-outline: rgba(174, 125, 172, 0.45);
+  --color-outline-variant: rgba(174, 125, 172, 0.28);
+  --color-sketch-green: #4ade80;
+  --color-sketch-dotted: rgba(241, 145, 109, 0.35);
+
+  --color-on-surface: #f3dadf;
+  --color-on-surface-variant: #ae7dac;
+
+  --color-surface-container-low: #19305c;
+  --color-surface-container: #1f2850;
+  --color-surface-container-high: #2a3358;
+  --color-surface-container-highest: #413b61;
+
+  --font-label: var(--font-body);
+}
+
+/* Header: logo left, nav tabs grouped center-right, profile flush right */
+.internal-container .internal-nav {
+  justify-content: flex-start;
+}
+
+.internal-container .nav-brand {
+  flex-shrink: 0;
+}
+
+.internal-container .nav-links {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: 0;
+  min-width: 0;
+}
+
+.internal-container .nav-profile {
+  flex-shrink: 0;
+  margin-left: 0;
+  padding-left: 1rem;
+}
+
+.internal-container .profile-btn {
+  color: #ffffff;
+  border-color: rgba(241, 145, 109, 0.55);
+  background: var(--color-surface-container-highest);
+}
+
+.internal-container .profile-btn .material-symbols-outlined {
+  color: var(--color-primary);
+}
+
+/* Action bar search (Subscriptions + modules) */
+.internal-container .search-box {
+  position: relative;
+  width: min(360px, 42vw);
+  display: flex;
+  align-items: center;
+}
+
+.internal-container .search-box .material-symbols-outlined {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--color-on-surface-variant);
+  pointer-events: none;
+  font-size: 1.25rem;
+}
+
+.internal-container .search-box input {
+  width: 100%;
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: 9999px;
+  padding: 0.625rem 1rem 0.625rem 2.5rem;
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.internal-container .search-box input::placeholder {
+  color: var(--color-on-surface-variant);
+}
+
+.internal-container .search-box input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface-container-highest);
 }
 
 .material-symbols-outlined {
@@ -34,18 +167,33 @@ body {
     'opsz' 24;
 }
 
-/* Force override Material variables */
-.mat-mdc-flat-button.mat-primary,
+/* Aggressive Force override for Material component themes */
+.mat-mdc-flat-button.mat-primary, 
 .mat-mdc-raised-button.mat-primary,
-.mat-primary {
-  --mdc-flat-button-container-color: #ffb59a !important;
-  --mdc-flat-button-label-text-color: #1a1a1a !important;
-  --mdc-protected-button-container-color: #ffb59a !important;
-  --mdc-protected-button-label-text-color: #1a1a1a !important;
+.mat-mdc-unelevated-button.mat-primary,
+.mat-primary,
+.btn-primary {
+  --mdc-flat-button-container-color: #f1916d !important;
+  --mdc-flat-button-label-text-color: #ffffff !important;
+  --mdc-protected-button-container-color: #f1916d !important;
+  --mdc-protected-button-label-text-color: #ffffff !important;
+  background-color: #f1916d !important;
+  color: #ffffff !important;
 }
 
 .mat-mdc-button.mat-primary {
-  --mdc-text-button-label-text-color: #ffb59a !important;
+  --mdc-text-button-label-text-color: #f1916d !important;
+  color: #f1916d !important;
+}
+
+/* Warn / danger → palette coral (replaces Material red) */
+.mat-mdc-unelevated-button.mat-warn,
+.mat-mdc-flat-button.mat-warn,
+.mat-mdc-raised-button.mat-warn {
+  --mdc-filled-button-container-color: #f1916d !important;
+  --mdc-filled-button-label-text-color: #ffffff !important;
+  background-color: #f1916d !important;
+  color: #ffffff !important;
 }
 
 /* Navbar Logo Fix */

@@ -4,27 +4,21 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-discount',
+  selector: 'app-configuration',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterLink, 
-    FormsModule
-  ],
-  templateUrl: './discount.html',
-  styleUrl: './discount.css'
+  imports: [CommonModule, RouterLink, FormsModule],
+  templateUrl: './configuration.html',
+  styleUrl: './configuration.css'
 })
-export class DiscountComponent {
-  
-  // Navigation State
+export class ConfigurationComponent {
   navItems = signal([
     { label: 'Subscriptions', active: false, path: '/subscriptions' },
     { label: 'Products', active: false, path: '/products' },
     { label: 'Reporting', active: false, path: '/reporting' },
     { label: 'Users/Contacts', active: false, path: '/users' },
-    { 
-      label: 'Configuration', 
-      active: true, 
+    {
+      label: 'Configuration',
+      active: true,
       isDropdown: true,
       dropdownItems: [
         { label: 'Overview', path: '/configuration' },
@@ -38,31 +32,28 @@ export class DiscountComponent {
     }
   ]);
 
-  // Form State
-  discountName = signal<string>('');
-  discountType = signal<string>('Percentage');
-  minimumPurchase = signal<number | null>(null);
-  minimumQuantity = signal<number | null>(null);
-  products = signal<string>('');
-  
-  startDate = signal<string>('');
-  endDate = signal<string>('');
-  limitUsage = signal<boolean>(false);
-  limitUsageCount = signal<number | null>(null);
+  searchQuery = signal('');
 
-  discountTypes = ['Fixed Price', 'Percentage'];
+  /** Mock rows — mockup example: attribute name brand, value color, extra price */
+  rows = signal([
+    { id: '1', attributeName: 'brand', value: 'color', extraPrice: '20 R.s' },
+    { id: '2', attributeName: '', value: '', extraPrice: '' },
+    { id: '3', attributeName: '', value: '', extraPrice: '' },
+    { id: '4', attributeName: '', value: '', extraPrice: '' },
+    { id: '5', attributeName: '', value: '', extraPrice: '' },
+    { id: '6', attributeName: '', value: '', extraPrice: '' }
+  ]);
 
-  onNew() {
-    alert('Create New Discount');
-  }
-
-  onDelete() {
-    alert('Delete Discount');
-  }
-
-  onSave() {
-    alert('Save Discount');
-  }
+  filteredRows = computed(() => {
+    const q = this.searchQuery().trim().toLowerCase();
+    if (!q) return this.rows();
+    return this.rows().filter(
+      r =>
+        r.attributeName.toLowerCase().includes(q) ||
+        r.value.toLowerCase().includes(q) ||
+        r.extraPrice.toLowerCase().includes(q)
+    );
+  });
 
   isConfigOpen = signal(false);
 
@@ -77,8 +68,16 @@ export class DiscountComponent {
     });
   }
 
-  onNavClick(item: any) {
+  onNavClick(item: { label: string }) {
     const items = this.navItems().map(i => ({ ...i, active: i.label === item.label }));
     this.navItems.set(items);
+  }
+
+  onDelete() {
+    /* placeholder */
+  }
+
+  onGridAction() {
+    /* placeholder — mockup secondary toolbar icon */
   }
 }

@@ -42,68 +42,80 @@
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="action-left">
-        <button type="button" class="btn-new" (click)="onNew()">
+        <button class="btn-new" (click)="onNew()">
+          <span class="material-symbols-outlined">add</span>
           New
         </button>
         <div class="action-icons">
-          <button type="button" class="icon-btn" (click)="onDelete()" title="Delete">
+          <button class="icon-btn" (click)="onDelete()" title="Delete">
             <span class="material-symbols-outlined">delete</span>
           </button>
-          <button type="button" class="icon-btn" (click)="onSave()" title="Save">
+          <button class="icon-btn" (click)="onSave()" title="Save">
             <span class="material-symbols-outlined">save</span>
           </button>
         </div>
       </div>
-      <div class="action-right">
-        <div class="search-box">
-          <span class="material-symbols-outlined">search</span>
-          <input type="text" placeholder="Search taxes..." />
-        </div>
-      </div>
     </div>
 
-    <!-- Tax Form Container -->
+    <!-- Product Form Container -->
     <div class="form-container">
 
-      <!-- Tax Name — large editable title -->
+      <!-- Product Name — large editable title -->
       <div class="title-group">
         <input
           type="text"
-          id="taxName"
+          id="productName"
           class="title-input"
-          placeholder="Tax Name"
-          [ngModel]="taxName()"
-          (ngModelChange)="taxName.set($event)" />
+          placeholder="Product Name"
+          [ngModel]="productName()"
+          (ngModelChange)="productName.set($event)" />
       </div>
 
       <!-- Fields Section -->
       <div class="fields-section">
 
-        <!-- Tax Computation Row -->
+        <!-- Sales Price -->
         <div class="field-row">
-          <label class="field-label" for="taxComputation">Tax Computation</label>
+          <label class="field-label" for="salesPrice">Sales Price</label>
+          <input
+            type="number"
+            id="salesPrice"
+            class="short-input"
+            [ngModel]="salesPrice()"
+            (ngModelChange)="salesPrice.set($event)"
+            placeholder="0.00" />
+        </div>
+
+        <!-- Category -->
+        <div class="field-row">
+          <label class="field-label" for="category">Product Category</label>
           <select
-            id="taxComputation"
-            class="field-select"
-            [value]="taxComputation()"
-            (change)="taxComputation.set($any($event.target).value)">
-            @for(type of computationTypes; track type) {
-              <option [value]="type">{{ type }}</option>
+            id="category"
+            class="unit-select"
+            [value]="category()"
+            (change)="category.set($any($event.target).value)">
+            @for(cat of categories; track cat) {
+              <option [value]="cat">{{ cat }}</option>
             }
           </select>
         </div>
 
-        <!-- Amount Row -->
+        <!-- Internal Reference -->
         <div class="field-row">
-          <label class="field-label" for="taxAmount">Amount</label>
+          <label class="field-label" for="internalReference">Internal Reference</label>
           <input
-            type="number"
-            id="taxAmount"
-            class="field-input"
-            [ngModel]="amount()"
-            (ngModelChange)="amount.set($event)"
-            placeholder="" />
+            type="text"
+            id="internalReference"
+            class="short-input"
+            [ngModel]="internalReference()"
+            (ngModelChange)="internalReference.set($event)"
+            placeholder="e.g. FURN_001" />
         </div>
+
+        <!-- Helper note -->
+        <p class="helper-note">
+           Configure the Base Settings for this Product to be used in Subscriptions and Quotations.
+        </p>
 
       </div>
 

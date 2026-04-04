@@ -7,9 +7,25 @@
     </div>
     <div class="nav-links">
       @for(item of navItems(); track item.label) {
-        <a href="#" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item); $event.preventDefault()">
-          {{ item.label }}
-        </a>
+        @if(item.isDropdown) {
+          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
+            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active" (click)="toggleConfig($event)">
+              {{ item.label }}
+              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
+            </button>
+            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
+              @for(sub of item.dropdownItems; track sub.label) {
+                <a [routerLink]="sub.path" class="dropdown-item">
+                  {{ sub.label }}
+                </a>
+              }
+            </div>
+          </div>
+        } @else {
+          <a [routerLink]="item.path" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item)">
+            {{ item.label }}
+          </a>
+        }
       }
     </div>
     <div class="nav-profile">
@@ -26,7 +42,7 @@
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="action-left">
-        <button class="btn-new" (click)="onNew()">
+        <button type="button" class="btn-new" (click)="onNew()">
           <span class="material-symbols-outlined">add</span>
           New
         </button>
@@ -51,14 +67,13 @@
       <div class="title-group">
         <input
           type="text"
-          id="planName"
+          name="recurring_name"
           class="title-input"
           placeholder="Recurring Name"
           [ngModel]="planName()"
           (ngModelChange)="planName.set($event)" />
       </div>
 
-      <!-- Fields Section -->
       <div class="fields-section">
 
         <!-- Billing Period Row -->
@@ -122,14 +137,14 @@
         </div>
 
         <!-- Product Table -->
-        <div class="table-section">
+        <div class="table-wrapper">
            <table class="products-table">
               <thead>
                 <tr>
-                  <th class="accent-text">Product</th>
-                  <th class="accent-text">Variant</th>
-                  <th class="accent-text">Price</th>
-                  <th class="accent-text">Min Qty.</th>
+                  <th class="table-header">Product</th>
+                  <th class="table-header">Variant</th>
+                  <th class="table-header">Price</th>
+                  <th class="table-header">Min Qty.</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,9 +158,8 @@
                 }
               </tbody>
            </table>
-           <button class="add-row-btn" (click)="addProductRow()">+ Add Product</button>
-          </div>
-
+        </div>
+        <button type="button" class="add-row-btn" (click)="addProductRow()">+ Add Product</button>
       </div>
 
     </div>

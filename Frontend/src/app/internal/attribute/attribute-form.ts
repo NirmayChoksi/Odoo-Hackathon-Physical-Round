@@ -1,21 +1,17 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-discount',
+  selector: 'app-attribute-form',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterLink, 
-    FormsModule
-  ],
-  templateUrl: './discount.html',
-  styleUrl: './discount.css'
+  imports: [CommonModule, RouterLink, FormsModule],
+  templateUrl: './attribute-form.html',
+  styleUrl: './attribute-form.css'
 })
-export class DiscountComponent {
-  
+export class AttributeFormComponent {
+
   // Navigation State
   navItems = signal([
     { label: 'Subscriptions', active: false, path: '/subscriptions' },
@@ -39,46 +35,49 @@ export class DiscountComponent {
   ]);
 
   // Form State
-  discountName = signal<string>('');
-  discountType = signal<string>('Percentage');
-  minimumPurchase = signal<number | null>(null);
-  minimumQuantity = signal<number | null>(null);
-  products = signal<string>('');
+  attributeName = signal<string>('');
+  isConfigOpen = signal(false);
   
-  startDate = signal<string>('');
-  endDate = signal<string>('');
-  limitUsage = signal<boolean>(false);
-  limitUsageCount = signal<number | null>(null);
+  // Table Data
+  attributeValues = signal([
+    { value: 'odoo', extraPrice: '20 R.s' },
+    { value: '', extraPrice: '' }
+  ]);
 
-  discountTypes = ['Fixed Price', 'Percentage'];
+  constructor(private route: ActivatedRoute) {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id && id !== 'new') {
+      this.attributeName.set('Brand'); // Mock data
+    }
+
+    window.addEventListener('click', () => {
+      this.isConfigOpen.set(false);
+    });
+  }
 
   onNew() {
-    alert('Create New Discount');
+    alert('Create New Attribute');
   }
 
   onDelete() {
-    alert('Delete Discount');
+    alert('Delete Attribute');
   }
 
   onSave() {
-    alert('Save Discount');
+    alert('Save Attribute');
   }
 
-  isConfigOpen = signal(false);
+  onNavClick(item: any) {
+    const items = this.navItems().map(i => ({ ...i, active: i.label === item.label }));
+    this.navItems.set(items);
+  }
 
   toggleConfig(event: Event) {
     event.stopPropagation();
     this.isConfigOpen.set(!this.isConfigOpen());
   }
 
-  constructor() {
-    window.addEventListener('click', () => {
-      this.isConfigOpen.set(false);
-    });
-  }
-
-  onNavClick(item: any) {
-    const items = this.navItems().map(i => ({ ...i, active: i.label === item.label }));
-    this.navItems.set(items);
+  addValueRow() {
+    this.attributeValues.set([...this.attributeValues(), { value: '', extraPrice: '' }]);
   }
 }

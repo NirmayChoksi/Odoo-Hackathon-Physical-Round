@@ -7,9 +7,25 @@
     </div>
     <div class="nav-links">
       @for(item of navItems(); track item.label) {
-        <a href="#" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item); $event.preventDefault()">
-          {{ item.label }}
-        </a>
+        @if(item.isDropdown) {
+          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
+            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active" (click)="toggleConfig($event)">
+              {{ item.label }}
+              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
+            </button>
+            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
+              @for(sub of item.dropdownItems; track sub.label) {
+                <a [routerLink]="sub.path" class="dropdown-item">
+                  {{ sub.label }}
+                </a>
+              }
+            </div>
+          </div>
+        } @else {
+          <a [routerLink]="item.path" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item)">
+            {{ item.label }}
+          </a>
+        }
       }
     </div>
     <div class="nav-profile">
@@ -26,28 +42,31 @@
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="action-left">
-        <button class="btn-new" (click)="onNew()">
-          <span class="material-symbols-outlined">add</span>
+        <button type="button" class="btn-new" (click)="onNew()">
           New
         </button>
         <div class="action-icons">
-          <button class="icon-btn" (click)="onDelete()" title="Delete">
+          <button type="button" class="icon-btn" (click)="onDelete()" title="Delete">
             <span class="material-symbols-outlined">delete</span>
           </button>
-          <button class="icon-btn" (click)="onSave()" title="Save">
+          <button type="button" class="icon-btn" (click)="onSave()" title="Save">
             <span class="material-symbols-outlined">save</span>
           </button>
         </div>
       </div>
       <div class="action-right">
+        <div class="search-box">
+          <span class="material-symbols-outlined">search</span>
+          <input type="text" placeholder="Search discounts..." />
+        </div>
       </div>
     </div>
 
     <!-- Discount Form Container -->
     <div class="form-container">
       
-      <div class="form-header-input-group">
-        <input type="text" class="form-title-input" placeholder="Discount Name" [(ngModel)]="discountName" />
+      <div class="title-group">
+        <input type="text" class="title-input" placeholder="Discount Name" [(ngModel)]="discountName" />
       </div>
       
       <div class="form-layout">

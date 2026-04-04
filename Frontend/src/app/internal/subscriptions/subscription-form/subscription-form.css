@@ -51,9 +51,9 @@
 }
 
 .nav-link--active {
-  background: rgba(255, 181, 154, 0.15); /* Tint of primary */
+  background: rgba(241, 145, 109, 0.18); /* Tint of primary */
   color: var(--color-primary);
-  box-shadow: 0 0 0 1px rgba(255, 181, 154, 0.2);
+  box-shadow: 0 0 0 1px rgba(241, 145, 109, 0.25);
 }
 
 .nav-profile {
@@ -97,7 +97,7 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(255, 181, 154, 0.2);
+  box-shadow: 0 4px 12px rgba(241, 145, 109, 0.25);
 }
 
 .btn-new:hover {
@@ -149,7 +149,7 @@
 }
 
 .btn-outline:hover {
-  background: rgba(255, 181, 154, 0.1);
+  background: rgba(241, 145, 109, 0.12);
 }
 
 /* ── Data Table ── */
@@ -217,12 +217,12 @@ input[type="checkbox"] {
 ::ng-deep .mat-mdc-input-element,
 ::ng-deep .mat-mdc-select-value-text,
 ::ng-deep input.mat-mdc-input-element {
-  color: #ffffff !important;
+  color: var(--color-on-surface) !important;
 }
 
 ::ng-deep .mdc-text-field--outlined .mdc-floating-label,
 ::ng-deep .mat-mdc-select-placeholder {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: rgba(243, 218, 223, 0.72) !important;
 }
 
 ::ng-deep .mdc-text-field--focused .mdc-floating-label {
@@ -232,13 +232,13 @@ input[type="checkbox"] {
 ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__leading,
 ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__notch,
 ::ng-deep .mdc-text-field--outlined .mdc-notched-outline__trailing {
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(174, 125, 172, 0.35) !important;
 }
 
 ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__leading,
 ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__notch,
 ::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__trailing {
-  border-color: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(174, 125, 172, 0.55) !important;
 }
 
 ::ng-deep .mdc-text-field--focused .mdc-notched-outline__leading,
@@ -249,5 +249,5 @@ input[type="checkbox"] {
 }
 
 ::ng-deep .mat-mdc-select-arrow {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: rgba(243, 218, 223, 0.72) !important;
 }

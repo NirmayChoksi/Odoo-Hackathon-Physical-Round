@@ -19,13 +19,26 @@ export interface Subscription {
   styleUrl: './subscriptions.css'
 })
 export class SubscriptionsComponent {
-  constructor(private router: Router) {}
-  
   // Navigation State
   navItems = signal([
-    { label: 'Reporting', active: false },
-    { label: 'Users/Contacts', active: false },
-    { label: 'Configuration', active: false },
+    { label: 'Subscriptions', active: true, path: '/subscriptions' },
+    { label: 'Products', active: false, path: '/products' },
+    { label: 'Reporting', active: false, path: '/reporting' },
+    { label: 'Users/Contacts', active: false, path: '/users' },
+    { 
+      label: 'Configuration', 
+      active: false, 
+      isDropdown: true,
+      dropdownItems: [
+        { label: 'Overview', path: '/configuration' },
+        { label: 'Attribute', path: '/attribute' },
+        { label: 'Recurring Plan', path: '/recurring-plan' },
+        { label: 'Quotation Template', path: '/quotation-template' },
+        { label: 'Payment term', path: '/payment-term' },
+        { label: 'Discount', path: '/discount' },
+        { label: 'Taxes', path: '/taxes' }
+      ]
+    }
   ]);
 
   // Data State
@@ -39,6 +52,7 @@ export class SubscriptionsComponent {
 
   // Search/Filter State
   searchQuery = signal('');
+  isConfigOpen = signal(false);
 
   // Computed filtered list
   filteredSubscriptions = computed(() => {
@@ -50,6 +64,22 @@ export class SubscriptionsComponent {
       sub.status.toLowerCase().includes(query)
     );
   });
+
+  constructor(private router: Router) {
+    window.addEventListener('click', () => {
+      this.isConfigOpen.set(false);
+    });
+  }
+
+  toggleConfig(event: Event) {
+    event.stopPropagation();
+    this.isConfigOpen.set(!this.isConfigOpen());
+  }
+
+  onNavClick(item: any) {
+    const items = this.navItems().map(i => ({ ...i, active: i.label === item.label }));
+    this.navItems.set(items);
+  }
 
   onSearch(event: any) {
     this.searchQuery.set(event.target.value);

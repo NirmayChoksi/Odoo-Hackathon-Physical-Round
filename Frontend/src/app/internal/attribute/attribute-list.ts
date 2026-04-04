@@ -1,21 +1,17 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-discount',
+  selector: 'app-attribute-list',
   standalone: true,
-  imports: [
-    CommonModule, 
-    RouterLink, 
-    FormsModule
-  ],
-  templateUrl: './discount.html',
-  styleUrl: './discount.css'
+  imports: [CommonModule, RouterLink, FormsModule],
+  templateUrl: './attribute-list.html',
+  styleUrl: './attribute-list.css'
 })
-export class DiscountComponent {
-  
+export class AttributeListComponent {
+
   // Navigation State
   navItems = signal([
     { label: 'Subscriptions', active: false, path: '/subscriptions' },
@@ -38,33 +34,25 @@ export class DiscountComponent {
     }
   ]);
 
-  // Form State
-  discountName = signal<string>('');
-  discountType = signal<string>('Percentage');
-  minimumPurchase = signal<number | null>(null);
-  minimumQuantity = signal<number | null>(null);
-  products = signal<string>('');
-  
-  startDate = signal<string>('');
-  endDate = signal<string>('');
-  limitUsage = signal<boolean>(false);
-  limitUsageCount = signal<number | null>(null);
+  // Table Data
+  attributes = signal([
+    { id: '1', name: 'Brand', values: 'Odoo, SubSync, Custom' },
+    { id: '2', name: 'Color', values: 'Red, Blue, Green' },
+    { id: '3', name: 'Size', values: 'Small, Medium, Large' }
+  ]);
 
-  discountTypes = ['Fixed Price', 'Percentage'];
+  searchQuery = signal('');
 
   onNew() {
-    alert('Create New Discount');
-  }
-
-  onDelete() {
-    alert('Delete Discount');
-  }
-
-  onSave() {
-    alert('Save Discount');
+    // Navigation would normally go to /attribute/new
   }
 
   isConfigOpen = signal(false);
+
+  onNavClick(item: any) {
+    const items = this.navItems().map(i => ({ ...i, active: i.label === item.label }));
+    this.navItems.set(items);
+  }
 
   toggleConfig(event: Event) {
     event.stopPropagation();
@@ -75,10 +63,5 @@ export class DiscountComponent {
     window.addEventListener('click', () => {
       this.isConfigOpen.set(false);
     });
-  }
-
-  onNavClick(item: any) {
-    const items = this.navItems().map(i => ({ ...i, active: i.label === item.label }));
-    this.navItems.set(items);
   }
 }
