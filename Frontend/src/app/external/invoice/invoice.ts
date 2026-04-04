@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar';
 import { ButtonComponent } from '../../components/button/button';
+import { ecommerceCommands } from '../ecommerce-navigation';
 
 @Component({
   selector: 'app-invoice',
@@ -12,6 +13,7 @@ import { ButtonComponent } from '../../components/button/button';
   styleUrl: './invoice.css',
 })
 export class InvoiceComponent {
+  readonly navLinkBase: string | undefined;
 
   orderId = signal('S0001');
   invId = signal('001');
@@ -40,7 +42,8 @@ export class InvoiceComponent {
   });
 
   constructor(private router: Router, private route: ActivatedRoute) {
-    this.route.params.subscribe(params => {
+    this.navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
+    this.route.params.subscribe((params) => {
       if (params['orderId']) {
         this.orderId.set(params['orderId']);
       }
@@ -51,7 +54,7 @@ export class InvoiceComponent {
   }
 
   goBack() {
-    this.router.navigate(['/order', this.orderId()]);
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'order', this.orderId()));
   }
 
   download() {

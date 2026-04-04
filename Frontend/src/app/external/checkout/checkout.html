@@ -1,11 +1,11 @@
-<app-external-navbar></app-external-navbar>
+<app-external-navbar [linkBase]="navLinkBase" />
 
 <main class="page-container">
   
   @if (step() !== 'success') {
     <!-- ── Breadcrumb Steps ── -->
     <div class="steps-nav">
-      <span class="step" (click)="router.navigate(['/cart'])" style="cursor: pointer;">Order</span>
+      <span class="step" (click)="goToCartStep()" style="cursor: pointer;">Order</span>
       <span class="step-sep"></span>
       <span class="step" [class.step--active]="step() === 'address'">Address</span>
       <span class="step-sep"></span>

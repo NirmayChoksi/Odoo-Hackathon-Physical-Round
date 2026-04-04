@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
@@ -6,25 +7,16 @@
   --color-on-primary: #1a1a1a;
   --color-secondary: #10b981; /* Emerald/Green for capsules */
   --color-on-secondary: #ffffff;
-  
+
   --color-surface: #0f1115;
   --color-on-surface: #f8fafc;
   --color-on-surface-variant: #94a3b8;
-  
+
   --color-outline: #334155;
   --color-outline-variant: #1e293b;
 
   --font-headline: 'Epilogue', sans-serif;
   --font-body: 'Inter', sans-serif;
-}
-
-@theme {
-  --color-primary: #ffb59a;
-  --color-on-primary: #1a1a1a;
-  --color-secondary: #10b981;
-  --color-surface: #0f1115;
-  --color-on-surface: #f8fafc;
-  --color-outline: #334155;
 }
 
 body {
@@ -35,11 +27,15 @@ body {
 }
 
 .material-symbols-outlined {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
 }
 
 /* Force override Material variables */
-.mat-mdc-flat-button.mat-primary, 
+.mat-mdc-flat-button.mat-primary,
 .mat-mdc-raised-button.mat-primary,
 .mat-primary {
   --mdc-flat-button-container-color: #ffb59a !important;
@@ -53,7 +49,8 @@ body {
 }
 
 /* Navbar Logo Fix */
-.nav__logo span, .ext-nav__logo-text {
+.nav__logo span,
+.ext-nav__logo-text {
   display: block;
   font-family: var(--font-headline);
   font-weight: 800;
@@ -61,5 +58,3 @@ body {
   color: var(--color-on-surface);
   letter-spacing: -0.02em;
 }
-
-

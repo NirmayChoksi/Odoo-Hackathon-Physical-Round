@@ -1,12 +1,13 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { NavbarComponent } from '../shared/navbar/navbar';
-import { MOCK_PRODUCTS, CATEGORIES, Product } from '../mock-products';
-import { InputComponent } from '../../components/input/input';
-import { CardComponent } from '../../components/card/card';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ecommerceCommands } from '../ecommerce-navigation';
 import { ButtonComponent } from '../../components/button/button';
+import { CardComponent } from '../../components/card/card';
+import { InputComponent } from '../../components/input/input';
+import { CATEGORIES, MOCK_PRODUCTS } from '../mock-products';
+import { NavbarComponent } from '../shared/navbar/navbar';
 
 @Component({
   selector: 'app-shop',
@@ -16,6 +17,9 @@ import { ButtonComponent } from '../../components/button/button';
   styleUrl: './shop.css'
 })
 export class ShopComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
+
   categories = CATEGORIES;
   allProducts = MOCK_PRODUCTS;
 
@@ -51,19 +55,20 @@ export class ShopComponent implements OnInit {
 
     // Sort
     switch (this.sortBy()) {
-      case 'price-asc':  products.sort((a, b) => a.baseMonthlyPrice - b.baseMonthlyPrice); break;
+      case 'price-asc': products.sort((a, b) => a.baseMonthlyPrice - b.baseMonthlyPrice); break;
       case 'price-desc': products.sort((a, b) => b.baseMonthlyPrice - a.baseMonthlyPrice); break;
-      case 'name':       products.sort((a, b) => a.name.localeCompare(b.name)); break;
+      case 'name': products.sort((a, b) => a.name.localeCompare(b.name)); break;
     }
     return products;
   });
 
-  constructor(private router: Router) {}
+  private router = inject(Router);
+
   ngOnInit() {}
 
   selectCategory(cat: string) { this.selectedCategory.set(cat); }
   onSearchInputComponent(value: string) { this.searchQuery.set(value); }
-  onSort(val: string)         { this.sortBy.set(val as any); }
+  onSort(val: string) { this.sortBy.set(val as any); }
   resetFilters() {
     this.searchQuery.set('');
     this.selectedCategory.set('All');
@@ -71,6 +76,8 @@ export class ShopComponent implements OnInit {
     this.maxPrice.set(5000);
     this.sortBy.set('default');
   }
-  goToProduct(id: number) { this.router.navigate(['/shop', id]); }
+  goToProduct(id: number) {
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'shop', id));
+  }
 }
 

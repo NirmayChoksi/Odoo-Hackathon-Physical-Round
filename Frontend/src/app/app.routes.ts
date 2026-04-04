@@ -1,10 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './external/home/home';
-import { ShopComponent } from './external/shop/shop';
-import { ProductComponent } from './external/product/product';
-import { CartComponent } from './external/cart/cart';
-import { CheckoutComponent } from './external/checkout/checkout';
-import { AccountComponent } from './external/account/account';
+import { portalPublicRoutes } from './dashboard/pages/portal/portal.routes';
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./auth/login/login').then(m => m.Login) },
@@ -17,18 +12,41 @@ export const routes: Routes = [
   { path: 'discount', loadComponent: () => import('./internal/discount/discount').then(m => m.DiscountComponent) },
   { path: 'taxes', loadComponent: () => import('./internal/taxes/taxes').then(m => m.TaxesComponent) },
   { path: 'recurring-plan', loadComponent: () => import('./internal/recurring-plan/recurring-plan').then(m => m.RecurringPlanComponent) },
-  { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
-  { path: 'shop', component: ShopComponent },
-  { path: 'shop/:id', component: ProductComponent },
-  { path: 'cart', component: CartComponent },
-  { path: 'checkout', component: CheckoutComponent },
-  { path: 'account', component: AccountComponent },
-  { path: 'orders', loadComponent: () => import('./external/orders/orders').then(m => m.OrdersComponent) },
-  { path: 'order/:id', loadComponent: () => import('./external/order/order').then(m => m.OrderComponent) },
   { path: 'invoice/:invId', loadComponent: () => import('./external/invoice/invoice').then(m => m.InvoiceComponent) },
   { path: 'invoice/:orderId/:invId', loadComponent: () => import('./external/invoice/invoice').then(m => m.InvoiceComponent) },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: '**', redirectTo: 'login' },
-  { path: '', component: HomeComponent },
-  { path: '**', redirectTo: '' }
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./auth/reset-password/reset-password').then((m) => m.ResetPassword),
+  },
+  {
+    path: 'update-password',
+    loadComponent: () => import('./auth/update-password/update-password').then((m) => m.UpdatePassword),
+  },
+  {
+    path: 'subscriptions/new',
+    loadComponent: () =>
+      import('./internal/subscriptions/subscription-form/subscription-form').then(
+        (m) => m.SubscriptionFormComponent,
+      ),
+  },
+  {
+    path: 'subscriptions',
+    loadComponent: () => import('./internal/subscriptions/subscriptions').then((m) => m.SubscriptionsComponent),
+  },
+  {
+    path: 'quotation-template',
+    loadComponent: () =>
+      import('./internal/quotation-template/quotation-template').then((m) => m.QuotationTemplateComponent),
+  },
+  { path: 'discount', loadComponent: () => import('./internal/discount/discount').then((m) => m.DiscountComponent) },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./dashboard/dashboard.routes').then((m) => m.dashboardRoutes),
+  },
+  ...portalPublicRoutes,
+  { path: '', pathMatch: 'full', redirectTo: '/login' },
+  {
+    path: '**',
+    redirectTo: '/login',
+  },
 ];

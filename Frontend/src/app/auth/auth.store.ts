@@ -6,6 +6,32 @@ import { firstValueFrom } from 'rxjs';
 
 export type UserRole = 'Admin' | 'portal' | 'Internal';
 
+/** Matches `roles` in `Backend/subscription_management.sql`: 1 Admin, 2 Internal, 3 External (portal). */
+export function roleIdToUserRole(roleId?: number): UserRole {
+  if (roleId === 1) return 'Admin';
+  if (roleId === 2) return 'Internal';
+  return 'portal';
+}
+
+const AUTH_USER_KEY = 'auth_user';
+
+function readStoredUser(): User | null {
+  try {
+    const raw = localStorage.getItem(AUTH_USER_KEY);
+    if (!raw) return null;
+    const u = JSON.parse(raw) as User;
+    if (u && u.role === undefined && u.role_id !== undefined) {
+      u.role = roleIdToUserRole(u.role_id);
+    }
+    return u;
+  } catch {
+    return null;
+  }
+}
+
+const storedToken = localStorage.getItem('token');
+const storedUser = storedToken ? readStoredUser() : null;
+
 export interface User {
   id?: number;
   full_name: string;
@@ -23,8 +49,8 @@ type AuthState = {
 };
 
 const initialState: AuthState = {
-  user: null,
-  token: localStorage.getItem('token') || null,
+  user: storedUser,
+  token: storedToken,
   isLoading: false,
   error: null,
 };
@@ -43,15 +69,17 @@ export const AuthStore = signalStore(
           http.post<any>('/api/auth/login', { email, password })
         );
         const token = response.data.token;
+        const role_id = response.data.user.role_id as number | undefined;
         const user: User = {
           id: response.data.user.id,
           full_name: response.data.user.full_name,
           email: response.data.user.email,
-          role_id: response.data.user.role_id,
+          role_id,
           status: response.data.user.status,
-          role: 'portal'
+          role: roleIdToUserRole(role_id),
         };
         localStorage.setItem('token', token);
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
         updateState(store, '[Auth] Login Success', { user, token, isLoading: false });
         return { success: true };
       } catch (err) {
@@ -119,6 +147,7 @@ export const AuthStore = signalStore(
     
     logout() {
       localStorage.removeItem('token');
+      localStorage.removeItem(AUTH_USER_KEY);
       updateState(store, '[Auth] Logout', { user: null, token: null });
     }
   }))

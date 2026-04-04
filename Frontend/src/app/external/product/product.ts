@@ -5,6 +5,7 @@ import { NavbarComponent } from '../shared/navbar/navbar';
 import { getProductById, calculatePricingPlans, Product, ProductVariant, SubscriptionPlan } from '../mock-products';
 import { ButtonComponent } from '../../components/button/button';
 import { CartService, CartItem } from '../services/cart.service';
+import { ecommerceCommands } from '../ecommerce-navigation';
 
 @Component({
   selector: 'app-product',
@@ -17,6 +18,7 @@ export class ProductComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   public cartService = inject(CartService);
+  readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
 
   product: Product | undefined;
   pricingPlans: SubscriptionPlan[] = [];
@@ -92,7 +94,12 @@ export class ProductComponent implements OnInit {
     setTimeout(() => this.addedToCart.set(false), 2000);
   }
 
-  goBack() { this.router.navigate(['/shop']); }
-  goHome() { this.router.navigate(['/']); }
+  goBack() {
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'shop'));
+  }
+
+  goHome() {
+    this.router.navigate(ecommerceCommands(this.navLinkBase));
+  }
 }
 

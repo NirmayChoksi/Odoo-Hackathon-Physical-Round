@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar';
 import { CartService } from '../services/cart.service';
 import { ButtonComponent } from '../../components/button/button';
 import { InputComponent } from '../../components/input/input';
-import { Router } from '@angular/router';
+import { ecommerceCommands } from '../ecommerce-navigation';
 
 @Component({
   selector: 'app-checkout',
@@ -13,9 +14,11 @@ import { Router } from '@angular/router';
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnInit {
   public cartService = inject(CartService);
   public router = inject(Router);
+  private route = inject(ActivatedRoute);
+  readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
 
   // States: 'address' -> 'payment' -> 'success'
   step = signal<'address' | 'payment' | 'success'>('address');
@@ -37,8 +40,12 @@ export class CheckoutComponent {
 
   ngOnInit() {
     if (this.items().length === 0 && this.step() !== 'success') {
-      this.router.navigate(['/cart']);
+      this.router.navigate(ecommerceCommands(this.navLinkBase, 'cart'));
     }
+  }
+
+  goToCartStep() {
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'cart'));
   }
 
   goToPayment() {

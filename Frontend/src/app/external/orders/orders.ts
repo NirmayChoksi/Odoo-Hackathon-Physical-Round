@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar';
+import { ecommerceCommands } from '../ecommerce-navigation';
 
 @Component({
   selector: 'app-orders',
@@ -11,15 +12,16 @@ import { NavbarComponent } from '../shared/navbar/navbar';
   styleUrl: './orders.css',
 })
 export class OrdersComponent {
-  
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
+
   orders = signal([
     { id: 'S0001', date: '06/02/2026', total: 1200 },
-    { id: 'S0002', date: '06/02/2026', total: 1800 }
+    { id: 'S0002', date: '06/02/2026', total: 1800 },
   ]);
 
-  constructor(private router: Router) {}
-
   goToOrder(orderId: string) {
-    this.router.navigate(['/order', orderId]);
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'order', orderId));
   }
 }

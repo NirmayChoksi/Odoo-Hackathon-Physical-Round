@@ -1,4 +1,4 @@
-<app-external-navbar></app-external-navbar>
+<app-external-navbar [linkBase]="navLinkBase" />
 
 <main class="page-container">
   
@@ -85,7 +85,7 @@
       <h2>Your cart is empty</h2>
       <p>Looks like you haven't added any products to your cart yet.</p>
       <div style="margin-top:24px">
-        <app-button variant="primary" label="Continue Shopping" (click)="router.navigate(['/shop'])"></app-button>
+        <app-button variant="primary" label="Continue Shopping" (click)="continueShopping()"></app-button>
       </div>
     </div>
   }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar';
 import { ButtonComponent } from '../../components/button/button';
+import { ecommerceCommands } from '../ecommerce-navigation';
 
 @Component({
   selector: 'app-order',
@@ -12,7 +13,8 @@ import { ButtonComponent } from '../../components/button/button';
   styleUrl: './order.css',
 })
 export class OrderComponent {
-  
+  readonly navLinkBase: string | undefined;
+
   orderId = signal('S0001');
   
   orderDetail = signal({
@@ -39,8 +41,12 @@ export class OrderComponent {
     total: 2640
   });
 
-  constructor(private router: Router, private route: ActivatedRoute) {
-    this.route.params.subscribe(params => {
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {
+    this.navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
+    this.route.params.subscribe((params) => {
       if (params['id']) {
         this.orderId.set(params['id']);
       }
@@ -48,7 +54,7 @@ export class OrderComponent {
   }
 
   goToInvoice(invId: string) {
-    this.router.navigate(['/invoice', invId]);
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'invoice', invId));
   }
 
   download() {
@@ -57,10 +63,10 @@ export class OrderComponent {
 
   renew() {
     alert('New order created successfully!');
-    this.router.navigate(['/orders']);
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'orders'));
   }
 
   close() {
-    this.router.navigate(['/orders']);
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'orders'));
   }
 }

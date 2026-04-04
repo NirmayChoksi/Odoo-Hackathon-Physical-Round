@@ -36,7 +36,8 @@ export class Login {
     try {
       const res = await this.authStore.login(this.email(), this.password());
       if (res.success) {
-        this.router.navigate(['/dashboard']);
+        const role = this.authStore.user()?.role;
+        void this.router.navigate(role === 'portal' ? ['/home'] : ['/dashboard']);
       } else {
         this.errorMessage.set(res.error || 'Failed to login');
       }

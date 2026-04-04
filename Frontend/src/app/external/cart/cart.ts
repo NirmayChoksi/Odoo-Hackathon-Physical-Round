@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ecommerceCommands } from '../ecommerce-navigation';
 import { NavbarComponent } from '../shared/navbar/navbar';
 import { CartService, CartItem } from '../services/cart.service';
 import { ButtonComponent } from '../../components/button/button';
@@ -16,6 +17,8 @@ import { InputComponent } from '../../components/input/input';
 export class CartComponent {
   public cartService = inject(CartService);
   public router = inject(Router);
+  private route = inject(ActivatedRoute);
+  readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
 
   get items() { return this.cartService.items; }
   get subtotal() { return this.cartService.subtotal; }
@@ -55,10 +58,13 @@ export class CartComponent {
   }
 
   goToCheckout() {
-    // Only proceed if there are items
     if (this.items().length > 0) {
-      this.router.navigate(['/checkout']);
+      this.router.navigate(ecommerceCommands(this.navLinkBase, 'checkout'));
     }
+  }
+
+  continueShopping() {
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'shop'));
   }
 }
 

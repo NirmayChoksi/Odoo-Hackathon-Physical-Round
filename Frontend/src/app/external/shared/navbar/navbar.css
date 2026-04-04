@@ -230,6 +230,9 @@
   border-bottom: 1px solid var(--color-outline-variant);
   text-decoration: none;
 }
+.ext-nav__mobile-link--active {
+  color: var(--color-primary);
+}
 .ext-nav__mobile-link--danger { color: var(--color-error); border-bottom: none; }
 .ext-nav__mobile-divider { border: none; border-top: 1px solid var(--color-outline-variant); margin: 8px 0; }
 

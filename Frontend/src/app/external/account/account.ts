@@ -1,9 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar';
 import { ButtonComponent } from '../../components/button/button';
 import { InputComponent } from '../../components/input/input';
 import { RouterModule } from '@angular/router';
+import { ecommerceCommands } from '../ecommerce-navigation';
 
 @Component({
   selector: 'app-account',
@@ -13,7 +15,10 @@ import { RouterModule } from '@angular/router';
   styleUrl: './account.css',
 })
 export class AccountComponent {
-  
+  private route = inject(ActivatedRoute);
+  readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
+  readonly ordersCmd = ecommerceCommands(this.navLinkBase, 'orders');
+
   isEditing = signal(false);
 
   // Mock User Data

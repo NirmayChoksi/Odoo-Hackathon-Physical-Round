@@ -7,7 +7,7 @@ import { SelectComponent } from '../../../components/select/select';
 @Component({
   selector: 'app-subscription-form',
   standalone: true,
-  imports: [CommonModule, RouterLink, InputComponent, SelectComponent],
+  imports: [CommonModule, InputComponent, SelectComponent],
   templateUrl: './subscription-form.html',
   styleUrl: './subscription-form.css'
 })
@@ -28,22 +28,22 @@ export class SubscriptionFormComponent {
 
   // Form Fields
   subscriptionNumber = signal('SO0001');
-  
+
   customerOptions = signal([
     { value: '1', label: 'Existing Customer 1' },
     { value: '2', label: 'Existing Customer 2' }
   ]);
-  
+
   templateOptions = signal([
     { value: 'monthly', label: 'Monthly Subscription' },
     { value: 'yearly', label: 'Yearly Subscription' }
   ]);
-  
+
   recurringPlanOptions = signal([
     { value: 'basic', label: 'Basic Plan' },
     { value: 'premium', label: 'Premium Plan' }
   ]);
-  
+
   paymentTermOptions = signal([
     { value: '15', label: '15 Days' },
     { value: '30', label: '30 Days' }

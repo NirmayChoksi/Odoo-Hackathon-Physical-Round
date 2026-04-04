@@ -1,6 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 
 export interface Subscription {
   number: string;
@@ -14,7 +14,7 @@ export interface Subscription {
 @Component({
   selector: 'app-subscriptions',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './subscriptions.html',
   styleUrl: './subscriptions.css'
 })
@@ -23,11 +23,9 @@ export class SubscriptionsComponent {
   
   // Navigation State
   navItems = signal([
-    { label: 'Subscriptions', active: true },
-    { label: 'Products', active: false },
     { label: 'Reporting', active: false },
     { label: 'Users/Contacts', active: false },
-    { label: 'Configuration', active: false }
+    { label: 'Configuration', active: false },
   ]);
 
   // Data State
@@ -55,6 +53,25 @@ export class SubscriptionsComponent {
 
   onSearch(event: any) {
     this.searchQuery.set(event.target.value);
+  }
+
+  /** When embedded under `/dashboard/internal`, storefront links use this prefix. */
+  private navPrefix(): string {
+    return this.router.url.split('?')[0].startsWith('/dashboard/internal') ? '/dashboard/internal' : '';
+  }
+
+  subsHomeLink(): string {
+    return this.navPrefix() || '/subscriptions';
+  }
+
+  shopLink(): string {
+    const p = this.navPrefix();
+    return p ? `${p}/shop` : '/shop';
+  }
+
+  accountLink(): string {
+    const p = this.navPrefix();
+    return p ? `${p}/account` : '/account';
   }
 
   onNewSubscription() {
