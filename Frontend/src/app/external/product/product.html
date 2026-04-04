@@ -1,15 +1,27 @@
 <app-external-navbar [linkBase]="navLinkBase" />
 
-@if (product) {
+@if (productStore.isLoading()) {
+<div class="prod-not-found">
+  <div class="spinner"></div>
+  <p style="margin-top: 16px;">Loading product details…</p>
+</div>
+} @else if (!productStore.product()) {
+<div class="prod-not-found">
+  <div class="prod-not-found__icon material-symbols-outlined" style="font-size: 3.5rem;">search_off</div>
+  <h2>Product not found</h2>
+  <p>{{ productStore.loadError() || 'The product you\'re looking for doesn\'t exist.' }}</p>
+  <app-button variant="primary" label="← Back to Shop" (click)="goBack()"></app-button>
+</div>
+} @else {
 <div class="prod">
 
   <!-- Breadcrumb -->
   <div class="prod__breadcrumb">
     <span (click)="goHome()">All Products</span>
     <span class="prod__breadcrumb-sep">›</span>
-    <span (click)="goBack()">{{ product.category }}</span>
+    <span (click)="goBack()">{{ productStore.product()?.product_type }}</span>
     <span class="prod__breadcrumb-sep">›</span>
-    <span class="prod__breadcrumb-current">{{ product.name }}</span>
+    <span class="prod__breadcrumb-current">{{ productStore.product()?.product_name }}</span>
   </div>
 
   <div class="prod__layout">
@@ -18,18 +30,18 @@
     <div class="prod__gallery">
       <!-- Thumbnails -->
       <div class="prod__thumbs">
-        @for (img of product.images; track $index) {
+        @for (img of productStore.images(); track $index) {
           <div class="prod__thumb"
                [class.prod__thumb--active]="selectedImageIndex() === $index"
                (click)="selectImage($index)">
-            <img [src]="img" [alt]="product.name + ' image ' + ($index+1)" />
+            <img [src]="img" [alt]="productStore.product()?.product_name + ' image ' + ($index+1)" />
           </div>
         }
       </div>
       <!-- Main Preview -->
       <div class="prod__main-img">
-        <img [src]="product.images[selectedImageIndex()]"
-             [alt]="product.name"
+        <img [src]="productStore.images()[selectedImageIndex()] || 'https://placehold.co/600x400/e2e8f0/64748b?text=Product'"
+             [alt]="productStore.product()?.product_name"
              class="prod__main-img-inner" />
         <div class="prod__img-hint">select image in big size</div>
       </div>
@@ -38,57 +50,58 @@
     <!-- ── RIGHT: Product Info ── -->
     <div class="prod__info">
 
-      <h1 class="prod__name">{{ product.name }}</h1>
-      <p class="prod__desc-full">{{ product.description }}</p>
+      <h1 class="prod__name">{{ productStore.product()?.product_name }}</h1>
+      <p class="prod__desc-full">{{ productStore.product()?.description || productStore.product()?.short_description }}</p>
 
       <!-- ── Pricing Table ── -->
+      @if (productStore.plans().length > 0) {
       <div class="prod__pricing-card">
         <h3 class="prod__section-title">Choose Your Plan</h3>
         <div class="prod__plans">
-          @for (plan of pricingPlans; track $index) {
+          @for (plan of productStore.plans(); track plan.product_plan_id; let i = $index) {
             <div class="prod__plan"
-                 [class.prod__plan--active]="selectedPlanIndex() === $index"
-                 (click)="selectPlan($index)">
+                 [class.prod__plan--active]="selectedPlanIndex() === i"
+                 (click)="selectPlan(i)">
               <div class="prod__plan-left">
                 <span class="prod__plan-radio"
-                      [class.prod__plan-radio--on]="selectedPlanIndex() === $index"></span>
-                <span class="prod__plan-label">{{ plan.label }}</span>
+                      [class.prod__plan-radio--on]="selectedPlanIndex() === i"></span>
+                <span class="prod__plan-label">{{ plan.plan_name }}</span>
               </div>
               <div class="prod__plan-right">
-                <span class="prod__plan-total">₹{{ plan.total | number }}</span>
-                <span class="prod__plan-per">₹{{ plan.perMonth | number }}/month</span>
-                @if (plan.discountPct > 0) {
-                  <span class="prod__plan-badge">{{ plan.discountPct }}% OFF</span>
-                }
+                <span class="prod__plan-total">₹{{ plan.price | number }}</span>
+                <span class="prod__plan-per">₹{{ plan.price | number }}/{{ plan.billing_period.toLowerCase() }}</span>
               </div>
             </div>
           }
         </div>
-        <p class="prod__billing-note">{{ pricingPlans[selectedPlanIndex()].billingNote }}</p>
+        <p class="prod__billing-note">Billed {{ productStore.plans()[selectedPlanIndex()]?.billing_period?.toLowerCase() || 'monthly' }}</p>
       </div>
+      }
 
       <!-- Category -->
       <div class="prod__meta">
         <span class="prod__meta-label">Product category:</span>
-        <span class="prod__meta-val">{{ product.category }}</span>
+        <span class="prod__meta-val">{{ productStore.product()?.product_type }}</span>
       </div>
 
       <!-- Variants -->
+      @if (productStore.variants().length > 0) {
       <div class="prod__variants-section">
-        <h3 class="prod__section-title">Variants available</h3>
+        <h3 class="prod__section-title">Variants available for {{ productStore.variants()[0].attribute_name }}</h3>
         <div class="prod__variants">
-          @for (v of product.variants; track v.name) {
+          @for (v of productStore.variants(); track v.variant_id) {
             <button class="prod__variant-btn"
-                    [class.prod__variant-btn--active]="selectedVariant()?.name === v.name"
+                    [class.prod__variant-btn--active]="selectedVariant()?.variant_id === v.variant_id"
                     (click)="selectVariant(v)">
-              {{ v.name }}
-              @if (v.extraPrice > 0) {
-                <span class="prod__variant-extra">+₹{{ v.extraPrice }}/mo</span>
+              {{ v.attribute_value }}
+              @if (+v.extra_price > 0) {
+                <span class="prod__variant-extra">+₹{{ v.extra_price }}</span>
               }
             </button>
           }
         </div>
       </div>
+      }
 
       <div class="prod__purchase-row">
         <div class="prod__qty">
@@ -104,7 +117,12 @@
                 ✓ Added to Cart!
               } @else {
                 <span>Add to Cart</span>
-                <span class="prod__add-btn-price">₹{{ currentPrice() | number }}/mo</span>
+                <span class="prod__add-btn-price">
+                  ₹{{ totalPrice() | number:'1.2-2' }}
+                  @if (quantity() > 1) {
+                    <span class="prod__add-btn-unit">(₹{{ currentPrice() | number:'1.2-2' }} × {{ quantity() }})</span>
+                  }
+                </span>
               }
             </span>
           </button>
@@ -130,18 +148,5 @@
     </div>
   </div>
 
-  <!-- Variant pop-up note -->
-  <div class="prod__variant-note">
-    <span class="material-symbols-outlined">lightbulb</span>
-    Small pop-up or a list of variants should come to select — accordingly price should vary (extra price)
-  </div>
-
-</div>
-} @else {
-<div class="prod-not-found">
-  <div class="prod-not-found__icon material-symbols-outlined" style="font-size: 3.5rem;">search_off</div>
-  <h2>Product not found</h2>
-  <p>The product you're looking for doesn't exist.</p>
-  <app-button variant="primary" label="← Back to Shop" (click)="goBack()"></app-button>
 </div>
 }

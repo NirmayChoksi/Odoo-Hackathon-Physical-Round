@@ -2,10 +2,10 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar';
-import { getProductById, calculatePricingPlans, Product, ProductVariant, SubscriptionPlan } from '../mock-products';
 import { ButtonComponent } from '../../components/button/button';
 import { CartService, CartItem } from '../services/cart.service';
-import { ecommerceCommands } from '../ecommerce-navigation';
+import { ecommerceCommands, INTERNAL_DASHBOARD_NAV_BASE } from '../ecommerce-navigation';
+import { ProductStore, ProductPlan, ProductVariant } from './product.store';
 
 @Component({
   selector: 'app-product',
@@ -18,10 +18,9 @@ export class ProductComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   public cartService = inject(CartService);
+  public productStore = inject(ProductStore);
+  
   readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
-
-  product: Product | undefined;
-  pricingPlans: SubscriptionPlan[] = [];
 
   selectedImageIndex = signal(0);
   selectedPlanIndex  = signal(0);
@@ -29,26 +28,50 @@ export class ProductComponent implements OnInit {
   quantity           = signal(1);
   addedToCart        = signal(false);
 
+  /** Per-unit price: plan price + variant extra. Falls back to display_price when no plans. */
   currentPrice = computed(() => {
-    if (!this.product || this.pricingPlans.length === 0) return 0;
-    const plan    = this.pricingPlans[this.selectedPlanIndex()];
-    if (!plan) return 0;
-    const variant = this.selectedVariant();
-    const extra   = variant ? variant.extraPrice : 0;
+    const product = this.productStore.product();
+    const plans = this.productStore.plans();
 
-    if (this.selectedPlanIndex() === 0) return plan.perMonth + extra;
-    if (this.selectedPlanIndex() === 1) return Math.round(plan.perMonth + extra * 0.9);
-    return Math.round(plan.perMonth + extra * 0.7);
+    if (!product) return 0;
+    if (plans.length === 0) {
+      return parseFloat(product.display_price || product.sales_price || '0') || 0;
+    }
+
+    const plan = plans[this.selectedPlanIndex()];
+    if (!plan) return 0;
+
+    const planPrice = parseFloat(plan.price) || 0;
+    const variant = this.selectedVariant();
+    const extraPrice = variant ? (parseFloat(variant.extra_price) || 0) : 0;
+
+    return planPrice + extraPrice;
   });
+
+  /** Total price shown on the Add to Cart button = unit price × quantity */
+  totalPrice = computed(() => this.currentPrice() * this.quantity());
+
+  apiTargetBase(): string {
+    return this.navLinkBase === INTERNAL_DASHBOARD_NAV_BASE
+      ? '/api/internal/shop'
+      : '/api/external/shop';
+  }
 
   constructor() {}
 
-  ngOnInit() {
+  async ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.product = getProductById(id);
-    if (this.product) {
-      this.pricingPlans = calculatePricingPlans(this.product.baseMonthlyPrice);
-      this.selectedVariant.set(this.product.variants[0]);
+    await this.productStore.loadProduct(this.apiTargetBase(), id);
+    
+    const variants = this.productStore.variants();
+    if (variants.length > 0) {
+      this.selectedVariant.set(variants[0]);
+    }
+    
+    const plans = this.productStore.plans();
+    const defaultPlanIndex = plans.findIndex(p => p.is_default);
+    if (defaultPlanIndex !== -1) {
+      this.selectedPlanIndex.set(defaultPlanIndex);
     }
   }
 
@@ -59,34 +82,23 @@ export class ProductComponent implements OnInit {
   decrement() { this.quantity.update(q => (q > 1 ? q - 1 : 1)); }
 
   addToCart() {
-    if (!this.product) return;
+    const product = this.productStore.product();
+    if (!product) return;
     
-    const plan = this.pricingPlans[this.selectedPlanIndex()];
+    const plans = this.productStore.plans();
+    const plan = plans[this.selectedPlanIndex()];
+    const imgUrl = this.productStore.images()[0] || 'https://placehold.co/600x400/e2e8f0/64748b?text=Product';
+
     const cartItem: CartItem = {
       id: '', // Service fills this
-      productId: this.product.id,
-      productName: this.product.name,
-      price: plan.perMonth,
+      productId: product.product_id,
+      productName: product.product_name,
+      price: this.currentPrice(),
       quantity: this.quantity(),
-      planDuration: plan.id,
-      variantName: this.selectedVariant()?.name,
-      image: this.product.images[0]
+      planDuration: (plan ? plan.billing_period.toLowerCase() : 'monthly') as any,
+      variantName: this.selectedVariant()?.attribute_value,
+      image: imgUrl
     };
-    
-    if (plan.id === 'yearly') {
-      cartItem.price = plan.total;
-    } else if (plan.id === '6-month') {
-      cartItem.price = plan.total;
-    } else {
-      cartItem.price = plan.perMonth;
-    }
-
-    if (this.selectedVariant()?.extraPrice) {
-       let multiplier = 1;
-       if(plan.id === 'yearly') multiplier = 12;
-       if(plan.id === '6-month') multiplier = 6;
-       cartItem.price += (this.selectedVariant()!.extraPrice * multiplier);
-    }
 
     this.cartService.addToCart(cartItem);
 

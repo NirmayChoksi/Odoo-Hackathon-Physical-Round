@@ -508,3 +508,73 @@ VALUES
     '+1-800-000-0002',
     'ACTIVE'
   );
+
+-- Insert dummy products
+INSERT INTO
+  products (
+    product_name,
+    product_type,
+    sales_price,
+    cost_price,
+    description,
+    short_description,
+    is_recurring,
+    status,
+    created_by
+  )
+VALUES
+  (
+    'Basic Software License',
+    'Software',
+    99.99,
+    50.00,
+    'A basic software license for individual users with core features.',
+    'Essential software for daily use.',
+    TRUE,
+    'ACTIVE',
+    1
+  ),
+  (
+    'Premium Support Package',
+    'Service',
+    199.99,
+    100.00,
+    'Premium support package including 24/7 technical assistance and priority response.',
+    'Round-the-clock support for critical issues.',
+    TRUE,
+    'ACTIVE',
+    1
+  ),
+  (
+    'Cloud Storage Subscription',
+    'Cloud Service',
+    29.99,
+    10.00,
+    'Unlimited cloud storage with automatic backup and file synchronization.',
+    'Secure and unlimited cloud storage.',
+    TRUE,
+    'ACTIVE',
+    1
+  ),
+  (
+    'Data Analytics Tool',
+    'Software',
+    499.99,
+    250.00,
+    'Advanced data analytics tool with machine learning capabilities.',
+    'Powerful analytics for business intelligence.',
+    TRUE,
+    'ACTIVE',
+    1
+  ),
+  (
+    'One-time Setup Service',
+    'Service',
+    149.99,
+    75.00,
+    'Professional setup and configuration service for new installations.',
+    'Expert setup to get you started quickly.',
+    FALSE,
+    'ACTIVE',
+    1
+  );
