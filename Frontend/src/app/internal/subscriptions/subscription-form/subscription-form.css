@@ -1,3 +1,4 @@
+
 .internal-container {
   min-height: 100vh;
   display: flex;
@@ -210,4 +211,43 @@ input[type="checkbox"] {
   width: 16px;
   height: 16px;
   cursor: pointer;
+}
+
+/* Material Form Field Overrides (Making text white) */
+::ng-deep .mat-mdc-input-element,
+::ng-deep .mat-mdc-select-value-text,
+::ng-deep input.mat-mdc-input-element {
+  color: #ffffff !important;
+}
+
+::ng-deep .mdc-text-field--outlined .mdc-floating-label,
+::ng-deep .mat-mdc-select-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+::ng-deep .mdc-text-field--focused .mdc-floating-label {
+  color: var(--color-primary) !important;
+}
+
+::ng-deep .mdc-text-field--outlined .mdc-notched-outline__leading,
+::ng-deep .mdc-text-field--outlined .mdc-notched-outline__notch,
+::ng-deep .mdc-text-field--outlined .mdc-notched-outline__trailing {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__leading,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__notch,
+::ng-deep .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(.mdc-text-field--focused):hover .mdc-notched-outline__trailing {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+::ng-deep .mdc-text-field--focused .mdc-notched-outline__leading,
+::ng-deep .mdc-text-field--focused .mdc-notched-outline__notch,
+::ng-deep .mdc-text-field--focused .mdc-notched-outline__trailing {
+  border-color: var(--color-primary) !important;
+  border-width: 2px !important;
+}
+
+::ng-deep .mat-mdc-select-arrow {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
