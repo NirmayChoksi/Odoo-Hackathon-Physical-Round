@@ -413,3 +413,8 @@ INSERT INTO discounts (discount_name, coupon_code, discount_type, discount_value
 SELECT 'Welcome 10', 'SAVE10', 'PERCENTAGE', 10, 0, 1, 'ACTIVE'
 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM discounts WHERE coupon_code = 'SAVE10' LIMIT 1);
+
+-- Insert admin user
+INSERT IGNORE INTO users (user_id, full_name, email, password_hash, role_id, phone, status)
+VALUES (1, 'Admin User', 'admin@system.com', '$2b$10$o3wSafZ.S2Vq3mzFnXfKpuuby..aF9lsu7nzjeqvhIJdOdoSR874O', 1, '+1-800-000-0000', 'ACTIVE');
+
