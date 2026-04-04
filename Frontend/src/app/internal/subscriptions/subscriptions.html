@@ -1,0 +1,98 @@
+<div class="internal-container">
+  
+  <!-- Navigation Header -->
+  <nav class="internal-nav">
+    <div class="nav-brand">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
+    </div>
+    <div class="nav-links">
+      @for(item of navItems(); track item.label) {
+        <a href="#" class="nav-link" [class.nav-link--active]="item.active">
+          {{ item.label }}
+        </a>
+      }
+    </div>
+    <div class="nav-profile">
+      <a routerLink="/login" class="profile-btn">
+        <span class="material-symbols-outlined">person</span>
+        My Profile
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content Body -->
+  <main class="internal-content">
+    
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-left">
+        <button class="btn-new" (click)="onNewSubscription()">
+          <span class="material-symbols-outlined">add</span>
+          New
+        </button>
+        <div class="action-icons">
+          <button class="icon-btn" (click)="onDelete()" title="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+          <button class="icon-btn" (click)="onSettings()" title="Configuration">
+            <span class="material-symbols-outlined">settings</span>
+          </button>
+        </div>
+      </div>
+      <div class="action-right">
+        <div class="search-box">
+          <span class="material-symbols-outlined">search</span>
+          <input 
+            type="text" 
+            placeholder="Search subscriptions, customers..." 
+            (input)="onSearch($event)"
+            title="Search bar" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Table Container -->
+    <div class="data-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="col-check"><input type="checkbox" /></th>
+            <th>Number</th>
+            <th>Customer</th>
+            <th>Next Invoice</th>
+            <th>Recurring</th>
+            <th>Plan</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(sub of filteredSubscriptions(); track sub.number) {
+            <tr class="data-row">
+              <td class="col-check"><input type="checkbox" /></td>
+              <td class="col-number">{{ sub.number }}</td>
+              <td>{{ sub.customer }}</td>
+              <td>{{ sub.nextInvoice }}</td>
+              <td class="col-recurring">{{ sub.recurring }}</td>
+              <td>
+                <span class="badge-plan">{{ sub.plan }}</span>
+              </td>
+              <td>
+                <span class="status-pill" [attr.data-status]="sub.status">
+                  {{ sub.status }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      
+      @if(filteredSubscriptions().length === 0) {
+        <div class="empty-state">
+           <span class="material-symbols-outlined emoji">search_off</span>
+           <p>No subscriptions found matching your criteria</p>
+        </div>
+      }
+    </div>
+
+  </main>
+</div>
