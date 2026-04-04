@@ -1,47 +1,48 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
+import { PaymentTermApiService } from '../../payment-term/payment-term-api.service';
+import {
+  CONFIGURATION_DROPDOWN_ITEMS,
+  SUBSCRIPTION_APP_PATHS,
+  USERS_CONTACTS_DROPDOWN_ITEMS,
+} from '../../subscription-app.constants';
 
 @Component({
   selector: 'app-subscription-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './subscription-form.html',
   styleUrl: './subscription-form.css'
 })
 export class SubscriptionFormComponent {
+  private readonly paymentTermApi = inject(PaymentTermApiService);
+
+  readonly paths = SUBSCRIPTION_APP_PATHS;
+
   navItems = signal([
-    { label: 'Subscriptions', active: true, path: '/subscriptions' },
-    { label: 'Products', active: false, path: '/products' },
-    { label: 'Reporting', active: false, path: '/reporting' },
+    { label: 'Subscriptions', active: true, path: SUBSCRIPTION_APP_PATHS.subscriptions },
+    { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
+    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
     {
       label: 'Users/Contacts',
       active: false,
-      path: '/subscription/users',
+      path: SUBSCRIPTION_APP_PATHS.users,
       isDropdown: true,
-      dropdownItems: [
-        { label: 'Users', path: '/subscription/users' },
-        { label: 'Contacts', path: '/subscription/contacts' },
-      ],
+      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
     },
     {
       label: 'Configuration',
       active: false,
       isDropdown: true,
-      dropdownItems: [
-        { label: 'Overview', path: '/configuration' },
-        { label: 'Attribute', path: '/attribute' },
-        { label: 'Recurring Plan', path: '/recurring-plan' },
-        { label: 'Quotation Template', path: '/quotation-template' },
-        { label: 'Payment term', path: '/payment-term' },
-        { label: 'Discount', path: '/discount' },
-        { label: 'Taxes', path: '/taxes' }
-      ]
-    }
+      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
+    },
   ]);
 
-  isConfigOpen = signal(false);
+  /** Which nav dropdown is open (`item.label`), so Users/Contacts and Configuration do not share one flag. */
+  navDropdownOpenKey = signal<string | null>(null);
 
   statusFlow = signal(['Quotation', 'Quotation Sent', 'Confirmed']);
   currentStatus = signal('Quotation');
@@ -65,9 +66,8 @@ export class SubscriptionFormComponent {
     { value: 'premium', label: 'Premium Plan' }
   ]);
 
-  paymentTermOptions = signal([
-    { value: '15', label: '15 Days' },
-    { value: '30', label: '30 Days' }
+  paymentTermOptions = signal<{ value: string; label: string }[]>([
+    { value: '', label: 'Select payment term' },
   ]);
 
   customerId = signal('');
@@ -81,12 +81,27 @@ export class SubscriptionFormComponent {
   ]);
 
   constructor() {
-    window.addEventListener('click', () => this.isConfigOpen.set(false));
+    window.addEventListener('click', () => this.navDropdownOpenKey.set(null));
+    void this.loadPaymentTerms();
   }
 
-  toggleConfig(event: Event) {
+  private async loadPaymentTerms() {
+    try {
+      const res = await firstValueFrom(this.paymentTermApi.list(1, 100, undefined, 'ACTIVE'));
+      if (!res.success) return;
+      const opts = [
+        { value: '', label: 'Select payment term' },
+        ...res.data.terms.map((t) => ({ value: String(t.paymentTermId), label: t.termName })),
+      ];
+      this.paymentTermOptions.set(opts);
+    } catch {
+      /* offline or not staff — keep placeholder */
+    }
+  }
+
+  toggleNavDropdown(event: Event, label: string) {
     event.stopPropagation();
-    this.isConfigOpen.set(!this.isConfigOpen());
+    this.navDropdownOpenKey.update((k) => (k === label ? null : label));
   }
 
   onNavClick(item: { label: string }) {

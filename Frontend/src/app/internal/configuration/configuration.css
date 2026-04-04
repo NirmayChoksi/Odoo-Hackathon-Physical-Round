@@ -139,6 +139,70 @@
   margin: 0 auto;
 }
 
+/* ── Configuration hub (module shortcuts) ── */
+.config-hub {
+  padding: 1.5rem 0 0.5rem;
+}
+
+.config-hub__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.config-hub__intro {
+  margin: 0 0 1.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-on-surface-variant);
+  line-height: 1.5;
+  max-width: 42rem;
+}
+
+.config-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.config-hub__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.125rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-outline);
+  background: rgba(3, 18, 47, 0.45);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.config-hub__card:hover {
+  border-color: rgba(241, 145, 109, 0.45);
+  background: rgba(241, 145, 109, 0.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.config-hub__icon {
+  font-size: 1.75rem;
+  color: var(--color-primary);
+}
+
+.config-hub__card-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.config-hub__card-desc {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--color-on-surface-variant);
+}
+
 /* ── Action bar: mockup — New + icons left, dashed search centered ── */
 .action-bar {
   display: flex;

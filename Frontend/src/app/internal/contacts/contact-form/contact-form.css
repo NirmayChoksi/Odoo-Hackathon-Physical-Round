@@ -56,7 +56,8 @@
 .nav-dropdown:hover .dropdown-icon, .nav-dropdown--open .dropdown-icon { transform: rotate(180deg); }
 .nav-dropdown:hover .nav-dropdown-content, .nav-dropdown--open .nav-dropdown-content { display: block; }
 .dropdown-item { display: block; padding: 0.75rem 1rem; color: var(--color-on-surface-variant); text-decoration: none; font-size: 0.8125rem; font-weight: 500; border-radius: 8px; transition: all 0.2s; }
-.dropdown-item:hover { background: rgba(241,145,109,0.12); color: var(--color-primary); }
+.dropdown-item:hover,
+.dropdown-item--current { background: rgba(241,145,109,0.12); color: var(--color-primary); }
 
 .nav-profile { margin-left: auto; }
 .profile-btn {

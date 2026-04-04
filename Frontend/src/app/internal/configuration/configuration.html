@@ -18,7 +18,11 @@
             </button>
             <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
               @for (sub of item.dropdownItems; track sub.label) {
-                <a [routerLink]="sub.path" class="dropdown-item" [class.dropdown-item--current]="sub.path === paths.configuration">
+                <a
+                  [routerLink]="sub.path"
+                  class="dropdown-item"
+                  routerLinkActive="dropdown-item--current"
+                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
                   {{ sub.label }}
                 </a>
               }
@@ -44,6 +48,20 @@
   </nav>
 
   <main class="internal-content">
+    <section class="config-hub" aria-label="Configuration modules">
+      <h2 class="config-hub__title">Configuration modules</h2>
+      <p class="config-hub__intro">Open subscription settings the same way from here or from the Configuration menu above.</p>
+      <div class="config-hub__grid">
+        @for (mod of hubModules; track mod.path) {
+          <a [routerLink]="mod.path" class="config-hub__card">
+            <span class="material-symbols-outlined config-hub__icon" aria-hidden="true">{{ mod.icon }}</span>
+            <span class="config-hub__card-title">{{ mod.title }}</span>
+            <span class="config-hub__card-desc">{{ mod.description }}</span>
+          </a>
+        }
+      </div>
+    </section>
+
     <div class="action-bar">
       <div class="action-left">
         <a class="btn-new" [routerLink]="paths.attributeNew">

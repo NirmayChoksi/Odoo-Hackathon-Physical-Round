@@ -1,13 +1,17 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
-import { SUBSCRIPTION_APP_PATHS } from '../../subscription-app.constants';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import {
+  CONFIGURATION_DROPDOWN_ITEMS,
+  SUBSCRIPTION_APP_PATHS,
+  USERS_CONTACTS_DROPDOWN_ITEMS,
+} from '../../subscription-app.constants';
 
 @Component({
   selector: 'app-contact-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './contact-form.html',
   styleUrl: './contact-form.css'
 })
@@ -21,28 +25,17 @@ export class ContactFormComponent {
       active: true,
       path: SUBSCRIPTION_APP_PATHS.users,
       isDropdown: true,
-      dropdownItems: [
-        { label: 'Users', path: SUBSCRIPTION_APP_PATHS.users },
-        { label: 'Contacts', path: SUBSCRIPTION_APP_PATHS.contacts }
-      ]
+      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
     },
     {
       label: 'Configuration',
       active: false,
       isDropdown: true,
-      dropdownItems: [
-        { label: 'Overview', path: SUBSCRIPTION_APP_PATHS.configuration },
-        { label: 'Attribute', path: SUBSCRIPTION_APP_PATHS.attribute },
-        { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlan },
-        { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplate },
-        { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm },
-        { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discount },
-        { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes },
-      ]
-    }
+      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
+    },
   ]);
 
-  isDropdownOpen = signal(false);
+  navDropdownOpenKey = signal<string | null>(null);
 
   // Form signals
   name = signal('');
@@ -56,12 +49,12 @@ export class ContactFormComponent {
   subscriptionCount = signal(2);
 
   constructor(private router: Router) {
-    window.addEventListener('click', () => this.isDropdownOpen.set(false));
+    window.addEventListener('click', () => this.navDropdownOpenKey.set(null));
   }
 
-  toggleDropdown(event: Event) {
+  toggleNavDropdown(event: Event, label: string) {
     event.stopPropagation();
-    this.isDropdownOpen.set(!this.isDropdownOpen());
+    this.navDropdownOpenKey.update((k) => (k === label ? null : label));
   }
 
   onNavClick(item: { label: string }) {

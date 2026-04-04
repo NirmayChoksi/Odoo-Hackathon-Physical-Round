@@ -20,7 +20,10 @@ export const subscriptionAppChildRoutes: Routes = [
     path: 'products',
     loadComponent: () => import('./products/products').then((m) => m.ProductsComponent),
   },
-  { path: 'reporting', redirectTo: 'subscriptions', pathMatch: 'full' },
+  {
+    path: 'reporting',
+    loadComponent: () => import('./reporting/reporting').then((m) => m.ReportingComponent),
+  },
   {
     path: 'users',
     loadComponent: () => import('./users/user-form/user-form').then((m) => m.UserFormComponent),
@@ -29,7 +32,10 @@ export const subscriptionAppChildRoutes: Routes = [
     path: 'contacts',
     loadComponent: () => import('./contacts/contact-form/contact-form').then((m) => m.ContactFormComponent),
   },
-  { path: 'payment-term', redirectTo: 'quotation-template', pathMatch: 'full' },
+  {
+    path: 'payment-term',
+    loadComponent: () => import('./payment-term/payment-term').then((m) => m.PaymentTermComponent),
+  },
   {
     path: 'quotation-template',
     loadComponent: () =>

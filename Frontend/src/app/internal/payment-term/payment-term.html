@@ -1,0 +1,366 @@
+<div class="internal-container">
+  <nav class="internal-nav">
+    <div class="nav-brand">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
+    </div>
+    <div class="nav-links">
+      @for (item of navItems(); track item.label) {
+        @if (item.isDropdown) {
+          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
+            <button
+              type="button"
+              class="nav-link nav-dropdown-btn"
+              [class.nav-link--active]="item.active"
+              (click)="toggleConfig($event)">
+              {{ item.label }}
+              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
+            </button>
+            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
+              @for (sub of item.dropdownItems; track sub.label) {
+                <a
+                  [routerLink]="sub.path"
+                  class="dropdown-item"
+                  routerLinkActive="dropdown-item--current"
+                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
+                  {{ sub.label }}
+                </a>
+              }
+            </div>
+          </div>
+        } @else {
+          <a
+            [routerLink]="item.path"
+            class="nav-link"
+            [class.nav-link--active]="item.active"
+            (click)="onNavClick(item)">
+            {{ item.label }}
+          </a>
+        }
+      }
+    </div>
+    <div class="nav-profile">
+      <a routerLink="/login" class="profile-btn">
+        <span class="material-symbols-outlined">person</span>
+        My Profile
+      </a>
+    </div>
+  </nav>
+
+  <main class="internal-content">
+    <div class="action-bar">
+      <div class="action-left">
+        <button type="button" class="btn-new" (click)="onNew()">
+          <span class="material-symbols-outlined">add</span>
+          New
+        </button>
+        <div class="action-icons">
+          <button type="button" class="icon-btn" (click)="onDelete()" [disabled]="selectedId() === null" title="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+          <button type="button" class="icon-btn" (click)="onSave()" [disabled]="saving()" title="Save">
+            <span class="material-symbols-outlined">save</span>
+          </button>
+        </div>
+        <button type="button" class="btn-secondary" (click)="onReset()">Reset</button>
+        <button type="button" class="btn-secondary" (click)="onCancel()">Cancel</button>
+      </div>
+    </div>
+
+    @if (message()) {
+      <p class="banner banner--ok">{{ message() }}</p>
+    }
+    @if (error()) {
+      <p class="banner banner--err">{{ error() }}</p>
+    }
+
+    <div class="pt-layout">
+      <aside class="pt-sidebar">
+        <h3 class="pt-sidebar-title">Saved terms</h3>
+        @if (loading()) {
+          <p class="helper-text">Loading…</p>
+        } @else if (termsList().length === 0) {
+          <p class="helper-text">No payment terms yet. Click New to create one.</p>
+        } @else {
+          <ul class="pt-term-list">
+            @for (t of termsList(); track t.paymentTermId) {
+              <li>
+                <button
+                  type="button"
+                  class="pt-term-pill"
+                  [class.pt-term-pill--active]="selectedId() === t.paymentTermId"
+                  (click)="selectTerm(t.paymentTermId)">
+                  <span class="pt-term-pill__name">{{ t.termName }}</span>
+                  <span class="pt-term-pill__meta">{{ t.dueType }} · {{ t.status }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </aside>
+
+      <div class="form-container pt-form">
+        <h1 class="pt-page-title">Payment term configuration</h1>
+        <p class="helper-text pt-page-lead">
+          Define reusable due rules for subscriptions, quotations, and invoices.
+        </p>
+
+        <section class="pt-section">
+          <h2 class="pt-section-title">Basic details</h2>
+          <div class="title-group">
+            <input
+              type="text"
+              class="title-input"
+              placeholder="Payment term name"
+              [ngModel]="termName()"
+              (ngModelChange)="termName.set($event)" />
+          </div>
+          <div class="fields-section pt-fields-wide">
+            <div class="field-row">
+              <label class="field-label" for="pt-desc">Description</label>
+              <input
+                id="pt-desc"
+                type="text"
+                class="field-input field-input--wide"
+                [ngModel]="description()"
+                (ngModelChange)="description.set($event)" />
+            </div>
+            <div class="field-row">
+              <label class="field-label" for="pt-status">Status</label>
+              <select
+                id="pt-status"
+                class="field-select"
+                [ngModel]="status()"
+                (ngModelChange)="status.set($event)">
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
+              </select>
+            </div>
+            <div class="field-row field-row--checkbox">
+              <label class="field-label" for="pt-def">Is default</label>
+              <label class="pt-check-label">
+                <input type="checkbox" [ngModel]="isDefault()" (ngModelChange)="isDefault.set($event)" id="pt-def" />
+                Use as default when creating subscriptions
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="pt-section">
+          <h2 class="pt-section-title">Due rule</h2>
+          <div class="fields-section pt-fields-wide">
+            <div class="field-row">
+              <label class="field-label" for="pt-due">Due type</label>
+              <select
+                id="pt-due"
+                class="field-select"
+                [ngModel]="dueType()"
+                (ngModelChange)="dueType.set($event)">
+                @for (d of dueTypes; track d) {
+                  <option [value]="d">{{ d }}</option>
+                }
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label" for="pt-days">Number of days</label>
+              <input
+                id="pt-days"
+                type="number"
+                class="field-input"
+                [ngModel]="days()"
+                (ngModelChange)="days.set($event === '' || $event === null ? null : +$event)" />
+            </div>
+            <div class="field-row">
+              <label class="field-label" for="pt-grace">Grace days</label>
+              <input
+                id="pt-grace"
+                type="number"
+                class="field-input"
+                [ngModel]="graceDays()"
+                (ngModelChange)="graceDays.set(+$event)" />
+            </div>
+            <div class="field-row">
+              <label class="field-label" for="pt-start">Start from</label>
+              <select
+                id="pt-start"
+                class="field-select"
+                [ngModel]="startFrom()"
+                (ngModelChange)="startFrom.set($event)">
+                @for (s of startFromOptions; track s) {
+                  <option [value]="s">{{ s }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </section>
+
+        @if (showSplitSection()) {
+          <section class="pt-section">
+            <h2 class="pt-section-title">Installments / split</h2>
+            <p class="helper-text">Percentages should total 100.</p>
+            <div class="pt-installments">
+              <div class="pt-installments-head">
+                <span>#</span>
+                <span>%</span>
+                <span>Due after (days)</span>
+                <span>Description</span>
+                <span></span>
+              </div>
+              @for (row of installments(); track $index) {
+                <div class="pt-installments-row">
+                  <input
+                    type="number"
+                    class="field-input pt-inp-sm"
+                    [ngModel]="row.installmentNumber"
+                    (ngModelChange)="patchInst($index, 'installmentNumber', $event)" />
+                  <input
+                    type="number"
+                    class="field-input pt-inp-sm"
+                    [ngModel]="row.percentage"
+                    (ngModelChange)="patchInst($index, 'percentage', $event)" />
+                  <input
+                    type="number"
+                    class="field-input pt-inp-sm"
+                    [ngModel]="row.dueAfterDays"
+                    (ngModelChange)="patchInst($index, 'dueAfterDays', $event)" />
+                  <input
+                    type="text"
+                    class="field-input"
+                    [ngModel]="row.description"
+                    (ngModelChange)="patchInst($index, 'description', $event)" />
+                  <button type="button" class="icon-btn" (click)="removeInstallmentRow($index)" title="Remove row">
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                </div>
+              }
+            </div>
+            <button type="button" class="btn-secondary pt-add-row" (click)="addInstallmentRow()">+ Add installment</button>
+          </section>
+        }
+
+        <section class="pt-section">
+          <h2 class="pt-section-title">Allowed payment methods</h2>
+          <div class="pt-methods">
+            <label class="pt-check-label"><input type="checkbox" [ngModel]="methodCard()" (ngModelChange)="methodCard.set($event)" /> CARD</label>
+            <label class="pt-check-label"><input type="checkbox" [ngModel]="methodBank()" (ngModelChange)="methodBank.set($event)" /> BANK_TRANSFER</label>
+            <label class="pt-check-label"><input type="checkbox" [ngModel]="methodUpi()" (ngModelChange)="methodUpi.set($event)" /> UPI</label>
+            <label class="pt-check-label"><input type="checkbox" [ngModel]="methodCash()" (ngModelChange)="methodCash.set($event)" /> CASH</label>
+          </div>
+          <div class="field-row pt-mt">
+            <label class="field-label" for="pt-defm">Default method</label>
+            <select
+              id="pt-defm"
+              class="field-select"
+              [ngModel]="defaultMethod() ?? ''"
+              (ngModelChange)="setDefaultMethod($event)">
+              <option value="">—</option>
+              <option value="CARD" [disabled]="!methodCard()">CARD</option>
+              <option value="BANK_TRANSFER" [disabled]="!methodBank()">BANK_TRANSFER</option>
+              <option value="UPI" [disabled]="!methodUpi()">UPI</option>
+              <option value="CASH" [disabled]="!methodCash()">CASH</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="pt-section">
+          <h2 class="pt-section-title">Late fee</h2>
+          <div class="fields-section pt-fields-wide">
+            <div class="field-row field-row--checkbox">
+              <label class="field-label">Enable</label>
+              <label class="pt-check-label">
+                <input type="checkbox" [ngModel]="enableLateFee()" (ngModelChange)="enableLateFee.set($event)" />
+                Charge late fee when overdue
+              </label>
+            </div>
+            @if (enableLateFee()) {
+              <div class="field-row">
+                <label class="field-label">Type</label>
+                <select class="field-select" [ngModel]="lateFeeType()" (ngModelChange)="lateFeeType.set($event)">
+                  <option value="FIXED">FIXED</option>
+                  <option value="PERCENTAGE">PERCENTAGE</option>
+                </select>
+              </div>
+              <div class="field-row">
+                <label class="field-label">Value</label>
+                <input
+                  type="number"
+                  class="field-input"
+                  [ngModel]="lateFeeValue()"
+                  (ngModelChange)="lateFeeValue.set($event === '' || $event === null ? null : +$event)" />
+              </div>
+              <div class="field-row">
+                <label class="field-label">Apply after (days)</label>
+                <input
+                  type="number"
+                  class="field-input"
+                  [ngModel]="lateFeeAfterDays()"
+                  (ngModelChange)="lateFeeAfterDays.set($event === '' || $event === null ? null : +$event)" />
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="pt-section">
+          <h2 class="pt-section-title">Early payment discount</h2>
+          <div class="fields-section pt-fields-wide">
+            <div class="field-row field-row--checkbox">
+              <label class="field-label">Enable</label>
+              <label class="pt-check-label">
+                <input type="checkbox" [ngModel]="enableEarlyDiscount()" (ngModelChange)="enableEarlyDiscount.set($event)" />
+                Discount if paid early
+              </label>
+            </div>
+            @if (enableEarlyDiscount()) {
+              <div class="field-row">
+                <label class="field-label">Type</label>
+                <select class="field-select" [ngModel]="earlyDiscountType()" (ngModelChange)="earlyDiscountType.set($event)">
+                  <option value="FIXED">FIXED</option>
+                  <option value="PERCENTAGE">PERCENTAGE</option>
+                </select>
+              </div>
+              <div class="field-row">
+                <label class="field-label">Value</label>
+                <input
+                  type="number"
+                  class="field-input"
+                  [ngModel]="earlyDiscountValue()"
+                  (ngModelChange)="earlyDiscountValue.set($event === '' || $event === null ? null : +$event)" />
+              </div>
+              <div class="field-row">
+                <label class="field-label">Valid within (days)</label>
+                <input
+                  type="number"
+                  class="field-input"
+                  [ngModel]="earlyDiscountWithinDays()"
+                  (ngModelChange)="earlyDiscountWithinDays.set($event === '' || $event === null ? null : +$event)" />
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="pt-section">
+          <h2 class="pt-section-title">Notes</h2>
+          <div class="fields-section pt-fields-wide">
+            <div class="field-row field-row--stack">
+              <label class="field-label" for="pt-notes">Notes</label>
+              <textarea
+                id="pt-notes"
+                class="pt-textarea"
+                rows="3"
+                [ngModel]="notes()"
+                (ngModelChange)="notes.set($event)"></textarea>
+            </div>
+            <div class="field-row field-row--stack">
+              <label class="field-label" for="pt-int">Internal remarks</label>
+              <textarea
+                id="pt-int"
+                class="pt-textarea"
+                rows="3"
+                [ngModel]="internalRemarks()"
+                (ngModelChange)="internalRemarks.set($event)"></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>

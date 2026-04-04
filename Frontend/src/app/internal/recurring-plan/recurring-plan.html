@@ -15,7 +15,11 @@
             </button>
             <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
               @for(sub of item.dropdownItems; track sub.label) {
-                <a [routerLink]="sub.path" class="dropdown-item">
+                <a
+                  [routerLink]="sub.path"
+                  class="dropdown-item"
+                  routerLinkActive="dropdown-item--current"
+                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
                   {{ sub.label }}
                 </a>
               }

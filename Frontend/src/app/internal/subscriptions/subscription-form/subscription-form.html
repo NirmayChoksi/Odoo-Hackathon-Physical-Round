@@ -6,18 +6,24 @@
     <div class="nav-links">
       @for (item of navItems(); track item.label) {
         @if (item.isDropdown) {
-          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
+          <div class="nav-dropdown" [class.nav-dropdown--open]="navDropdownOpenKey() === item.label">
             <button
               type="button"
               class="nav-link nav-dropdown-btn"
               [class.nav-link--active]="item.active"
-              (click)="toggleConfig($event)">
+              (click)="toggleNavDropdown($event, item.label)">
               {{ item.label }}
               <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
             </button>
             <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
               @for (sub of item.dropdownItems; track sub.label) {
-                <a [routerLink]="sub.path" class="dropdown-item">{{ sub.label }}</a>
+                <a
+                  [routerLink]="sub.path"
+                  class="dropdown-item"
+                  routerLinkActive="dropdown-item--current"
+                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
+                  {{ sub.label }}
+                </a>
               }
             </div>
           </div>
@@ -43,7 +49,7 @@
   <main class="internal-content sf-main">
     <header class="sf-page-head">
       <nav class="sf-breadcrumb" aria-label="Breadcrumb">
-        <a routerLink="/subscriptions" class="sf-breadcrumb__link">Subscriptions</a>
+        <a [routerLink]="paths.subscriptions" class="sf-breadcrumb__link">Subscriptions</a>
         <span class="material-symbols-outlined sf-breadcrumb__sep" aria-hidden="true">chevron_right</span>
         <span class="sf-breadcrumb__current">New subscription</span>
       </nav>
@@ -61,7 +67,7 @@
 
     <div class="sf-toolbar">
       <div class="sf-toolbar__left">
-        <a routerLink="/subscriptions" class="sf-btn sf-btn--ghost">
+        <a [routerLink]="paths.subscriptions" class="sf-btn sf-btn--ghost">
           <span class="material-symbols-outlined">arrow_back</span>
           Back to list
         </a>
@@ -161,9 +167,8 @@
               class="sf-control sf-control--select"
               [value]="paymentTermId()"
               (change)="paymentTermId.set($any($event.target).value)">
-              <option value="" disabled>Select payment term</option>
-              @for (opt of paymentTermOptions(); track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
+              @for (opt of paymentTermOptions(); track $index) {
+                <option [value]="opt.value" [disabled]="opt.value === ''">{{ opt.label }}</option>
               }
             </select>
           </div>

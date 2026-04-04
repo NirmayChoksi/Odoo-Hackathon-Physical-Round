@@ -2,7 +2,12 @@ import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { INTERNAL_DASHBOARD_NAV_BASE } from '../../external/ecommerce-navigation';
-import { SUBSCRIPTION_APP_BASE, SUBSCRIPTION_APP_PATHS } from '../subscription-app.constants';
+import {
+  CONFIGURATION_DROPDOWN_ITEMS,
+  SUBSCRIPTION_APP_BASE,
+  SUBSCRIPTION_APP_PATHS,
+  USERS_CONTACTS_DROPDOWN_ITEMS,
+} from '../subscription-app.constants';
 
 export interface Subscription {
   number: string;
@@ -16,7 +21,7 @@ export interface Subscription {
 @Component({
   selector: 'app-subscriptions',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './subscriptions.html',
   styleUrl: './subscriptions.css'
 })
@@ -31,24 +36,13 @@ export class SubscriptionsComponent {
       active: false,
       path: SUBSCRIPTION_APP_PATHS.users,
       isDropdown: true,
-      dropdownItems: [
-        { label: 'Users', path: SUBSCRIPTION_APP_PATHS.users },
-        { label: 'Contacts', path: SUBSCRIPTION_APP_PATHS.contacts },
-      ],
+      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
     },
     {
       label: 'Configuration',
       active: false,
       isDropdown: true,
-      dropdownItems: [
-        { label: 'Overview', path: SUBSCRIPTION_APP_PATHS.configuration },
-        { label: 'Attribute', path: SUBSCRIPTION_APP_PATHS.attribute },
-        { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlan },
-        { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplate },
-        { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm },
-        { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discount },
-        { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes },
-      ],
+      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
     },
   ]);
 
@@ -63,7 +57,7 @@ export class SubscriptionsComponent {
 
   // Search/Filter State
   searchQuery = signal('');
-  isConfigOpen = signal(false);
+  navDropdownOpenKey = signal<string | null>(null);
 
   // Computed filtered list
   filteredSubscriptions = computed(() => {
@@ -78,13 +72,13 @@ export class SubscriptionsComponent {
 
   constructor(private router: Router) {
     window.addEventListener('click', () => {
-      this.isConfigOpen.set(false);
+      this.navDropdownOpenKey.set(null);
     });
   }
 
-  toggleConfig(event: Event) {
+  toggleNavDropdown(event: Event, label: string) {
     event.stopPropagation();
-    this.isConfigOpen.set(!this.isConfigOpen());
+    this.navDropdownOpenKey.update((k) => (k === label ? null : label));
   }
 
   onNavClick(item: any) {

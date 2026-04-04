@@ -1,13 +1,17 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { SUBSCRIPTION_APP_PATHS } from '../subscription-app.constants';
+import {
+  CONFIGURATION_DROPDOWN_ITEMS,
+  SUBSCRIPTION_APP_PATHS,
+  USERS_CONTACTS_DROPDOWN_ITEMS,
+} from '../subscription-app.constants';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
   templateUrl: './products.html',
   styleUrl: './products.css'
 })
@@ -23,24 +27,13 @@ export class ProductsComponent {
       active: false,
       path: SUBSCRIPTION_APP_PATHS.users,
       isDropdown: true,
-      dropdownItems: [
-        { label: 'Users', path: SUBSCRIPTION_APP_PATHS.users },
-        { label: 'Contacts', path: SUBSCRIPTION_APP_PATHS.contacts },
-      ],
+      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
     },
     {
       label: 'Configuration',
       active: false,
       isDropdown: true,
-      dropdownItems: [
-        { label: 'Overview', path: SUBSCRIPTION_APP_PATHS.configuration },
-        { label: 'Attribute', path: SUBSCRIPTION_APP_PATHS.attribute },
-        { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlan },
-        { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplate },
-        { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm },
-        { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discount },
-        { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes },
-      ],
+      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
     },
   ]);
 
@@ -64,16 +57,16 @@ export class ProductsComponent {
     alert('Save Product');
   }
 
-  isConfigOpen = signal(false);
+  navDropdownOpenKey = signal<string | null>(null);
 
-  toggleConfig(event: Event) {
+  toggleNavDropdown(event: Event, label: string) {
     event.stopPropagation();
-    this.isConfigOpen.set(!this.isConfigOpen());
+    this.navDropdownOpenKey.update((k) => (k === label ? null : label));
   }
 
   constructor() {
     window.addEventListener('click', () => {
-      this.isConfigOpen.set(false);
+      this.navDropdownOpenKey.set(null);
     });
   }
 

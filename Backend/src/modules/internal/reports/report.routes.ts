@@ -7,6 +7,8 @@ const router = Router();
 
 router.use(requireInternalStaffSync);
 
+router.get("/page", asyncHandler(reportController.page.bind(reportController)));
+router.get("/meta", asyncHandler(reportController.meta.bind(reportController)));
 router.get("/summary", asyncHandler(reportController.summary.bind(reportController)));
 router.get(
   "/active-subscriptions",

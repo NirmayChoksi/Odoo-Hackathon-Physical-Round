@@ -8,14 +8,18 @@
     <div class="nav-links">
       @for(item of navItems(); track item.label) {
         @if(item.isDropdown) {
-          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
-            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active" (click)="toggleConfig($event)">
+          <div class="nav-dropdown" [class.nav-dropdown--open]="navDropdownOpenKey() === item.label">
+            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active" (click)="toggleNavDropdown($event, item.label)">
               {{ item.label }}
               <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
             </button>
             <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
               @for(sub of item.dropdownItems; track sub.label) {
-                <a [routerLink]="sub.path" class="dropdown-item">
+                <a
+                  [routerLink]="sub.path"
+                  class="dropdown-item"
+                  routerLinkActive="dropdown-item--current"
+                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
                   {{ sub.label }}
                 </a>
               }

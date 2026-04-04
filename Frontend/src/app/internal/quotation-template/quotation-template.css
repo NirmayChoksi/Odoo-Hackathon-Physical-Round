@@ -115,7 +115,8 @@
   transition: all 0.2s;
 }
 
-.dropdown-item:hover {
+.dropdown-item:hover,
+.dropdown-item--current {
   background: rgba(241, 145, 109, 0.12);
   color: var(--color-primary);
 }

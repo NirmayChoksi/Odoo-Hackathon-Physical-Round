@@ -12,6 +12,7 @@ import customerRoutes from "./modules/internal/customers/customer.routes";
 import dashboardRoutes from "./modules/internal/dashboard/dashboard.routes";
 import internalInvoiceRoutes from "./modules/internal/invoices/internalInvoice.routes";
 import internalProfileRoutes from "./modules/internal/profile/internalProfile.routes";
+import paymentTermConfigRoutes from "./modules/internal/payment-terms/paymentTerm.routes";
 import paymentRoutes from "./modules/internal/payments/payment.routes";
 import productManagementRoutes from "./modules/internal/product-management/productManagement.routes";
 import variantRoutes from "./modules/internal/product-management/variant.routes";
@@ -53,6 +54,7 @@ app.use("/api/internal/invoices", internalInvoiceRoutes);
 app.use("/api/internal/payments", paymentRoutes);
 app.use("/api/internal/reports", reportRoutes);
 app.use("/api/internal/profile", internalProfileRoutes);
+app.use("/api/internal/config/payment-terms", paymentTermConfigRoutes);
 
 app.use(errorMiddleware);
 
