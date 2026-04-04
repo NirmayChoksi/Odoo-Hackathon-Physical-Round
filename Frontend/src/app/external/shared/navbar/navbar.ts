@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { ecommerceCommands } from '../../ecommerce-navigation';
 import { AuthStore } from '../../../auth/auth.store';
+import { ProfileStore } from '../../../profile/profile.store';
 
 @Component({
   selector: 'app-external-navbar',
@@ -16,6 +17,7 @@ export class NavbarComponent {
   private router = inject(Router);
   public cartService = inject(CartService);
   private authStore = inject(AuthStore);
+  private profileStore = inject(ProfileStore);
 
   /** When set (e.g. `/dashboard/internal`), cart/account/orders use that prefix. */
   linkBase = input<string | undefined>(undefined);
@@ -49,6 +51,7 @@ export class NavbarComponent {
   signOut() {
     this.profileOpen.set(false);
     this.mobileMenuOpen.set(false);
+    this.profileStore.reset();
     this.authStore.logout();
     void this.router.navigate(['/login']);
   }

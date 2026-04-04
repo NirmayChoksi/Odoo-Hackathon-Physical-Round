@@ -149,6 +149,15 @@ export const AuthStore = signalStore(
       localStorage.removeItem('token');
       localStorage.removeItem(AUTH_USER_KEY);
       updateState(store, '[Auth] Logout', { user: null, token: null });
-    }
+    },
+
+    /** Keep session user in sync after profile PATCH (full_name / email). */
+    syncUserFromProfile(updates: Pick<User, 'full_name' | 'email'>) {
+      const u = store.user();
+      if (!u) return;
+      const next: User = { ...u, ...updates };
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(next));
+      updateState(store, '[Auth] Sync Profile', { user: next });
+    },
   }))
 );

@@ -4,12 +4,12 @@ import { ProductComponent } from './external/product/product';
 import { CartComponent } from './external/cart/cart';
 import { CheckoutComponent } from './external/checkout/checkout';
 import { AccountComponent } from './external/account/account';
+import { INTERNAL_DASHBOARD_NAV_BASE } from './external/ecommerce-navigation';
 
 const navData = (navLinkBase: string | undefined) =>
   navLinkBase ? { navLinkBase } : {};
 
-/** Base URL for storefront routes nested under the internal dashboard. */
-export const INTERNAL_DASHBOARD_NAV_BASE = '/dashboard/internal' as const;
+export { INTERNAL_DASHBOARD_NAV_BASE };
 
 export function buildEcommerceRoutes(navLinkBase?: string): Routes {
   const data = navData(navLinkBase);

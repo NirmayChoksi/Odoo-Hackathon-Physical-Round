@@ -20,7 +20,7 @@ export class UpdatePassword {
   confirmPassword = signal('');
   showPassword = signal(false);
   showConfirm = signal(false);
-  
+
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
@@ -72,7 +72,7 @@ export class UpdatePassword {
     this.isLoading.set(true);
     try {
       const res = await this.authStore.verifyReset(email, token, this.password());
-      
+
       if (res.success) {
         this.successMessage.set('Password successfully updated!');
         setTimeout(() => {

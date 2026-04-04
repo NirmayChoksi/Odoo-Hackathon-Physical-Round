@@ -466,3 +466,45 @@ VALUES
     '+1-800-000-0000',
     'ACTIVE'
   );
+
+-- Insert internal user
+INSERT IGNORE INTO users (
+  user_id,
+  full_name,
+  email,
+  password_hash,
+  role_id,
+  phone,
+  status
+)
+VALUES
+  (
+    2,
+    'Internal User',
+    'internal@system.com',
+    '$2b$10$aYr/uWO3gUVEWcoE.MdopeZoA4xY/cf1Ce16L.YvDjyp0qLGD7KfC',
+    2,
+    '+1-800-000-0001',
+    'ACTIVE'
+  );
+
+-- Insert external user
+INSERT IGNORE INTO users (
+  user_id,
+  full_name,
+  email,
+  password_hash,
+  role_id,
+  phone,
+  status
+)
+VALUES
+  (
+    3,
+    'External User',
+    'external@system.com',
+    '$2b$10$aYr/uWO3gUVEWcoE.MdopeZoA4xY/cf1Ce16L.YvDjyp0qLGD7KfC',
+    3,
+    '+1-800-000-0002',
+    'ACTIVE'
+  );

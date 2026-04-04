@@ -1,65 +1,110 @@
 <app-external-navbar [linkBase]="navLinkBase" />
 
 <main class="page-container">
-  
   <div class="account-card">
     <div class="account__header">
-      <h1 class="account__title">Account Settings</h1>
-      <div class="account__tabs">
-        <button class="account__tab account__tab--active">User Details</button>
-        <button class="account__tab" type="button" [routerLink]="ordersCmd">My Orders</button>
+      <div class="account__header-inner">
+        <div>
+          <h1 class="account__title">Account Settings</h1>
+          <p class="account__subtitle">Manage your personal information and preferences.</p>
+        </div>
+        @if (!isEditing() && profileStore.profile()) {
+          <app-button
+            variant="secondary"
+            label="Edit Profile"
+            icon="edit"
+            (click)="toggleEdit()"
+            class="header-action"
+          ></app-button>
+        }
       </div>
     </div>
 
-    <div class="account__content">
-      <div class="account__sidebar">
-        @if (!isEditing()) {
-          <app-button variant="secondary" [fullWidth]="true" label="Edit Profile" icon="edit" (click)="toggleEdit()"></app-button>
-        } @else {
-          <app-button variant="primary" [fullWidth]="true" label="Save Changes" icon="save" (click)="save()"></app-button>
-          <div style="margin-top: 12px">
-            <app-button variant="ghost" [fullWidth]="true" label="Cancel" (click)="toggleEdit()"></app-button>
-          </div>
-        }
+    @if (profileStore.isLoading()) {
+      <div class="account__loading">
+        <div class="spinner"></div>
+        <p>Loading profile…</p>
       </div>
-
-      <div class="account__main">
+    } @else if (profileStore.loadError()) {
+      <div class="account__error-container">
+        <p class="account__status account__status--error">{{ profileStore.loadError() }}</p>
+        <app-button variant="secondary" label="Retry" (click)="reloadProfile()" />
+      </div>
+    } @else {
+      <div class="account__content">
         @if (!isEditing()) {
           <div class="profile-view">
             <div class="profile-group">
-              <label>User Name</label>
-              <p>{{ user().name }}</p>
+              <label>Full Name</label>
+              <p>{{ profileStore.profile()?.full_name }}</p>
             </div>
             <div class="profile-group">
-              <label>Email</label>
-              <p>{{ user().email }}</p>
+              <label>Email Address</label>
+              <p>{{ profileStore.profile()?.email }}</p>
             </div>
             <div class="profile-group">
               <label>Phone Number</label>
-              <p>{{ user().phone }}</p>
+              <p>{{ profileStore.profile()?.phone || 'Not provided' }}</p>
+            </div>
+            <div class="profile-group profile-group--wide">
+              <label>Shipping Address</label>
+              <p>{{ profileStore.addressSummary() }}</p>
             </div>
             <div class="profile-group">
-              <label>Address</label>
-              <p>{{ user().address }}</p>
-            </div>
-            <div class="profile-group">
-              <label>Bio / Other Details</label>
-              <p class="text-italic">{{ user().otherDetails }}</p>
+              <label>Member Since</label>
+              <p>{{ profileStore.profile()?.created_at | date: 'mediumDate' }}</p>
             </div>
           </div>
         } @else {
-          <div class="profile-edit">
-            <div class="edit-row">
-              <app-input label="User Name" [value]="editBuffer.name" (valueChange)="updateField('name', $event)"></app-input>
-              <app-input label="Email" type="email" [value]="editBuffer.email" (valueChange)="updateField('email', $event)"></app-input>
+          <div class="profile-edit-container">
+            <div class="profile-edit">
+              <div class="edit-row">
+                <app-input
+                  class="w-full"
+                  label="Full Name"
+                  type="text"
+                  [value]="editModel().fullName"
+                  (valueChange)="updateField('fullName', $event)"
+                  [error]="fieldErrorMessage(fullNameState().errors())"
+                ></app-input>
+                <app-input
+                  class="w-full"
+                  label="Email Address"
+                  type="email"
+                  [value]="editModel().email"
+                  (valueChange)="updateField('email', $event)"
+                  [error]="fieldErrorMessage(emailState().errors())"
+                ></app-input>
+              </div>
+              <app-input
+                class="w-full"
+                label="Phone Number"
+                type="text"
+                [value]="editModel().phone"
+                (valueChange)="updateField('phone', $event)"
+                [error]="fieldErrorMessage(phoneState().errors())"
+              ></app-input>
+              <div class="account__hint">
+                <span class="material-icons">info</span>
+                <p>Address is managed at checkout. Default shipping address is shown above.</p>
+              </div>
             </div>
-            <app-input label="Phone Number" [value]="editBuffer.phone" (valueChange)="updateField('phone', $event)"></app-input>
-            <app-input label="Address" [value]="editBuffer.address" (valueChange)="updateField('address', $event)"></app-input>
-            <app-input label="Other Details" [value]="editBuffer.otherDetails" (valueChange)="updateField('otherDetails', $event)"></app-input>
+            <div class="profile-edit-actions">
+              <app-button
+                variant="primary"
+                label="Save Changes"
+                icon="save"
+                [disabled]="!profileForm().valid() || profileStore.isSaving()"
+                (click)="save()"
+              ></app-button>
+              <app-button variant="ghost" label="Cancel" (click)="toggleEdit()"></app-button>
+            </div>
+            @if (profileStore.saveError()) {
+              <p class="account__inline-error">{{ profileStore.saveError() }}</p>
+            }
           </div>
         }
       </div>
-    </div>
+    }
   </div>
-
 </main>
