@@ -1,0 +1,92 @@
+<div class="internal-container">
+
+  <!-- Navigation Header -->
+  <nav class="internal-nav">
+    <div class="nav-brand">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
+    </div>
+    <div class="nav-links">
+      @for(item of navItems(); track item.label) {
+        <a href="#" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item); $event.preventDefault()">
+          {{ item.label }}
+        </a>
+      }
+    </div>
+    <div class="nav-profile">
+      <a routerLink="/login" class="profile-btn">
+        <span class="material-symbols-outlined">person</span>
+        My Profile
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content Body -->
+  <main class="internal-content">
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-left">
+        <button class="btn-new" (click)="onNew()">
+          <span class="material-symbols-outlined">add</span>
+          New
+        </button>
+        <div class="action-icons">
+          <button class="icon-btn" (click)="onDelete()" title="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+          <button class="icon-btn" (click)="onSave()" title="Save">
+            <span class="material-symbols-outlined">save</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tax Form Container -->
+    <div class="form-container">
+
+      <!-- Tax Name — large editable title -->
+      <div class="tax-name-group">
+        <input
+          type="text"
+          id="taxName"
+          class="tax-name-input"
+          placeholder="Tax Name"
+          [ngModel]="taxName()"
+          (ngModelChange)="taxName.set($event)" />
+      </div>
+
+      <!-- Fields Section -->
+      <div class="fields-section">
+
+        <!-- Tax Computation Row -->
+        <div class="field-row">
+          <label class="field-label" for="taxComputation">Tax Computation</label>
+          <select
+            id="taxComputation"
+            class="field-select"
+            [value]="taxComputation()"
+            (change)="taxComputation.set($any($event.target).value)">
+            @for(type of computationTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Amount Row -->
+        <div class="field-row">
+          <label class="field-label" for="taxAmount">Amount</label>
+          <input
+            type="number"
+            id="taxAmount"
+            class="field-input"
+            [ngModel]="amount()"
+            (ngModelChange)="amount.set($event)"
+            placeholder="" />
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>

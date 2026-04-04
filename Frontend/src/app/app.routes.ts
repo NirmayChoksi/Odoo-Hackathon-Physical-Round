@@ -15,6 +15,7 @@ export const routes: Routes = [
   { path: 'subscriptions', loadComponent: () => import('./internal/subscriptions/subscriptions').then(m => m.SubscriptionsComponent) },
   { path: 'quotation-template', loadComponent: () => import('./internal/quotation-template/quotation-template').then(m => m.QuotationTemplateComponent) },
   { path: 'discount', loadComponent: () => import('./internal/discount/discount').then(m => m.DiscountComponent) },
+  { path: 'taxes', loadComponent: () => import('./internal/taxes/taxes').then(m => m.TaxesComponent) },
   { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
   { path: 'shop', component: ShopComponent },
   { path: 'shop/:id', component: ProductComponent },
