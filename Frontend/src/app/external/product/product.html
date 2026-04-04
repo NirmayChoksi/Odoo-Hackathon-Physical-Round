@@ -96,7 +96,7 @@
           <span class="prod__qty-val">{{ quantity() }}</span>
           <button class="prod__qty-btn" (click)="increment()">+</button>
         </div>
-        <div style="flex:1;">
+        <div class="prod__add-btn-wrap">
           <button class="prod__add-btn" [class.prod__add-btn--success]="addedToCart()" (click)="addToCart()">
             <span class="material-symbols-outlined">{{ addedToCart() ? 'check' : 'shopping_cart' }}</span>
             <span class="prod__add-btn-label">

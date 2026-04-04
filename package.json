@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "concurrently \"npm run start --prefix Frontend\" \"npm run dev --prefix Backend\"",
-    "install:all": "concurrently \"npm install --prefix Frontend\" \"npm install --prefix Backend\"",
+    "install:all": "concurrently \"npm install --prefix Frontend --include=optional --legacy-peer-deps --ignore-scripts\" \"npm install --prefix Backend\"",
     "setup": "npm run install:all && npm run dev",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
