@@ -146,5 +146,116 @@ export const ProfileStore = signalStore(
         return { success: false, error: errorMsg };
       }
     },
+
+    async addAddress(
+      apiBase: string,
+      body: {
+        fullName: string;
+        phone: string;
+        addressLine1: string;
+        addressLine2?: string;
+        city: string;
+        state: string;
+        postalCode: string;
+        country: string;
+        isDefault: boolean;
+      }
+    ): Promise<{ success: boolean; error?: string }> {
+      updateState(store, '[Profile] Add Address Loading', { isSaving: true, saveError: null });
+      try {
+        await firstValueFrom(
+          http.post(`${apiBase}/addresses`, body)
+        );
+        // Refresh profile to get the new address list
+        await this.loadProfile(apiBase);
+        
+        updateState(store, '[Profile] Add Address Success', { isSaving: false });
+        return { success: true };
+      } catch (err) {
+        const errorMsg = httpErrorMessage(err);
+        updateState(store, '[Profile] Add Address Failure', {
+          isSaving: false,
+          saveError: errorMsg,
+        });
+        return { success: false, error: errorMsg };
+      }
+    },
+
+    async updateAddress(
+      apiBase: string,
+      addressId: number,
+      body: Partial<{
+        fullName: string;
+        phone: string;
+        addressLine1: string;
+        addressLine2: string;
+        city: string;
+        state: string;
+        postalCode: string;
+        country: string;
+        isDefault: boolean;
+      }>
+    ): Promise<{ success: boolean; error?: string }> {
+      updateState(store, '[Profile] Update Address Loading', { isSaving: true, saveError: null });
+      try {
+        await firstValueFrom(
+          http.patch(`${apiBase}/addresses/${addressId}`, body)
+        );
+        await this.loadProfile(apiBase);
+        updateState(store, '[Profile] Update Address Success', { isSaving: false });
+        return { success: true };
+      } catch (err) {
+        const errorMsg = httpErrorMessage(err);
+        updateState(store, '[Profile] Update Address Failure', {
+          isSaving: false,
+          saveError: errorMsg,
+        });
+        return { success: false, error: errorMsg };
+      }
+    },
+
+    async deleteAddress(
+      apiBase: string,
+      addressId: number
+    ): Promise<{ success: boolean; error?: string }> {
+      updateState(store, '[Profile] Delete Address Loading', { isSaving: true, saveError: null });
+      try {
+        await firstValueFrom(
+          http.delete(`${apiBase}/addresses/${addressId}`)
+        );
+        await this.loadProfile(apiBase);
+        updateState(store, '[Profile] Delete Address Success', { isSaving: false });
+        return { success: true };
+      } catch (err) {
+        const errorMsg = httpErrorMessage(err);
+        updateState(store, '[Profile] Delete Address Failure', {
+          isSaving: false,
+          saveError: errorMsg,
+        });
+        return { success: false, error: errorMsg };
+      }
+    },
+
+    async setDefaultAddress(
+      apiBase: string,
+      addressId: number
+    ): Promise<{ success: boolean; error?: string }> {
+      updateState(store, '[Profile] Set Default Address Loading', { isSaving: true, saveError: null });
+      try {
+        await firstValueFrom(
+          http.post(`${apiBase}/addresses/${addressId}/default`, {})
+        );
+        await this.loadProfile(apiBase);
+        updateState(store, '[Profile] Set Default Address Success', { isSaving: false });
+        return { success: true };
+      } catch (err) {
+        const errorMsg = httpErrorMessage(err);
+        updateState(store, '[Profile] Set Default Address Failure', {
+          isSaving: false,
+          saveError: errorMsg,
+        });
+        return { success: false, error: errorMsg };
+      }
+    },
   })),
 );

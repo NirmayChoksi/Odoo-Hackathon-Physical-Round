@@ -41,6 +41,38 @@ export class AccountComponent implements OnInit {
   readonly emailState = computed(() => this.profileForm.email());
   readonly phoneState = computed(() => this.profileForm.phone());
 
+  readonly isAddingAddress = signal(false);
+
+  readonly addressModel = signal({
+    fullName: '',
+    phone: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: '',
+    isDefault: false,
+  });
+
+  readonly addressForm = form(this.addressModel, (m) => {
+    required(m.fullName);
+    required(m.phone);
+    required(m.addressLine1);
+    required(m.city);
+    required(m.state);
+    required(m.postalCode);
+    required(m.country);
+  });
+
+  readonly addrFullNameState = computed(() => this.addressForm.fullName());
+  readonly addrPhoneState = computed(() => this.addressForm.phone());
+  readonly addrLine1State = computed(() => this.addressForm.addressLine1());
+  readonly addrCityState = computed(() => this.addressForm.city());
+  readonly addrStateState = computed(() => this.addressForm.state());
+  readonly addrPostalCodeState = computed(() => this.addressForm.postalCode());
+  readonly addrCountryState = computed(() => this.addressForm.country());
+
   async ngOnInit() {
     await this.reloadProfile();
   }
@@ -89,6 +121,37 @@ export class AccountComponent implements OnInit {
     });
     if (res.success) {
       this.isEditing.set(false);
+    }
+  }
+
+  updateAddressField(field: keyof ReturnType<typeof this.addressModel>, value: any) {
+    this.addressModel.update((m) => ({ ...m, [field]: value }));
+  }
+
+  toggleAddAddress() {
+    if (!this.isAddingAddress()) {
+      const p = this.profileStore.profile();
+      this.addressModel.set({
+        fullName: p?.full_name ?? '',
+        phone: p?.phone ?? '',
+        addressLine1: '',
+        addressLine2: '',
+        city: '',
+        state: '',
+        postalCode: '',
+        country: '',
+        isDefault: this.profileStore.addresses().length === 0,
+      });
+      this.profileStore.clearSaveError();
+    }
+    this.isAddingAddress.update((v) => !v);
+  }
+
+  async saveAddress() {
+    if (!this.addressForm().valid()) return;
+    const res = await this.profileStore.addAddress(this.profileApiUrl(), this.addressModel());
+    if (res.success) {
+      this.isAddingAddress.set(false);
     }
   }
 }

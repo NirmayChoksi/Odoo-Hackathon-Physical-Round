@@ -84,20 +84,188 @@
                 (valueChange)="updateField('phone', $event)"
                 [error]="fieldErrorMessage(phoneState().errors())"
               ></app-input>
-              <div class="account__hint">
-                <span class="material-icons">info</span>
-                <p>Address is managed at checkout. Default shipping address is shown above.</p>
+              <hr
+                style="
+                  margin: 32px 0;
+                  border: none;
+                  border-top: 1px solid var(--color-outline-variant, #e0e0e0);
+                "
+              />
+
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 16px;
+                "
+              >
+                <h3 style="margin: 0; font-size: 1.5rem; color: var(--color-primary)">Addresses</h3>
+                @if (!isAddingAddress()) {
+                  <app-button
+                    variant="secondary"
+                    label="Add Address"
+                    icon="add"
+                    (click)="toggleAddAddress()"
+                  ></app-button>
+                }
               </div>
+
+              @if (isAddingAddress()) {
+                <div
+                  style="
+                    background: var(--color-surface-container-low, #f5f5f5);
+                    padding: 24px;
+                    border-radius: 16px;
+                    margin-bottom: 24px;
+                  "
+                >
+                  <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--color-on-surface)">
+                    Add New Address
+                  </h4>
+                  <div class="profile-edit" style="margin-bottom: 24px">
+                    <app-input
+                      class="w-full"
+                      label="Full Name"
+                      type="text"
+                      [value]="addressModel().fullName"
+                      (valueChange)="updateAddressField('fullName', $event)"
+                      [error]="fieldErrorMessage(addrFullNameState().errors())"
+                    ></app-input>
+                    <app-input
+                      class="w-full"
+                      label="Phone Number"
+                      type="text"
+                      [value]="addressModel().phone"
+                      (valueChange)="updateAddressField('phone', $event)"
+                      [error]="fieldErrorMessage(addrPhoneState().errors())"
+                    ></app-input>
+                    <app-input
+                      class="w-full"
+                      label="Address Line 1"
+                      type="text"
+                      [value]="addressModel().addressLine1"
+                      (valueChange)="updateAddressField('addressLine1', $event)"
+                      [error]="fieldErrorMessage(addrLine1State().errors())"
+                    ></app-input>
+                    <app-input
+                      class="w-full"
+                      label="Address Line 2 (Optional)"
+                      type="text"
+                      [value]="addressModel().addressLine2 || ''"
+                      (valueChange)="updateAddressField('addressLine2', $event)"
+                    ></app-input>
+                    <div class="edit-row">
+                      <app-input
+                        class="w-full"
+                        label="City"
+                        type="text"
+                        [value]="addressModel().city"
+                        (valueChange)="updateAddressField('city', $event)"
+                        [error]="fieldErrorMessage(addrCityState().errors())"
+                      ></app-input>
+                      <app-input
+                        class="w-full"
+                        label="State"
+                        type="text"
+                        [value]="addressModel().state"
+                        (valueChange)="updateAddressField('state', $event)"
+                        [error]="fieldErrorMessage(addrStateState().errors())"
+                      ></app-input>
+                    </div>
+                    <div class="edit-row">
+                      <app-input
+                        class="w-full"
+                        label="Postal Code"
+                        type="text"
+                        [value]="addressModel().postalCode"
+                        (valueChange)="updateAddressField('postalCode', $event)"
+                        [error]="fieldErrorMessage(addrPostalCodeState().errors())"
+                      ></app-input>
+                      <app-input
+                        class="w-full"
+                        label="Country"
+                        type="text"
+                        [value]="addressModel().country"
+                        (valueChange)="updateAddressField('country', $event)"
+                        [error]="fieldErrorMessage(addrCountryState().errors())"
+                      ></app-input>
+                    </div>
+                  </div>
+                  <div class="profile-edit-actions">
+                    <app-button
+                      variant="primary"
+                      label="Save Address"
+                      icon="save"
+                      [disabled]="!addressForm().valid() || profileStore.isSaving()"
+                      (click)="saveAddress()"
+                    ></app-button>
+                    <app-button
+                      variant="ghost"
+                      label="Cancel"
+                      (click)="toggleAddAddress()"
+                    ></app-button>
+                  </div>
+                </div>
+              } @else {
+                <div
+                  class="addresses-list"
+                  style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px"
+                >
+                  @for (address of profileStore.addresses(); track address.address_id) {
+                    <div class="profile-group" style="position: relative">
+                      @if (address.is_default) {
+                        <span
+                          style="
+                            position: absolute;
+                            top: 16px;
+                            right: 16px;
+                            background: var(--color-primary);
+                            color: white;
+                            padding: 4px 8px;
+                            border-radius: 4px;
+                            font-size: 0.8rem;
+                            font-weight: bold;
+                          "
+                          >Default</span
+                        >
+                      }
+                      <p style="margin-bottom: 8px">
+                        <strong>{{ address.address_line1 }}</strong>
+                      </p>
+                      @if (address.address_line2) {
+                        <p>{{ address.address_line2 }}</p>
+                      }
+                      <p>{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
+                      <p>{{ address.country }}</p>
+                    </div>
+                  } @empty {
+                    <div class="account__hint" style="margin-top: 0">
+                      <span class="material-icons">info</span>
+                      <p>You have not added any addresses yet.</p>
+                    </div>
+                  }
+                </div>
+              }
             </div>
-            <div class="profile-edit-actions">
+
+            <hr
+              style="
+                margin: 32px 0;
+                border: none;
+                border-top: 1px solid var(--color-outline-variant, #e0e0e0);
+              "
+            />
+
+            <div class="profile-edit-actions" style="margin-bottom: 16px">
               <app-button
                 variant="primary"
-                label="Save Changes"
+                label="Save Account Changes"
                 icon="save"
                 [disabled]="!profileForm().valid() || profileStore.isSaving()"
                 (click)="save()"
               ></app-button>
-              <app-button variant="ghost" label="Cancel" (click)="toggleEdit()"></app-button>
+              <app-button variant="ghost" label="Cancel Edit" (click)="toggleEdit()"></app-button>
             </div>
             @if (profileStore.saveError()) {
               <p class="account__inline-error">{{ profileStore.saveError() }}</p>
