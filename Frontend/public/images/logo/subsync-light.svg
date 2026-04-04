@@ -1,0 +1,44 @@
+<svg width="300" height="80" viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Light background -->
+  <rect x="0" y="0" width="300" height="80" rx="20" fill="#F3DADF"/>
+
+  <!-- Icon background -->
+  <rect x="12" y="12" width="56" height="56" rx="14" fill="#03122F"/>
+
+  <!-- Refresh arc -->
+  <path d="M40 22 A16 16 0 1 1 25 42" fill="none" stroke="#AE7DAC" stroke-width="2.8" stroke-linecap="round"/>
+
+  <!-- Arrow tip -->
+  <polyline points="21,36 25,44 32,40" fill="none" stroke="#F1916D" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Bill lines -->
+  <line x1="44" y1="31" x2="58" y2="31" stroke="#F3DADF" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="44" y1="40" x2="60" y2="40" stroke="#F3DADF" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="44" y1="49" x2="55" y2="49" stroke="#F3DADF" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
+
+  <!-- Sub -->
+  <text x="82" y="42"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="30"
+    font-weight="700"
+    fill="#03122F"
+    letter-spacing="-0.8">Sub</text>
+
+  <!-- Sync -->
+  <text x="144" y="42"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="30"
+    font-weight="700"
+    fill="#F1916D"
+    letter-spacing="-0.8">Sync</text>
+
+  <!-- Tagline -->
+  <text x="83" y="58"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="9.5"
+    font-weight="500"
+    fill="#413B61"
+    letter-spacing="1.8">SUBSCRIPTION MANAGEMENT</text>
+
+</svg>
