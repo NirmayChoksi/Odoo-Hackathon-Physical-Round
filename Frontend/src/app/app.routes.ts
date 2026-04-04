@@ -1,26 +1,30 @@
 import { Routes } from '@angular/router';
 import { portalPublicRoutes } from './dashboard/pages/portal/portal.routes';
+import { subscriptionStaffGuard } from './dashboard/dashboard.guards';
+import { InternalDashboardLayoutComponent } from './dashboard/pages/internal/internal-dashboard-layout.component';
+import { subscriptionAppChildRoutes } from './internal/subscription-app.routes';
+
+/** Old top-level URLs → `/subscription/...` (bookmarks and old links). */
+const subscriptionLegacyRedirects: Routes = [
+  { path: 'subscriptions/new', redirectTo: 'subscription/subscriptions/new', pathMatch: 'full' },
+  { path: 'subscriptions', redirectTo: 'subscription/subscriptions', pathMatch: 'full' },
+  { path: 'configuration', redirectTo: 'subscription/configuration', pathMatch: 'full' },
+  { path: 'products', redirectTo: 'subscription/products', pathMatch: 'full' },
+  { path: 'reporting', redirectTo: 'subscription/subscriptions', pathMatch: 'full' },
+  { path: 'users', redirectTo: 'subscription/subscriptions', pathMatch: 'full' },
+  { path: 'payment-term', redirectTo: 'subscription/quotation-template', pathMatch: 'full' },
+  { path: 'quotation-template', redirectTo: 'subscription/quotation-template', pathMatch: 'full' },
+  { path: 'discount', redirectTo: 'subscription/discount', pathMatch: 'full' },
+  { path: 'taxes', redirectTo: 'subscription/taxes', pathMatch: 'full' },
+  { path: 'attribute/new', redirectTo: 'subscription/attribute/new', pathMatch: 'full' },
+  { path: 'attribute', redirectTo: 'subscription/attribute', pathMatch: 'full' },
+  { path: 'attribute/:id', redirectTo: 'subscription/attribute/:id', pathMatch: 'full' },
+  { path: 'recurring-plan', redirectTo: 'subscription/recurring-plan', pathMatch: 'full' },
+];
 
 export const routes: Routes = [
-  { path: 'login', loadComponent: () => import('./auth/login/login').then(m => m.Login) },
-  { path: 'signup', loadComponent: () => import('./auth/signup/signup').then(m => m.Signup) },
-  { path: 'reset-password', loadComponent: () => import('./auth/reset-password/reset-password').then(m => m.ResetPassword) },
-  { path: 'update-password', loadComponent: () => import('./auth/update-password/update-password').then(m => m.UpdatePassword) },
-  { path: 'subscriptions/new', loadComponent: () => import('./internal/subscriptions/subscription-form/subscription-form').then(m => m.SubscriptionFormComponent) },
-  { path: 'subscriptions', loadComponent: () => import('./internal/subscriptions/subscriptions').then(m => m.SubscriptionsComponent) },
-  { path: 'configuration', loadComponent: () => import('./internal/configuration/configuration').then(m => m.ConfigurationComponent) },
-  { path: 'products', loadComponent: () => import('./internal/products/products').then(m => m.ProductsComponent) },
-  { path: 'reporting', redirectTo: 'subscriptions', pathMatch: 'full' },
-  { path: 'users', redirectTo: 'subscriptions', pathMatch: 'full' },
-  { path: 'payment-term', redirectTo: 'quotation-template', pathMatch: 'full' },
-  { path: 'quotation-template', loadComponent: () => import('./internal/quotation-template/quotation-template').then(m => m.QuotationTemplateComponent) },
-  { path: 'discount', loadComponent: () => import('./internal/discount/discount').then(m => m.DiscountComponent) },
-  { path: 'taxes', loadComponent: () => import('./internal/taxes/taxes').then(m => m.TaxesComponent) },
-  { path: 'attribute', loadComponent: () => import('./internal/attribute/attribute-list').then(m => m.AttributeListComponent) },
-  { path: 'attribute/:id', loadComponent: () => import('./internal/attribute/attribute-form').then(m => m.AttributeFormComponent) },
-  { path: 'recurring-plan', loadComponent: () => import('./internal/recurring-plan/recurring-plan').then(m => m.RecurringPlanComponent) },
-  { path: 'invoice/:invId', loadComponent: () => import('./external/invoice/invoice').then(m => m.InvoiceComponent) },
-  { path: 'invoice/:orderId/:invId', loadComponent: () => import('./external/invoice/invoice').then(m => m.InvoiceComponent) },
+  { path: 'login', loadComponent: () => import('./auth/login/login').then((m) => m.Login) },
+  { path: 'signup', loadComponent: () => import('./auth/signup/signup').then((m) => m.Signup) },
   {
     path: 'reset-password',
     loadComponent: () => import('./auth/reset-password/reset-password').then((m) => m.ResetPassword),
@@ -29,31 +33,18 @@ export const routes: Routes = [
     path: 'update-password',
     loadComponent: () => import('./auth/update-password/update-password').then((m) => m.UpdatePassword),
   },
+  ...subscriptionLegacyRedirects,
   {
-    path: 'subscriptions/new',
-    loadComponent: () =>
-      import('./internal/subscriptions/subscription-form/subscription-form').then(
-        (m) => m.SubscriptionFormComponent,
-      ),
+    path: 'subscription',
+    component: InternalDashboardLayoutComponent,
+    canActivate: [subscriptionStaffGuard],
+    children: subscriptionAppChildRoutes,
   },
-  {
-    path: 'subscriptions',
-    loadComponent: () => import('./internal/subscriptions/subscriptions').then((m) => m.SubscriptionsComponent),
-  },
-  {
-    path: 'quotation-template',
-    loadComponent: () =>
-      import('./internal/quotation-template/quotation-template').then((m) => m.QuotationTemplateComponent),
-  },
-  { path: 'discount', loadComponent: () => import('./internal/discount/discount').then((m) => m.DiscountComponent) },
   {
     path: 'dashboard',
     loadChildren: () => import('./dashboard/dashboard.routes').then((m) => m.dashboardRoutes),
   },
   ...portalPublicRoutes,
   { path: '', pathMatch: 'full', redirectTo: '/login' },
-  {
-    path: '**',
-    redirectTo: '/login',
-  },
+  { path: '**', redirectTo: '/login' },
 ];

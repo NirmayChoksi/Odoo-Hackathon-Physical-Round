@@ -1,5 +1,6 @@
 import type { Request } from "express";
-import { clampLimit, clampPage } from "../../../utils/pagination";
+import { z } from "zod";
+import { optionalPositiveIntQuery, optionalSearch, optionalUpperEnum, zodQueryParse, zQueryLimit, zQueryPage } from "../../../utils/zodSql";
 import type {
   CreateSubscriptionBody,
   CreateSubscriptionItemBody,
@@ -9,7 +10,8 @@ import type {
   SubscriptionListQuery
 } from "./subscription.types";
 
-const STATUSES = new Set(["DRAFT", "QUOTATION", "CONFIRMED", "ACTIVE", "CLOSED"]);
+const SUBSCRIPTION_STATUSES = ["DRAFT", "QUOTATION", "CONFIRMED", "ACTIVE", "CLOSED"] as const;
+const STATUSES: ReadonlySet<string> = new Set(SUBSCRIPTION_STATUSES);
 
 function num(v: unknown): number | undefined {
   if (v === undefined || v === null || v === "") return undefined;
@@ -17,31 +19,18 @@ function num(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+const subscriptionListQuerySchema = z.object({
+  page: zQueryPage(1),
+  limit: zQueryLimit(10),
+  search: optionalSearch(500),
+  status: optionalUpperEnum(SUBSCRIPTION_STATUSES),
+  customerId: optionalPositiveIntQuery,
+});
+
 export function parseSubscriptionListQuery(
   req: Request
 ): { ok: true; value: SubscriptionListQuery } | { ok: false; errors: string[] } {
-  const q = req.query as Record<string, unknown>;
-  const page = clampPage(Number(q.page) || 1);
-  const limit = clampLimit(Number(q.limit) || 10);
-  const search = q.search != null ? String(q.search).trim() : undefined;
-  const status = q.status != null ? String(q.status).trim().toUpperCase() : undefined;
-  if (status && !STATUSES.has(status)) {
-    return { ok: false, errors: ["Invalid status"] };
-  }
-  const customerId = num(q.customerId);
-  if (q.customerId !== undefined && customerId !== undefined && (!Number.isInteger(customerId) || customerId < 1)) {
-    return { ok: false, errors: ["customerId invalid"] };
-  }
-  return {
-    ok: true,
-    value: {
-      page,
-      limit,
-      status,
-      customerId: customerId !== undefined && Number.isInteger(customerId) ? customerId : undefined,
-      search: search || undefined
-    }
-  };
+  return zodQueryParse(subscriptionListQuerySchema, req.query);
 }
 
 export function parseCreateSubscription(

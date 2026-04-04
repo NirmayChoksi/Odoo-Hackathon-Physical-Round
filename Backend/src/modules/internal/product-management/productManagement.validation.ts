@@ -1,5 +1,6 @@
 import type { Request } from "express";
-import { clampLimit, clampPage } from "../../../utils/pagination";
+import { z } from "zod";
+import { optionalSearch, optionalUpperEnum, zodQueryParse, zQueryLimit, zQueryPage } from "../../../utils/zodSql";
 import type {
   AttachPlanBody,
   CreateProductBody,
@@ -15,18 +16,17 @@ function num(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+const productListQuerySchema = z.object({
+  page: zQueryPage(1),
+  limit: zQueryLimit(20),
+  search: optionalSearch(500),
+  status: optionalUpperEnum(["ACTIVE", "INACTIVE"]),
+});
+
 export function parseProductListQuery(
   req: Request
 ): { ok: true; value: ProductListQuery } | { ok: false; errors: string[] } {
-  const q = req.query as Record<string, unknown>;
-  const page = clampPage(Number(q.page) || 1);
-  const limit = clampLimit(Number(q.limit) || 20);
-  const search = q.search != null ? String(q.search).trim() : undefined;
-  const status = q.status != null ? String(q.status).trim().toUpperCase() : undefined;
-  if (status && !["ACTIVE", "INACTIVE"].includes(status)) {
-    return { ok: false, errors: ["status must be ACTIVE or INACTIVE"] };
-  }
-  return { ok: true, value: { page, limit, search: search || undefined, status } };
+  return zodQueryParse(productListQuerySchema, req.query);
 }
 
 export function parseCreateProduct(

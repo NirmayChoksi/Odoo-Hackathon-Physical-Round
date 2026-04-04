@@ -1,19 +1,19 @@
 import type { Request } from "express";
-import { clampLimit, clampPage } from "../../../utils/pagination";
+import { z } from "zod";
+import { optionalSearch, optionalUpperEnum, zodQueryParse, zQueryLimit, zQueryPage } from "../../../utils/zodSql";
 import type { CreateCustomerBody, CustomerListQuery, PatchCustomerBody } from "./customer.types";
+
+const customerListQuerySchema = z.object({
+  page: zQueryPage(1),
+  limit: zQueryLimit(10),
+  search: optionalSearch(500),
+  status: optionalUpperEnum(["ACTIVE", "INACTIVE"]),
+});
 
 export function parseCustomerListQuery(
   req: Request
 ): { ok: true; value: CustomerListQuery } | { ok: false; errors: string[] } {
-  const q = req.query as Record<string, unknown>;
-  const page = clampPage(Number(q.page) || 1);
-  const limit = clampLimit(Number(q.limit) || 10);
-  const search = q.search != null ? String(q.search).trim() : undefined;
-  const status = q.status != null ? String(q.status).trim().toUpperCase() : undefined;
-  if (status && !["ACTIVE", "INACTIVE"].includes(status)) {
-    return { ok: false, errors: ["status must be ACTIVE or INACTIVE"] };
-  }
-  return { ok: true, value: { page, limit, search: search || undefined, status } };
+  return zodQueryParse(customerListQuerySchema, req.query);
 }
 
 export function parseCreateCustomer(

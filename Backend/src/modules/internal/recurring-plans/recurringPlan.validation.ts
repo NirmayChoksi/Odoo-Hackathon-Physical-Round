@@ -1,21 +1,21 @@
 import type { Request } from "express";
-import { clampLimit, clampPage } from "../../../utils/pagination";
+import { z } from "zod";
+import { optionalSearch, optionalUpperEnum, zodQueryParse, zQueryLimit, zQueryPage } from "../../../utils/zodSql";
 import type { CreatePlanBody, PatchPlanBody, PlanListQuery } from "./recurringPlan.types";
 
 const BILLING = new Set(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]);
 
+const planListQuerySchema = z.object({
+  page: zQueryPage(1),
+  limit: zQueryLimit(20),
+  search: optionalSearch(500),
+  status: optionalUpperEnum(["ACTIVE", "INACTIVE"]),
+});
+
 export function parsePlanListQuery(
   req: Request
 ): { ok: true; value: PlanListQuery } | { ok: false; errors: string[] } {
-  const q = req.query as Record<string, unknown>;
-  const page = clampPage(Number(q.page) || 1);
-  const limit = clampLimit(Number(q.limit) || 20);
-  const search = q.search != null ? String(q.search).trim() : undefined;
-  const status = q.status != null ? String(q.status).trim().toUpperCase() : undefined;
-  if (status && !["ACTIVE", "INACTIVE"].includes(status)) {
-    return { ok: false, errors: ["status must be ACTIVE or INACTIVE"] };
-  }
-  return { ok: true, value: { page, limit, search: search || undefined, status } };
+  return zodQueryParse(planListQuerySchema, req.query);
 }
 
 export function parseCreatePlan(

@@ -18,7 +18,7 @@
             </button>
             <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
               @for (sub of item.dropdownItems; track sub.label) {
-                <a [routerLink]="sub.path" class="dropdown-item" [class.dropdown-item--current]="sub.path === '/configuration'">
+                <a [routerLink]="sub.path" class="dropdown-item" [class.dropdown-item--current]="sub.path === paths.configuration">
                   {{ sub.label }}
                 </a>
               }
@@ -46,7 +46,7 @@
   <main class="internal-content">
     <div class="action-bar">
       <div class="action-left">
-        <a class="btn-new" routerLink="/attribute/new">
+        <a class="btn-new" [routerLink]="paths.attributeNew">
           <span class="material-symbols-outlined">add</span>
           New
         </a>

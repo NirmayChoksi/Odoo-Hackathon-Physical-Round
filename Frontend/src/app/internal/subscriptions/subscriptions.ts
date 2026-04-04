@@ -1,6 +1,8 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { INTERNAL_DASHBOARD_NAV_BASE } from '../../external/ecommerce-navigation';
+import { SUBSCRIPTION_APP_BASE, SUBSCRIPTION_APP_PATHS } from '../subscription-app.constants';
 
 export interface Subscription {
   number: string;
@@ -21,24 +23,24 @@ export interface Subscription {
 export class SubscriptionsComponent {
   // Navigation State
   navItems = signal([
-    { label: 'Subscriptions', active: true, path: '/subscriptions' },
-    { label: 'Products', active: false, path: '/products' },
-    { label: 'Reporting', active: false, path: '/reporting' },
-    { label: 'Users/Contacts', active: false, path: '/users' },
-    { 
-      label: 'Configuration', 
-      active: false, 
+    { label: 'Subscriptions', active: true, path: SUBSCRIPTION_APP_PATHS.subscriptions },
+    { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
+    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
+    { label: 'Users/Contacts', active: false, path: SUBSCRIPTION_APP_PATHS.users },
+    {
+      label: 'Configuration',
+      active: false,
       isDropdown: true,
       dropdownItems: [
-        { label: 'Overview', path: '/configuration' },
-        { label: 'Attribute', path: '/attribute' },
-        { label: 'Recurring Plan', path: '/recurring-plan' },
-        { label: 'Quotation Template', path: '/quotation-template' },
-        { label: 'Payment term', path: '/payment-term' },
-        { label: 'Discount', path: '/discount' },
-        { label: 'Taxes', path: '/taxes' }
-      ]
-    }
+        { label: 'Overview', path: SUBSCRIPTION_APP_PATHS.configuration },
+        { label: 'Attribute', path: SUBSCRIPTION_APP_PATHS.attribute },
+        { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlan },
+        { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplate },
+        { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm },
+        { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discount },
+        { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes },
+      ],
+    },
   ]);
 
   // Data State
@@ -85,27 +87,31 @@ export class SubscriptionsComponent {
     this.searchQuery.set(event.target.value);
   }
 
-  /** When embedded under `/dashboard/internal`, storefront links use this prefix. */
-  private navPrefix(): string {
-    return this.router.url.split('?')[0].startsWith('/dashboard/internal') ? '/dashboard/internal' : '';
+  /** Staff storefront lives under `/dashboard/internal`; subscription UI under `/subscription`. */
+  private staffStorefrontBase(): string | null {
+    const url = this.router.url.split('?')[0];
+    if (url.startsWith('/dashboard/internal') || url.startsWith(SUBSCRIPTION_APP_BASE)) {
+      return INTERNAL_DASHBOARD_NAV_BASE;
+    }
+    return null;
   }
 
   subsHomeLink(): string {
-    return this.navPrefix() || '/subscriptions';
+    return SUBSCRIPTION_APP_PATHS.subscriptions;
   }
 
   shopLink(): string {
-    const p = this.navPrefix();
-    return p ? `${p}/shop` : '/shop';
+    const b = this.staffStorefrontBase();
+    return b ? `${b}/shop` : '/shop';
   }
 
   accountLink(): string {
-    const p = this.navPrefix();
-    return p ? `${p}/account` : '/account';
+    const b = this.staffStorefrontBase();
+    return b ? `${b}/account` : '/account';
   }
 
   onNewSubscription() {
-    this.router.navigate(['/subscriptions/new']);
+    void this.router.navigate([SUBSCRIPTION_APP_PATHS.subscriptionsNew]);
   }
 
   onDelete() {

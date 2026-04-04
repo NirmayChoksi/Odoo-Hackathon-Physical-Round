@@ -37,14 +37,7 @@ export const dashboardRoutes: Routes = [
             (m) => m.InternalDashboardLayoutComponent,
           ),
         children: [
-          {
-            path: '',
-            pathMatch: 'full',
-            loadComponent: () =>
-              import('./pages/internal/internal-subscriptions-page.component').then(
-                (m) => m.InternalSubscriptionsPageComponent,
-              ),
-          },
+          { path: '', pathMatch: 'full', redirectTo: '/subscription' },
           ...buildEcommerceRoutes(INTERNAL_DASHBOARD_NAV_BASE),
         ],
       },

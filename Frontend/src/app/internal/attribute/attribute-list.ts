@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { SUBSCRIPTION_APP_PATHS, subscriptionAttributeDetailPath } from '../subscription-app.constants';
 
 @Component({
   selector: 'app-attribute-list',
@@ -11,27 +12,29 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './attribute-list.css'
 })
 export class AttributeListComponent {
+  readonly paths = SUBSCRIPTION_APP_PATHS;
+  readonly attributeDetailPath = subscriptionAttributeDetailPath;
 
   // Navigation State
   navItems = signal([
-    { label: 'Subscriptions', active: false, path: '/subscriptions' },
-    { label: 'Products', active: false, path: '/products' },
-    { label: 'Reporting', active: false, path: '/reporting' },
-    { label: 'Users/Contacts', active: false, path: '/users' },
-    { 
-      label: 'Configuration', 
-      active: true, 
+    { label: 'Subscriptions', active: false, path: SUBSCRIPTION_APP_PATHS.subscriptions },
+    { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
+    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
+    { label: 'Users/Contacts', active: false, path: SUBSCRIPTION_APP_PATHS.users },
+    {
+      label: 'Configuration',
+      active: true,
       isDropdown: true,
       dropdownItems: [
-        { label: 'Overview', path: '/configuration' },
-        { label: 'Attribute', path: '/attribute' },
-        { label: 'Recurring Plan', path: '/recurring-plan' },
-        { label: 'Quotation Template', path: '/quotation-template' },
-        { label: 'Payment term', path: '/payment-term' },
-        { label: 'Discount', path: '/discount' },
-        { label: 'Taxes', path: '/taxes' }
-      ]
-    }
+        { label: 'Overview', path: SUBSCRIPTION_APP_PATHS.configuration },
+        { label: 'Attribute', path: SUBSCRIPTION_APP_PATHS.attribute },
+        { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlan },
+        { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplate },
+        { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm },
+        { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discount },
+        { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes },
+      ],
+    },
   ]);
 
   // Table Data

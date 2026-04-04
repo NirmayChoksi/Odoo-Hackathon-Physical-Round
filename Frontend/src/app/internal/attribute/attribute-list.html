@@ -42,7 +42,7 @@
     <!-- Action Bar -->
     <div class="action-bar">
       <div class="action-left">
-        <button class="btn-new" routerLink="/attribute/new">
+        <button class="btn-new" [routerLink]="paths.attributeNew">
           <span class="material-symbols-outlined">add</span>
           New
         </button>
@@ -80,7 +80,7 @@
         </thead>
         <tbody>
           @for(attr of attributes(); track attr.id) {
-            <tr [routerLink]="['/attribute', attr.id]">
+            <tr [routerLink]="attributeDetailPath(attr.id)">
               <td class="checkbox-cell"><input type="checkbox" (click)="$event.stopPropagation()" /></td>
               <td class="accent-text">{{ attr.name }}</td>
               <td>{{ attr.values }}</td>

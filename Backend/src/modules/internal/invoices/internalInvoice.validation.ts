@@ -1,5 +1,6 @@
 import type { Request } from "express";
-import { clampLimit, clampPage } from "../../../utils/pagination";
+import { z } from "zod";
+import { optionalPositiveIntQuery, optionalUpperEnum, zodQueryParse, zQueryLimit, zQueryPage } from "../../../utils/zodSql";
 import type { CreateInternalInvoiceBody, InternalInvoiceListQuery } from "./internalInvoice.types";
 
 function num(v: unknown): number | undefined {
@@ -8,28 +9,17 @@ function num(v: unknown): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+const internalInvoiceListQuerySchema = z.object({
+  page: zQueryPage(1),
+  limit: zQueryLimit(20),
+  status: optionalUpperEnum(["DRAFT", "CONFIRMED", "PAID", "CANCELLED"]),
+  customerId: optionalPositiveIntQuery,
+});
+
 export function parseInternalInvoiceListQuery(
   req: Request
 ): { ok: true; value: InternalInvoiceListQuery } | { ok: false; errors: string[] } {
-  const q = req.query as Record<string, unknown>;
-  const page = clampPage(Number(q.page) || 1);
-  const limit = clampLimit(Number(q.limit) || 20);
-  const status = q.status != null ? String(q.status).trim().toUpperCase() : undefined;
-  const allowed = new Set(["DRAFT", "CONFIRMED", "PAID", "CANCELLED"]);
-  if (status && !allowed.has(status)) return { ok: false, errors: ["Invalid status"] };
-  const customerId = num(q.customerId);
-  if (q.customerId !== undefined && customerId !== undefined && (!Number.isInteger(customerId) || customerId < 1)) {
-    return { ok: false, errors: ["customerId invalid"] };
-  }
-  return {
-    ok: true,
-    value: {
-      page,
-      limit,
-      status,
-      customerId: customerId !== undefined && Number.isInteger(customerId) ? customerId : undefined
-    }
-  };
+  return zodQueryParse(internalInvoiceListQuerySchema, req.query);
 }
 
 export function parseCreateInternalInvoice(

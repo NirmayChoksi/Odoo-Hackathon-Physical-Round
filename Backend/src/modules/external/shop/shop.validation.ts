@@ -1,70 +1,60 @@
-import type { Request } from 'express';
-import { clampLimit, clampPage } from '../../../utils/pagination';
-import { normalizeSortOrder, pickSortColumn } from '../../../utils/queryBuilder';
-import type { BillingPeriod, ShopListQuery } from './shop.types';
+import type { Request } from "express";
+import { z } from "zod";
+import type { ShopListQuery } from "./shop.types";
+import {
+  firstQueryValue,
+  optionalNonNegativeNumber,
+  optionalSearch,
+  optionalUpperEnum,
+  zodQueryParse,
+  zQueryLimit,
+  zQueryPage,
+} from "../../../utils/zodSql";
 
-const BILLING: Set<string> = new Set(['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']);
-const SORT_COLUMNS = ['product_name', 'price', 'created_at'] as const;
-
-function parseNum(q: Record<string, unknown>, key: string): number | undefined {
-  const v = q[key];
-  if (v === undefined || v === null || v === '') return undefined;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : undefined;
-}
-
-function parseStr(q: Record<string, unknown>, key: string): string | undefined {
-  const v = q[key];
-  if (v === undefined || v === null) return undefined;
-  const s = String(v).trim();
-  return s === '' ? undefined : s;
-}
+const shopListQuerySchema = z
+  .object({
+    page: zQueryPage(1),
+    limit: zQueryLimit(20),
+    search: optionalSearch(500),
+    productType: optionalSearch(120),
+    category: optionalSearch(120),
+    minPrice: optionalNonNegativeNumber,
+    maxPrice: optionalNonNegativeNumber,
+    billingPeriod: optionalUpperEnum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]),
+    sortBy: z.preprocess((v) => {
+      const x = firstQueryValue(v);
+      if (x === undefined || x === null) return "created_at";
+      const c = String(x).trim().replace(/[^a-zA-Z0-9_]/g, "");
+      return ["product_name", "price", "created_at"].includes(c) ? c : "created_at";
+    }, z.enum(["product_name", "price", "created_at"])),
+    sortOrder: z.preprocess((v) => {
+      const x = firstQueryValue(v);
+      const s = typeof x === "string" ? x.trim().toLowerCase() : "";
+      if (s === "asc" || s === "desc") return s;
+      return "desc";
+    }, z.enum(["asc", "desc"])),
+  })
+  .superRefine((data, ctx) => {
+    if (data.minPrice !== undefined && data.maxPrice !== undefined && data.minPrice > data.maxPrice) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "minPrice cannot exceed maxPrice", path: ["maxPrice"] });
+    }
+  })
+  .transform(
+    (d): ShopListQuery => ({
+      page: d.page,
+      limit: d.limit,
+      search: d.search,
+      productType: d.productType ?? d.category,
+      minPrice: d.minPrice,
+      maxPrice: d.maxPrice,
+      billingPeriod: d.billingPeriod,
+      sortBy: d.sortBy,
+      sortOrder: d.sortOrder,
+    })
+  );
 
 export function parseShopListQuery(
-  req: Request,
+  req: Request
 ): { ok: true; value: ShopListQuery } | { ok: false; errors: string[] } {
-  const q = req.query as Record<string, unknown>;
-  const errors: string[] = [];
-
-  const page = clampPage(parseNum(q, 'page') ?? 1);
-  const limit = clampLimit(parseNum(q, 'limit') ?? 20);
-
-  const minPrice = parseNum(q, 'minPrice');
-  const maxPrice = parseNum(q, 'maxPrice');
-  if (minPrice !== undefined && minPrice < 0) errors.push('minPrice must be >= 0');
-  if (maxPrice !== undefined && maxPrice < 0) errors.push('maxPrice must be >= 0');
-  if (minPrice !== undefined && maxPrice !== undefined && minPrice > maxPrice) {
-    errors.push('minPrice cannot exceed maxPrice');
-  }
-
-  const billingRaw = parseStr(q, 'billingPeriod')?.toUpperCase();
-  let billingPeriod: BillingPeriod | undefined;
-  if (billingRaw) {
-    if (BILLING.has(billingRaw)) billingPeriod = billingRaw as BillingPeriod;
-    else errors.push('billingPeriod must be DAILY, WEEKLY, MONTHLY, or YEARLY');
-  }
-
-  const sortBy = pickSortColumn(
-    parseStr(q, 'sortBy'),
-    SORT_COLUMNS,
-    'created_at',
-  ) as ShopListQuery['sortBy'];
-  const sortOrder = normalizeSortOrder(parseStr(q, 'sortOrder'), 'desc');
-
-  if (errors.length) return { ok: false, errors };
-
-  return {
-    ok: true,
-    value: {
-      page,
-      limit,
-      search: parseStr(q, 'search'),
-      productType: parseStr(q, 'productType') || parseStr(q, 'category'),
-      minPrice,
-      maxPrice,
-      billingPeriod,
-      sortBy,
-      sortOrder,
-    },
-  };
+  return zodQueryParse(shopListQuerySchema, req.query);
 }
