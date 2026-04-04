@@ -80,12 +80,13 @@
         </div>
         <div class="shop__sort-wrap">
           <label class="shop__sort-label">Sort By:</label>
-          <select class="shop__sort" (change)="onSort($any($event.target).value)">
-            <option value="default">Default</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name">Name A–Z</option>
-          </select>
+          <app-select 
+            class="shop__sort-custom"
+            [options]="sortOptions" 
+            [value]="sortBy()" 
+            (valueChange)="onSort($any($event))"
+            placeholder="Default">
+          </app-select>
         </div>
       </div>
 

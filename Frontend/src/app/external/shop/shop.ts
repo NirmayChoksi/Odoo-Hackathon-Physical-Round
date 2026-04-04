@@ -7,11 +7,13 @@ import { ButtonComponent } from '../../components/button/button';
 import { CardComponent } from '../../components/card/card';
 import { CATEGORIES, MOCK_PRODUCTS } from '../mock-products';
 import { NavbarComponent } from '../shared/navbar/navbar';
+import { SelectComponent, SelectOption } from '../../components/select/select';
+import { InputComponent } from '../../components/input/input';
 
 @Component({
   selector: 'app-shop',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent, CardComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, InputComponent, CardComponent, ButtonComponent, SelectComponent],
   templateUrl: './shop.html',
   styleUrl: './shop.css'
 })
@@ -27,6 +29,13 @@ export class ShopComponent implements OnInit {
   minPrice = signal(0);
   maxPrice = signal(5000);
   sortBy = signal<'default' | 'price-asc' | 'price-desc' | 'name'>('default');
+
+  sortOptions: SelectOption[] = [
+    { value: 'default', label: 'Default' },
+    { value: 'price-asc', label: 'Price: Low to High' },
+    { value: 'price-desc', label: 'Price: High to Low' },
+    { value: 'name', label: 'Name A–Z' }
+  ];
 
   filteredProducts = computed(() => {
     let products = [...this.allProducts];
@@ -63,7 +72,7 @@ export class ShopComponent implements OnInit {
 
   private router = inject(Router);
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   selectCategory(cat: string) { this.selectedCategory.set(cat); }
   onSearchInputComponent(value: string) { this.searchQuery.set(value); }

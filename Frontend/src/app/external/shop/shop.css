@@ -202,26 +202,43 @@
   color: var(--color-on-surface-variant);
   white-space: nowrap;
 }
-.shop__sort {
-  padding: 10px 36px 10px 14px;
-  border: 1.5px solid var(--color-outline-variant);
-  border-radius: 10px;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  color: var(--color-on-surface);
-  background: var(--color-surface-container-low);
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23b0bec5%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
+.shop__sort-custom {
+  width: 180px;
 }
-.shop__sort:focus { border-color: var(--color-primary); }
-.shop__sort option {
-  background-color: var(--color-surface-container-high);
-  color: var(--color-on-surface);
+.shop__sort-custom ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+.shop__sort-custom ::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: var(--color-surface-container-low) !important;
+  height: 42px !important;
+  cursor: pointer !important;
+  border-radius: 10px !important;
+}
+.shop__sort-custom ::ng-deep .mat-mdc-form-field-flex {
+  height: 42px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.shop__sort-custom ::ng-deep .mdc-notched-outline__leading,
+.shop__sort-custom ::ng-deep .mdc-notched-outline__notch,
+.shop__sort-custom ::ng-deep .mdc-notched-outline__trailing {
+  border-color: var(--color-outline-variant) !important;
+  border-width: 1.5px !important;
+}
+.shop__sort-custom:hover ::ng-deep .mdc-notched-outline__leading,
+.shop__sort-custom:hover ::ng-deep .mdc-notched-outline__notch,
+.shop__sort-custom:hover ::ng-deep .mdc-notched-outline__trailing {
+  border-color: var(--color-primary) !important;
+}
+.shop__sort-custom ::ng-deep .mat-mdc-select-value {
+  font-family: var(--font-body) !important;
+  font-size: 0.85rem !important;
+  color: var(--color-on-surface) !important;
+  font-weight: 500 !important;
+}
+.shop__sort-custom ::ng-deep .mat-mdc-select-arrow svg {
+  color: var(--color-on-surface-variant) !important;
+  fill: var(--color-on-surface-variant) !important;
 }
 
 /* Product Grid */

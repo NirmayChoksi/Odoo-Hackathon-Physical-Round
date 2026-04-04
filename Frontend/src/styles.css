@@ -211,3 +211,40 @@ body:has(app-subscription-form) {
   color: var(--color-on-surface);
   letter-spacing: -0.02em;
 }
+ 
+/* ── Material Select Global Dark Theme ── */
+.mat-mdc-select-panel {
+  background-color: #1e293b !important; /* surface-container-high */
+  border: 1px solid #334155 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+.mat-mdc-option {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  min-height: 44px !important;
+}
+
+.mat-mdc-option .mdc-list-item__primary-text {
+  font-family: var(--font-body) !important;
+  font-size: 0.85rem !important;
+  color: #f8fafc !important;
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled) {
+  background-color: rgba(255, 181, 154, 0.08) !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background-color: rgba(255, 181, 154, 0.12) !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) .mdc-list-item__primary-text {
+  color: #ffb59a !important; /* primary */
+  font-weight: 700 !important;
+}
+
+/* Fix for check icon in select */
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) .mat-pseudo-checkbox-checked {
+  display: none !important; /* Keep it clean like Image 2 */
+}
