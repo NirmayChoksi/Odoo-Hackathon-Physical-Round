@@ -103,7 +103,7 @@ export const authService = {
 
     // Construct reset link
     const clientUrl = process.env.CLIENT_URL || 'http://localhost:3000';
-    const resetUrl = `${clientUrl}/reset-password?token=${token}&email=${email}`;
+    const resetUrl = `${clientUrl}/update-password?token=${token}&email=${email}`;
 
     const htmlMessage = `
       <p>Hello ${user.full_name},</p>

@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthStore } from '../auth.store';
 
 @Component({
   selector: 'app-signup',
@@ -12,7 +12,7 @@ import { AuthService } from '../auth.service';
   styleUrl: './signup.css'
 })
 export class Signup {
-  private authService = inject(AuthService);
+  private authStore = inject(AuthStore);
   private router = inject(Router);
 
   name = signal('');
@@ -80,7 +80,7 @@ export class Signup {
 
     this.isLoading.set(true);
     try {
-      const res = await this.authService.signup(this.name(), this.email(), this.password());
+      const res = await this.authStore.signup(this.name(), this.email(), this.password());
       if (res.success) {
         this.router.navigate(['/login']);
       } else {

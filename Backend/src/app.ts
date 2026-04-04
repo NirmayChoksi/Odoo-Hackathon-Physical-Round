@@ -21,6 +21,7 @@ import recurringPlanRoutes from "./modules/internal/recurring-plans/recurringPla
 import reportRoutes from "./modules/internal/reports/report.routes";
 import subscriptionItemRoutes from "./modules/internal/subscription-items/subscriptionItem.routes";
 import subscriptionRoutes from "./modules/internal/subscriptions/subscription.routes";
+import authRoutes from "./modules/auth/auth.routes";
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use("/api/external/checkout", checkoutRoutes);
 app.use("/api/external/orders", orderRoutes);
 app.use("/api/external/invoices", invoiceRoutes);
 app.use("/api/external/profile", profileRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use("/api/internal/dashboard", dashboardRoutes);
 app.use("/api/internal/customers", customerRoutes);

@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthStore } from '../auth.store';
 
 @Component({
   selector: 'app-reset-password',
@@ -12,7 +12,7 @@ import { AuthService } from '../auth.service';
   styleUrl: './reset-password.css'
 })
 export class ResetPassword {
-  private authService = inject(AuthService);
+  private authStore = inject(AuthStore);
 
   email = signal('');
   isLoading = signal(false);
@@ -30,7 +30,7 @@ export class ResetPassword {
 
     this.isLoading.set(true);
     try {
-      const res = await this.authService.resetPassword(this.email());
+      const res = await this.authStore.resetPassword(this.email());
       if (res.success) {
         this.successMessage.set('The password reset link has been sent to your email.');
         this.email.set('');

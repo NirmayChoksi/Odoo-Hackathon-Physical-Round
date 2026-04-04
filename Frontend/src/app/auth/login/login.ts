@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthStore } from '../auth.store';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +12,7 @@ import { AuthService } from '../auth.service';
   styleUrl: './login.css'
 })
 export class Login {
-  authService = inject(AuthService);
+  authStore = inject(AuthStore);
   router = inject(Router);
 
   email = signal('');
@@ -34,7 +34,7 @@ export class Login {
 
     this.isLoading.set(true);
     try {
-      const res = await this.authService.login(this.email(), this.password());
+      const res = await this.authStore.login(this.email(), this.password());
       if (res.success) {
         this.router.navigate(['/dashboard']);
       } else {
