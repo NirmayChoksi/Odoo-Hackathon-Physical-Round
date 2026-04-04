@@ -1,0 +1,132 @@
+<app-external-navbar></app-external-navbar>
+
+<div class="shop">
+
+  <!-- Page Header -->
+  <div class="shop__header">
+    <div class="shop__header-inner">
+      <div>
+        <h1 class="shop__heading">All Products</h1>
+        <p class="shop__subheading">{{ filteredProducts().length }} products available</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="shop__body">
+
+    <!-- ── Sidebar ── -->
+    <aside class="shop__sidebar">
+
+      <!-- Category -->
+      <div class="filter-group">
+        <h3 class="filter-group__title">Category</h3>
+        <div class="filter-group__list">
+          @for (cat of categories; track cat) {
+            <button class="filter-cat-btn"
+                    [class.filter-cat-btn--active]="selectedCategory() === cat"
+                    (click)="selectCategory(cat)">
+              {{ cat }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Price Range -->
+      <div class="filter-group">
+        <h3 class="filter-group__title">Price Range</h3>
+        <p class="filter-group__price-label">
+          ₹{{ minPrice() }} – ₹{{ maxPrice() }}/month
+        </p>
+        <div class="filter-range-wrap">
+          <label class="filter-range-label">Min</label>
+          <input type="range" class="filter-range"
+                 min="0" max="5000" step="100"
+                 [value]="minPrice()"
+                 (input)="minPrice.set(+$any($event.target).value)" />
+          <label class="filter-range-label">Max</label>
+          <input type="range" class="filter-range"
+                 min="0" max="5000" step="100"
+                 [value]="maxPrice()"
+                 (input)="maxPrice.set(+$any($event.target).value)" />
+        </div>
+      </div>
+
+      <!-- Reset -->
+      <button class="filter-reset-btn" (click)="resetFilters()">Reset Filters</button>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="shop__main">
+
+      <!-- Product Type / Breadcrumb -->
+      <div class="shop__type-bar">
+        <span class="shop__breadcrumb">
+          All Products
+          @if (selectedCategory() !== 'All') {
+            <span> / {{ selectedCategory() }}</span>
+          }
+        </span>
+        <span class="shop__product-type-hint">product type</span>
+      </div>
+
+      <!-- Search + Sort bar -->
+      <div class="shop__toolbar">
+        <div class="shop__search-wrap" style="flex:1;">
+          <app-input placeholder="Search products..." prefixIcon="search" [value]="searchQuery()" (valueChange)="onSearchInputComponent($event)"></app-input>
+        </div>
+        <div class="shop__sort-wrap">
+          <label class="shop__sort-label">Sort By:</label>
+          <select class="shop__sort" (change)="onSort($any($event.target).value)">
+            <option value="default">Default</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Product Grid -->
+      @if (filteredProducts().length > 0) {
+        <div class="shop__grid">
+          @for (product of filteredProducts(); track product.id) {
+            <app-card class="shop-card" variant="outlined" [hasFooter]="true">
+              <div class="shop-card__img-container">
+                <img [src]="product.images[0]" [alt]="product.name" class="shop-card__img" />
+                <div class="shop-card__cat-overlay">
+                  <span class="shop-card__cat-tag">{{ product.category }}</span>
+                </div>
+              </div>
+              
+              <div class="shop-card__body">
+                <h3 class="shop-card__name">{{ product.name }}</h3>
+                <p class="shop-card__desc">{{ product.description }}</p>
+                
+                <div class="shop-card__price-row">
+                  <span class="shop-card__price-amt">₹{{ product.baseMonthlyPrice | number }}</span>
+                  <span class="shop-card__price-unit">/ month</span>
+                </div>
+
+                <div class="shop-card__savings">
+                  <span class="shop-card__save-pill">Save 20% — 6M</span>
+                  <span class="shop-card__save-pill">Save 30% — Yearly</span>
+                </div>
+              </div>
+
+              <div footer class="w-full">
+                <app-button variant="primary" [fullWidth]="true" label="View Plans" icon="arrow_forward" iconPosition="right" (click)="goToProduct(product.id)"></app-button>
+              </div>
+            </app-card>
+          }
+        </div>
+      } @else {
+        <div class="shop__empty">
+          <div class="shop__empty-icon material-symbols-outlined" style="font-size: 3rem;">search_off</div>
+          <h3>No products found</h3>
+          <p>Try adjusting your filters or search term.</p>
+            <button class="filter-reset-btn" (click)="resetFilters()">Reset Filters</button>
+        </div>
+      }
+
+    </main>
+  </div>
+</div>

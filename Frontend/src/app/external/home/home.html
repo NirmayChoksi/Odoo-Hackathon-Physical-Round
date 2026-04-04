@@ -1,0 +1,182 @@
+<app-external-navbar></app-external-navbar>
+
+<main class="home">
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="hero__content">
+      <div class="hero__badge">Subscription Software Marketplace</div>
+      <h1 class="hero__title">
+        Powerful Tools.<br />
+        <span class="hero__title-accent">Flexible Plans.</span>
+      </h1>
+      <p class="hero__subtitle">
+        Discover, subscribe, and manage best-in-class SaaS products.
+        Pay monthly, semi-annually, or yearly — and save more as you commit.
+      </p>
+      <div class="hero__actions">
+        <app-button variant="primary" size="lg" label="Browse Products" icon="arrow_forward" iconPosition="right" (click)="goToShop()"></app-button>
+        <app-button variant="ghost" size="lg" label="How It Works"></app-button>
+      </div>
+      <div class="hero__stats">
+        <div class="hero__stat">
+          <span class="hero__stat-value">50+</span>
+          <span class="hero__stat-label">Products</span>
+        </div>
+        <div class="hero__stat-divider"></div>
+        <div class="hero__stat">
+          <span class="hero__stat-value">30%</span>
+          <span class="hero__stat-label">Yearly Savings</span>
+        </div>
+        <div class="hero__stat-divider"></div>
+        <div class="hero__stat">
+          <span class="hero__stat-value">30-day</span>
+          <span class="hero__stat-label">Money-back guarantee</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero__visual">
+      <app-card variant="glass" class="hero__card hero__card--1">
+        <div class="hero__card-inner">
+          <div class="hero__card-icon material-symbols-outlined">bar_chart</div>
+          <div class="hero__card-text">
+            <strong>DataPulse Analytics</strong>
+            <span>₹1,200 / month</span>
+          </div>
+          <app-badge variant="success" size="sm" label="Popular" [dot]="true"></app-badge>
+        </div>
+      </app-card>
+
+      <app-card variant="glass" class="hero__card hero__card--2">
+        <div class="hero__card-inner">
+          <div class="hero__card-icon material-symbols-outlined">lock</div>
+          <div class="hero__card-text">
+            <strong>ShieldGuard Security</strong>
+            <span>₹1,500 / month</span>
+          </div>
+        </div>
+      </app-card>
+
+      <app-card variant="glass" class="hero__card hero__card--3">
+        <div class="hero__card-inner">
+          <div class="hero__card-icon material-symbols-outlined">bolt</div>
+          <div class="hero__card-text">
+            <strong>AutoFlow Pro</strong>
+            <span>₹800 / month</span>
+          </div>
+        </div>
+      </app-card>
+      <div class="hero__glow"></div>
+    </div>
+  </section>
+
+  <!-- ── Features strip ── -->
+  <section class="features">
+    <div class="features__inner">
+      <div class="feature-item">
+        <span class="feature-icon material-symbols-outlined" style="font-size: 1.8rem;">autorenew</span>
+        <div>
+          <strong>Recurring Billing</strong>
+          <p>Monthly, semi-annual & yearly plans</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon material-symbols-outlined" style="font-size: 1.8rem;">shield</span>
+        <div>
+          <strong>Money-Back Guarantee</strong>
+          <p>30-day risk-free trial on all plans</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon material-symbols-outlined" style="font-size: 1.8rem;">rocket_launch</span>
+        <div>
+          <strong>Instant Activation</strong>
+          <p>Access your tools in under 60 seconds</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <span class="feature-icon material-symbols-outlined" style="font-size: 1.8rem;">inventory_2</span>
+        <div>
+          <strong>Bundle & Save</strong>
+          <p>Combine products for extra discounts</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Featured Products ── -->
+  <section class="section">
+    <div class="section__inner">
+      <div class="section__header">
+        <div>
+          <h2 class="section__title">Featured Products</h2>
+          <p class="section__subtitle">Hand-picked tools trusted by thousands of teams</p>
+        </div>
+        <app-button variant="secondary" label="View All" icon="arrow_forward" iconPosition="right" (click)="goToShop()"></app-button>
+      </div>
+
+      <div class="product-grid">
+        @for (product of featuredProducts; track product.id) {
+          <app-card class="product-card" variant="outlined" [header]="product.name" [subtitle]="product.category">
+            <div class="product-card__img-wrap">
+              <img [src]="product.images[0]" [alt]="product.name" class="product-card__img" />
+              @if (product.id === 1) {
+                <app-badge variant="info" size="sm" label="Top Rated" class="product-card__badge"></app-badge>
+              }
+            </div>
+            
+            <div class="product-card__price-row">
+              <div class="product-card__price">
+                <span class="price-val">₹{{ product.baseMonthlyPrice | number }}</span>
+                <span class="price-unit">/ month</span>
+              </div>
+              <app-button variant="primary" size="sm" label="View" (click)="goToProduct(product.id)"></app-button>
+            </div>
+          </app-card>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA Banner ── -->
+  <section class="cta-banner">
+    <div class="cta-banner__inner">
+      <div>
+        <h2 class="cta-banner__title">Ready to get started?</h2>
+        <p class="cta-banner__subtitle">Choose from 50+ products and save up to 30% with annual plans.</p>
+      </div>
+      <app-button variant="secondary" size="lg" label="Browse Products" icon="arrow_forward" iconPosition="right" (click)="goToShop()"></app-button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="ext-footer">
+    <div class="ext-footer__inner">
+      <div class="ext-footer__brand">
+        <span class="ext-footer__logo">SubSync</span>
+        <p>Subscription software made simple.</p>
+      </div>
+      <div class="ext-footer__links">
+        <div>
+          <strong>Products</strong>
+          <a (click)="goToShop()">Shop</a>
+          <a>Categories</a>
+          <a>New Arrivals</a>
+        </div>
+        <div>
+          <strong>Support</strong>
+          <a>Help Center</a>
+          <a>Contact Us</a>
+          <a>Refund Policy</a>
+        </div>
+        <div>
+          <strong>Legal</strong>
+          <a>Privacy Policy</a>
+          <a>Terms of Service</a>
+        </div>
+      </div>
+    </div>
+    <div class="ext-footer__copy">© 2024 SubSync. All rights reserved.</div>
+  </footer>
+
+</main>

@@ -1,0 +1,144 @@
+<app-external-navbar></app-external-navbar>
+
+@if (product) {
+<div class="prod">
+
+  <!-- Breadcrumb -->
+  <div class="prod__breadcrumb">
+    <span (click)="goHome()">All Products</span>
+    <span class="prod__breadcrumb-sep">›</span>
+    <span (click)="goBack()">{{ product.category }}</span>
+    <span class="prod__breadcrumb-sep">›</span>
+    <span class="prod__breadcrumb-current">{{ product.name }}</span>
+  </div>
+
+  <div class="prod__layout">
+
+    <!-- ── LEFT: Image Gallery ── -->
+    <div class="prod__gallery">
+      <!-- Thumbnails -->
+      <div class="prod__thumbs">
+        @for (img of product.images; track $index) {
+          <div class="prod__thumb"
+               [class.prod__thumb--active]="selectedImageIndex() === $index"
+               (click)="selectImage($index)">
+            <img [src]="img" [alt]="product.name + ' image ' + ($index+1)" />
+          </div>
+        }
+      </div>
+      <!-- Main Preview -->
+      <div class="prod__main-img">
+        <img [src]="product.images[selectedImageIndex()]"
+             [alt]="product.name"
+             class="prod__main-img-inner" />
+        <div class="prod__img-hint">select image in big size</div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: Product Info ── -->
+    <div class="prod__info">
+
+      <h1 class="prod__name">{{ product.name }}</h1>
+      <p class="prod__desc-full">{{ product.description }}</p>
+
+      <!-- ── Pricing Table ── -->
+      <div class="prod__pricing-card">
+        <h3 class="prod__section-title">Choose Your Plan</h3>
+        <div class="prod__plans">
+          @for (plan of pricingPlans; track $index) {
+            <div class="prod__plan"
+                 [class.prod__plan--active]="selectedPlanIndex() === $index"
+                 (click)="selectPlan($index)">
+              <div class="prod__plan-left">
+                <span class="prod__plan-radio"
+                      [class.prod__plan-radio--on]="selectedPlanIndex() === $index"></span>
+                <span class="prod__plan-label">{{ plan.label }}</span>
+              </div>
+              <div class="prod__plan-right">
+                <span class="prod__plan-total">₹{{ plan.total | number }}</span>
+                <span class="prod__plan-per">₹{{ plan.perMonth | number }}/month</span>
+                @if (plan.discountPct > 0) {
+                  <span class="prod__plan-badge">{{ plan.discountPct }}% OFF</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <p class="prod__billing-note">{{ pricingPlans[selectedPlanIndex()].billingNote }}</p>
+      </div>
+
+      <!-- Category -->
+      <div class="prod__meta">
+        <span class="prod__meta-label">Product category:</span>
+        <span class="prod__meta-val">{{ product.category }}</span>
+      </div>
+
+      <!-- Variants -->
+      <div class="prod__variants-section">
+        <h3 class="prod__section-title">Variants available</h3>
+        <div class="prod__variants">
+          @for (v of product.variants; track v.name) {
+            <button class="prod__variant-btn"
+                    [class.prod__variant-btn--active]="selectedVariant()?.name === v.name"
+                    (click)="selectVariant(v)">
+              {{ v.name }}
+              @if (v.extraPrice > 0) {
+                <span class="prod__variant-extra">+₹{{ v.extraPrice }}/mo</span>
+              }
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="prod__purchase-row">
+        <div class="prod__qty">
+          <button class="prod__qty-btn" (click)="decrement()">−</button>
+          <span class="prod__qty-val">{{ quantity() }}</span>
+          <button class="prod__qty-btn" (click)="increment()">+</button>
+        </div>
+        <div style="flex:1;">
+          <app-button
+            [variant]="addedToCart() ? 'secondary' : 'primary'"
+            size="lg"
+            [fullWidth]="true"
+            [label]="addedToCart() ? '✓ Added to Cart!' : 'Add to Cart — ₹' + (currentPrice() | number) + '/mo'"
+            [icon]="addedToCart() ? 'check' : 'shopping_cart'"
+            (click)="addToCart()">
+          </app-button>
+        </div>
+      </div>
+
+      <!-- Trust badges -->
+      <div class="prod__trust">
+        <div class="prod__trust-item">
+          <span class="material-symbols-outlined">assignment_turned_in</span>
+          <span>Terms and Conditions apply</span>
+        </div>
+        <div class="prod__trust-item">
+          <span class="material-symbols-outlined">verified_user</span>
+          <span>30-day money-back guarantee</span>
+        </div>
+        <div class="prod__trust-item">
+          <span class="material-symbols-outlined">speed</span>
+          <span>Instant Activation & Setup</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Variant pop-up note -->
+  <div class="prod__variant-note">
+    <span class="material-symbols-outlined">lightbulb</span>
+    Small pop-up or a list of variants should come to select — accordingly price should vary (extra price)
+  </div>
+
+</div>
+} @else {
+<div class="prod-not-found">
+  <div class="prod-not-found__icon material-symbols-outlined" style="font-size: 3.5rem;">search_off</div>
+  <h2>Product not found</h2>
+  <p>The product you're looking for doesn't exist.</p>
+  <app-button variant="primary" label="← Back to Shop" (click)="goBack()"></app-button>
+</div>
+}

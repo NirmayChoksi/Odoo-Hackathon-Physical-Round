@@ -1,0 +1,132 @@
+<app-external-navbar></app-external-navbar>
+
+<main class="page-container">
+  
+  @if (step() !== 'success') {
+    <!-- ── Breadcrumb Steps ── -->
+    <div class="steps-nav">
+      <span class="step" (click)="router.navigate(['/cart'])" style="cursor: pointer;">Order</span>
+      <span class="step-sep"></span>
+      <span class="step" [class.step--active]="step() === 'address'">Address</span>
+      <span class="step-sep"></span>
+      <span class="step" [class.step--active]="step() === 'payment'">Payment</span>
+    </div>
+
+    <div class="chk-layout">
+      
+      <!-- ── Left: Form Area ── -->
+      <div class="chk-form-area">
+        @if (step() === 'address') {
+          <div class="chk-card">
+            <h2 class="chk-title">Shipping & Billing Address</h2>
+            
+            <div class="chk-option">
+              <input type="checkbox" id="useDef" [checked]="useDefaultAddress()" (change)="useDefaultAddress.set(!useDefaultAddress())" />
+              <label for="useDef">Use Default User Address</label>
+            </div>
+
+            @if (useDefaultAddress()) {
+              <div class="chk-address-box">
+                {{ address() }}
+              </div>
+            } @else {
+              <div class="chk-grid">
+                <app-input placeholder="Full Name"></app-input>
+                <app-input placeholder="Phone Number"></app-input>
+                <div style="grid-column: 1 / -1;">
+                  <app-input placeholder="Street Address"></app-input>
+                </div>
+                <app-input placeholder="City"></app-input>
+                <app-input placeholder="Postal Code"></app-input>
+              </div>
+            }
+
+            <div style="margin-top: 32px">
+              <app-button variant="primary" label="Continue to Payment" (click)="goToPayment()"></app-button>
+            </div>
+          </div>
+        }
+
+        @if (step() === 'payment') {
+          <div class="chk-card">
+            <h2 class="chk-title">Payment Information</h2>
+            <p style="color: var(--color-on-surface-variant); margin-bottom: 24px;">Note: For payment any demo or testing beta version payment gate will work. This is a frontend prototype.</p>
+            
+            <div class="chk-grid">
+              <div style="grid-column: 1 / -1;">
+                <app-input placeholder="Card Number" prefixIcon="credit_card"></app-input>
+              </div>
+              <app-input placeholder="MM/YY"></app-input>
+              <app-input placeholder="CVC"></app-input>
+              <div style="grid-column: 1 / -1;">
+                <app-input placeholder="Name on Card"></app-input>
+              </div>
+            </div>
+
+            <div style="margin-top: 32px; display: flex; gap: 16px;">
+              <app-button variant="ghost" label="Back to Address" (click)="step.set('address')"></app-button>
+              <app-button variant="primary" label="Complete Checkout" (click)="processPayment()"></app-button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- ── Right: Summary Box ── -->
+      <div class="summary-box">
+        <h3 style="margin-top: 0; margin-bottom: 24px; color: var(--color-primary);">Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>{{ subtotal() | number }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Taxes</span>
+          <span>{{ taxes() | number:'1.0-0' }}</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row summary-row--total">
+          <span>Total</span>
+          <span>{{ total() | number:'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (step() === 'success') {
+    <!-- Success Area (matches right side wireframe of Image 1) -->
+    <div class="success-layout">
+      
+      <div class="success-main">
+        <h1 class="success-title">Thank you for your order</h1>
+        <p class="success-subtitle">Order {{ finalOrderNumber() }}</p>
+
+        <div class="success-box">
+          Your payment has been processed. A confirmation email has been sent to your registered address.
+        </div>
+      </div>
+      
+      <div class="success-actions">
+        <app-button variant="secondary" label="Print Invoice" icon="print" (click)="printOrder()"></app-button>
+      </div>
+
+      <div class="summary-box success-sidebar">
+        <!-- We just show the totals summary for the snapshot -->
+        <h3 style="margin-top: 0; margin-bottom: 24px; color: var(--color-primary);">Order Info</h3>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>{{ finalSubtotal() | number }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Taxes</span>
+          <span>{{ finalTaxes() | number:'1.0-0' }}</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row summary-row--total">
+          <span>Total</span>
+          <span>{{ finalTotal() | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</main>
