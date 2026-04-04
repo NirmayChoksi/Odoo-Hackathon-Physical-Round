@@ -1,0 +1,118 @@
+<div class="internal-container">
+  <!-- Navigation Header -->
+  <nav class="internal-nav">
+    <div class="nav-links w-full flex justify-between items-center px-4 py-2 bg-surface-container-low border-b border-outline-variant">
+      <div class="flex gap-4">
+        @for(item of navItems(); track item.label) {
+          <a href="#" class="nav-link px-4 py-2 font-medium" [class.nav-link--active]="item.active"
+          [style.color]="item.active ? 'var(--color-primary)' : 'var(--color-on-surface)'">
+            {{ item.label }}
+          </a>
+        }
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Body -->
+  <main class="internal-content p-6">
+    
+    <!-- Action Bar & Status -->
+    <div class="action-bar flex justify-between items-center mb-8 border-b border-outline-variant pb-4">
+      <div class="action-left flex gap-3 items-center">
+        <!-- New Button is standard, outline for secondary actions like send/confirm -->
+        <button class="btn-new" (click)="onSave()">New</button>
+        <div class="action-icons">
+          <button class="icon-btn tooltip" title="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+          <button class="icon-btn tooltip" title="Print">
+            <span class="material-symbols-outlined">print</span>
+          </button>
+        </div>
+        <button class="btn btn-outline" (click)="onSend()">Send</button>
+        <button class="btn btn-outline" (click)="onConfirm()">Confirm</button>
+      </div>
+      <div class="status-workflow flex gap-4">
+         @for(status of statusFlow(); track status) {
+            <!-- Changed the dynamic style to match a simpler text conditional style similar to the status pills -->
+            <div class="status-pill border border-outline-variant px-4 py-1 rounded-full text-sm font-semibold transition-colors"
+                 [ngClass]="currentStatus() === status ? 'border-primary text-primary bg-primary/10' : 'text-on-surface-variant bg-surface-container-highest'">
+                 {{ status }}
+            </div>
+         }
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-container">
+        <h2 class="text-2xl font-bold mb-6 text-primary flex items-center gap-2">
+            Subscription Number
+            <span class="text-on-surface text-xl font-normal border-b border-outline-variant pb-1">{{ subscriptionNumber() }}</span>
+        </h2>
+
+        <!-- Use a grid layout and space out items -->
+        <div class="grid grid-cols-2 gap-x-12 gap-y-6 mb-8 mt-4">
+            <div class="col-left flex flex-col gap-4">
+                 <app-select [label]="'Customer'" [options]="customerOptions()" [placeholder]="'Select or type existing...'"></app-select>
+                 <app-select [label]="'Quotation template'" [options]="templateOptions()" [placeholder]="'Select Template'"></app-select>
+            </div>
+            <div class="col-right flex flex-col gap-4">
+                 <app-input [label]="'Expiration'" [type]="'text'"></app-input>
+                 <app-select [label]="'Recurring Plan'" [options]="recurringPlanOptions()" [placeholder]="'Select Plan'"></app-select>
+                 <app-select [label]="'Payment Term'" [options]="paymentTermOptions()" [placeholder]="'Select Payment Term'"></app-select>
+            </div>
+        </div>
+
+        <!-- Custom tabs section -->
+        <div class="tabs-container mt-12 bg-surface-container-low border border-outline-variant rounded-xl p-4">
+            <!-- Tabs -->
+            <div class="tabs mb-4 flex gap-2 border-b border-outline-variant">
+                 <button class="px-6 py-2 rounded-t-lg transition-colors font-medium border-x border-t border-transparent"
+                         [ngClass]="activeTab() === 'order-lines' ? 'border-outline-variant bg-surface-container text-primary font-bold' : 'text-on-surface hover:bg-surface-container-highest'"
+                         (click)="onTabClick('order-lines')">
+                     Order Lines
+                 </button>
+                 <button class="px-6 py-2 rounded-t-lg transition-colors font-medium border-x border-t border-transparent"
+                         [ngClass]="activeTab() === 'other-info' ? 'border-outline-variant bg-surface-container text-primary font-bold' : 'text-on-surface hover:bg-surface-container-highest'"
+                         (click)="onTabClick('other-info')">
+                     Other info
+                 </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content" *ngIf="activeTab() === 'order-lines'">
+                 <div class="data-container border border-outline-variant rounded-lg overflow-hidden mt-4">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Discount</th>
+                                <th>Taxes</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for(line of orderLines(); track line.product) {
+                                <tr class="data-row">
+                                    <td class="text-primary font-medium">{{ line.product }}</td>
+                                    <td>{{ line.quantity }}</td>
+                                    <td>{{ line.unitPrice | currency:'INR' }}</td>
+                                    <td>{{ line.discount }}%</td>
+                                    <td>{{ line.taxes }}%</td>
+                                    <td class="font-semibold">{{ line.amount | currency:'INR' }}</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                 </div>
+            </div>
+            <div class="tab-content p-4" *ngIf="activeTab() === 'other-info'">
+                <p class="text-on-surface-variant">Other configuration info would be here.</p>
+            </div>
+        </div>
+
+    </div>
+  </main>
+</div>

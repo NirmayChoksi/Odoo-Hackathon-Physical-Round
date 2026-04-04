@@ -1,6 +1,6 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 export interface Subscription {
   number: string;
@@ -19,6 +19,7 @@ export interface Subscription {
   styleUrl: './subscriptions.css'
 })
 export class SubscriptionsComponent {
+  constructor(private router: Router) {}
   
   // Navigation State
   navItems = signal([
@@ -31,11 +32,11 @@ export class SubscriptionsComponent {
 
   // Data State
   subscriptionsList = signal<Subscription[]>([
-    { number: 'S0001', customer: 'Customer 1', nextInvoice: 'Feb 14, 2026', recurring: '$140.00', plan: 'Monthly', status: 'In progress' },
-    { number: 'S0002', customer: 'Customer 2', nextInvoice: 'Feb 18, 2026', recurring: '$116.00', plan: 'Monthly', status: 'Churned' },
-    { number: 'S0003', customer: 'Customer 3', nextInvoice: 'Feb 10, 2026', recurring: '$230.00', plan: 'Yearly', status: 'Quotation Sent' },
-    { number: 'S0004', customer: 'Architects Inc.', nextInvoice: 'Mar 1, 2026', recurring: '$450.00', plan: 'Yearly', status: 'In progress' },
-    { number: 'S0005', customer: 'Design Studio B', nextInvoice: 'Feb 28, 2026', recurring: '$120.00', plan: 'Monthly', status: 'Pending' }
+    { number: 'S0001', customer: 'Customer 1', nextInvoice: 'Feb 14, 2026', recurring: '₹140.00', plan: 'Monthly', status: 'In progress' },
+    { number: 'S0002', customer: 'Customer 2', nextInvoice: 'Feb 18, 2026', recurring: '₹116.00', plan: 'Monthly', status: 'Churned' },
+    { number: 'S0003', customer: 'Customer 3', nextInvoice: 'Feb 10, 2026', recurring: '₹230.00', plan: 'Yearly', status: 'Quotation Sent' },
+    { number: 'S0004', customer: 'Architects Inc.', nextInvoice: 'Mar 1, 2026', recurring: '₹450.00', plan: 'Yearly', status: 'In progress' },
+    { number: 'S0005', customer: 'Design Studio B', nextInvoice: 'Feb 28, 2026', recurring: '₹120.00', plan: 'Monthly', status: 'Pending' }
   ]);
 
   // Search/Filter State
@@ -57,7 +58,7 @@ export class SubscriptionsComponent {
   }
 
   onNewSubscription() {
-    alert('Feature coming soon: Create New Subscription');
+    this.router.navigate(['/subscriptions/new']);
   }
 
   onDelete() {
