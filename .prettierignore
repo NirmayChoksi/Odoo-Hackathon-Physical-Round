@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+
+frontend/dist
+backend/dist
+
+*.log
+.env

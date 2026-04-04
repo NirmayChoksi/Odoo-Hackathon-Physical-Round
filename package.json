@@ -1,0 +1,14 @@
+{
+  "name": "Odoo_Hackathon_Physical_round",
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.8.1"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run start --prefix Frontend\" \"npm run dev --prefix Backend\"",
+    "install:all": "concurrently \"npm install --prefix Frontend\" \"npm install --prefix Backend\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  }
+}
