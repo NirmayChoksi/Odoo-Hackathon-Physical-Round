@@ -1,8 +1,8 @@
+import { errorMiddleware } from './middlewares/error.middleware';
+import cartRoutes from './modules/external/cart/cart.routes';
+import checkoutRoutes from "./modules/external/checkout/checkout.routes";
 import cors from "cors";
 import express from "express";
-import { errorMiddleware } from "./middlewares/error.middleware";
-import cartRoutes from "./modules/external/cart/cart.routes";
-import checkoutRoutes from "./modules/external/checkout/checkout.routes";
 import invoiceRoutes from "./modules/external/invoices/invoice.routes";
 import orderRoutes from "./modules/external/orders/order.routes";
 import profileRoutes from "./modules/external/profile/profile.routes";
