@@ -1,0 +1,87 @@
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Brand -->
+    <img class="auth-brand" src="/images/logo/subsync-logo.svg" alt="SubSync" style="height: 3rem;" />
+
+    <!-- Header -->
+    <h1 class="auth-title">Sign In</h1>
+    <p class="auth-subtitle">Enter your credentials to access the platform.</p>
+
+    <!-- Form -->
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+
+      <!-- Email -->
+      <div class="field">
+        <label class="field-label" for="login-email">EMAIL ADDRESS</label>
+        <div class="field-input-wrap">
+          <input
+            id="login-email"
+            type="email"
+            class="field-input"
+            placeholder="architect@subsync.io"
+            [value]="email()"
+            (input)="email.set($any($event.target).value)"
+            autocomplete="email" />
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <div class="field-label-row">
+          <label class="field-label" for="login-password">PASSWORD</label>
+          <a routerLink="/reset-password" class="field-link">Forgot Password</a>
+        </div>
+        <div class="field-input-wrap">
+          <input
+            id="login-password"
+            [type]="showPassword() ? 'text' : 'password'"
+            class="field-input"
+            placeholder="••••••••"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+            autocomplete="current-password" />
+          <button type="button" class="field-toggle" (click)="togglePassword()">
+            <span class="material-symbols-outlined">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="errorMessage()" class="auth-error">
+        <span class="material-symbols-outlined">error</span>
+        {{ errorMessage() }}
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="auth-btn-primary" [disabled]="isLoading()">
+        <span *ngIf="isLoading()" class="spinner"></span>
+        <span *ngIf="!isLoading()">Sign In</span>
+      </button>
+
+      <!-- Divider -->
+      <!-- <div class="auth-divider">
+        <span>OR CONTINUE WITH</span>
+      </div> -->
+
+      <!-- Social Buttons -->
+      <!-- <div class="auth-social-row">
+        <button type="button" class="auth-btn-outline">
+          <span class="material-symbols-outlined">cloud</span>
+          Enterprise
+        </button>
+        <button type="button" class="auth-btn-outline">
+          <span class="material-symbols-outlined">key</span>
+          SSO
+        </button>
+      </div> -->
+
+      <!-- Footer -->
+      <p class="auth-footer">
+        New to the platform?
+        <a routerLink="/signup" class="auth-footer-link">Create an Account</a>
+      </p>
+
+    </form>
+  </div>
+</div>
