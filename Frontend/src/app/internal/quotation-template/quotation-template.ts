@@ -3,13 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-// Import Reusable Components
-import { NavbarComponent, NavItem } from '../../components/navbar/navbar';
-import { ButtonComponent } from '../../components/button/button';
-import { InputComponent } from '../../components/input/input';
-import { SelectComponent, SelectOption } from '../../components/select/select';
-import { CheckboxComponent } from '../../components/checkbox/checkbox';
-
 export interface QuotationProduct {
   id: string;
   product: string;
@@ -23,12 +16,7 @@ export interface QuotationProduct {
   imports: [
     CommonModule, 
     RouterLink, 
-    FormsModule,
-    NavbarComponent,
-    ButtonComponent,
-    InputComponent,
-    SelectComponent,
-    CheckboxComponent
+    FormsModule
   ],
   templateUrl: './quotation-template.html',
   styleUrl: './quotation-template.css'
@@ -36,7 +24,7 @@ export interface QuotationProduct {
 export class QuotationTemplateComponent {
   
   // Navigation State
-  navItems = signal<NavItem[]>([
+  navItems = signal([
     { label: 'Subscriptions', active: false },
     { label: 'Products', active: false },
     { label: 'Reporting', active: false },
@@ -51,11 +39,7 @@ export class QuotationTemplateComponent {
   endAfterAmount = signal<number>(1);
   endAfterUnit = signal<string>('Month');
 
-  timeUnitOptions = signal<SelectOption[]>([
-    { value: 'Week', label: 'Week' },
-    { value: 'Month', label: 'Month' },
-    { value: 'Year', label: 'Year' }
-  ]);
+  timeUnits = ['Week', 'Month', 'Year'];
 
   products = signal<QuotationProduct[]>([
     { id: '1', product: 'demo', description: 'Demo product', quantity: 1 }
@@ -73,7 +57,7 @@ export class QuotationTemplateComponent {
     alert('Save quotation template.');
   }
 
-  onNavClick(item: NavItem) {
+  onNavClick(item: any) {
     // Basic stub for nav clicks
     const items = this.navItems().map(i => ({ ...i, active: i.label === item.label }));
     this.navItems.set(items);
