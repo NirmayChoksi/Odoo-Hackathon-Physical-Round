@@ -5,6 +5,9 @@ declare global {
     interface Request {
       userId?: number;
       shopQuery?: ShopListQuery;
+      /** Lowercased role_name from DB (internal APIs) */
+      roleName?: string;
+      isAdmin?: boolean;
     }
   }
 }

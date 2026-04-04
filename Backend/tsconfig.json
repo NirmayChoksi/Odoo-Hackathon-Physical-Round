@@ -7,5 +7,9 @@
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true
-  }
+  },
+  "exclude": [
+    "./src/modules/auth",
+    "./src/shared/mailer.ts"
+  ]
 }
