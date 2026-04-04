@@ -43,7 +43,7 @@
             <a class="ext-nav__dropdown-item" routerLink="/account" (click)="profileOpen.set(false)">
               My Account
             </a>
-            <a class="ext-nav__dropdown-item" routerLink="/account" (click)="profileOpen.set(false)">
+            <a class="ext-nav__dropdown-item" routerLink="/orders" (click)="profileOpen.set(false)">
               My Orders
             </a>
             <div class="ext-nav__dropdown-divider"></div>
@@ -70,6 +70,7 @@
       <hr class="ext-nav__mobile-divider" />
       <a class="ext-nav__mobile-link" routerLink="/cart" (click)="mobileMenuOpen.set(false)">Cart ({{ cartCount() }})</a>
       <a class="ext-nav__mobile-link" routerLink="/account" (click)="mobileMenuOpen.set(false)">My Account</a>
+      <a class="ext-nav__mobile-link" routerLink="/orders" (click)="mobileMenuOpen.set(false)">My Orders</a>
       <a class="ext-nav__mobile-link ext-nav__mobile-link--danger" (click)="signOut()">Sign Out</a>
     </div>
   }

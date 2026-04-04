@@ -1,0 +1,30 @@
+<app-external-navbar></app-external-navbar>
+
+<main class="page-container">
+  <div class="orders-card">
+    <div class="orders__header">
+      <h1 class="orders__title">Orders</h1>
+    </div>
+
+    <div class="orders__content">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Order Date</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of orders(); track order.id) {
+            <tr (click)="goToOrder(order.id)" class="orders-row">
+              <td class="text-primary font-bold">{{ order.id }}</td>
+              <td>{{ order.date }}</td>
+              <td>{{ order.total }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>

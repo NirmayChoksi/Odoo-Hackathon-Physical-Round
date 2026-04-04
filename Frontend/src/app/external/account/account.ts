@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../shared/navbar/navbar';
 import { ButtonComponent } from '../../components/button/button';
 import { InputComponent } from '../../components/input/input';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, ButtonComponent, InputComponent],
+  imports: [CommonModule, NavbarComponent, ButtonComponent, InputComponent, RouterModule],
   templateUrl: './account.html',
   styleUrl: './account.css',
 })

@@ -1,0 +1,102 @@
+<app-external-navbar></app-external-navbar>
+
+<main class="page-container">
+  <div class="invoice-card">
+    <div class="invoice__header">
+      <h1 class="invoice__title">Order/{{ orderId() }}/Inv/{{ invId() }}</h1>
+      <div class="invoice__actions">
+        <!-- If payment is not done, show Payment button -->
+        @if (invoiceDetail().amountDue > 0) {
+          <app-button variant="primary" label="Payment" icon="credit_card" (click)="pay()"></app-button>
+        }
+        <app-button variant="secondary" label="Download" icon="download" (click)="download()"></app-button>
+        <app-button variant="ghost" label="Back" icon="arrow_back" (click)="goBack()"></app-button>
+      </div>
+    </div>
+
+    <div class="invoice__content">
+      <div class="invoice__top-section">
+        <div class="invoice__details">
+          <h2 class="sub-title">Invoice {{ invoiceDetail().invoiceNumber }}</h2>
+          
+          <div class="invoice__dates">
+            <div class="date-group">
+              <span class="label">Invoice Date</span>
+              <span class="value">{{ invoiceDetail().invoiceDate }}</span>
+            </div>
+            <div class="date-group">
+              <span class="label">Due Date</span>
+              <span class="value">{{ invoiceDetail().dueDate }}</span>
+            </div>
+            <div class="date-group">
+              <span class="label">Source</span>
+              <span class="value">{{ invoiceDetail().source }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="invoice__address">
+          <h3 class="section-title">Address</h3>
+          <p>{{ invoiceDetail().address.name }}</p>
+          <p>{{ invoiceDetail().address.line }}</p>
+          <p>Email: {{ invoiceDetail().address.email }}</p>
+        </div>
+      </div>
+
+      <div class="invoice__products">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Products</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Taxes</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (prod of invoiceDetail().products; track prod.name) {
+              <tr>
+                <td class="text-primary">{{ prod.name }}</td>
+                <td>{{ prod.qty }} Unit</td>
+                <td>{{ prod.price }} Rs</td>
+                <td>{{ prod.tax }}</td>
+                <td>{{ prod.amount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="invoice__footer">
+          <div class="payment-terms">
+            <span class="label">Payment Terms</span>
+            <span class="value">{{ invoiceDetail().paymentTerms }}</span>
+          </div>
+
+          <div class="invoice__summary">
+            <div class="summary-row">
+              <span>Untaxed Amount</span>
+              <span>{{ invoiceDetail().subtotal }}</span>
+            </div>
+            <div class="summary-row text-primary">
+              <span>Tax 15%</span>
+              <span>{{ invoiceDetail().taxAmount }}</span>
+            </div>
+            <div class="summary-row summary-total">
+              <span>Total</span>
+              <span>{{ invoiceDetail().total }}</span>
+            </div>
+            <div class="summary-row paid-info">
+              <span>Paid on {{ invoiceDetail().paidOn }}</span>
+              <span>{{ invoiceDetail().paidAmount }}</span>
+            </div>
+            <div class="summary-row amount-due">
+              <span>Amount Due</span>
+              <span>{{ invoiceDetail().amountDue }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

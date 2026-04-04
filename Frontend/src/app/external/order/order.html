@@ -1,0 +1,97 @@
+<app-external-navbar></app-external-navbar>
+
+<main class="page-container">
+  <div class="order-card">
+    <div class="order__header">
+      <h1 class="order__title">Order/{{ orderId() }}</h1>
+      <div class="order__actions">
+        <app-button variant="secondary" label="Download" icon="download" (click)="download()"></app-button>
+        <app-button variant="primary" label="Renew" icon="refresh" (click)="renew()"></app-button>
+        <app-button variant="ghost" label="Close" (click)="close()"></app-button>
+      </div>
+    </div>
+
+    <div class="order__content">
+      <div class="order__top-section">
+        <div class="order__subscription">
+          <div class="sub-header">
+            <h2 class="sub-title">{{ orderDetail().subscriptionId }}</h2>
+            <span class="badge">{{ orderDetail().status }}</span>
+          </div>
+          <div class="info-group">
+            <span class="label">Plan:</span>
+            <span class="value">{{ orderDetail().plan }}</span>
+          </div>
+          <div class="info-group">
+            <span class="label">Start Date:</span>
+            <span class="value">{{ orderDetail().startDate }}</span>
+          </div>
+          <div class="info-group">
+            <span class="label">End Date:</span>
+            <span class="value">{{ orderDetail().endDate }}</span>
+          </div>
+        </div>
+
+        <div class="order__address">
+          <h3 class="section-title">Invoicing and Shipping Address</h3>
+          <p>{{ orderDetail().address.name }}</p>
+          <p>{{ orderDetail().address.line }}</p>
+          <p>Email: {{ orderDetail().address.email }}</p>
+          <p>Phone number: {{ orderDetail().address.phone }}</p>
+        </div>
+      </div>
+
+      <div class="order__invoices">
+        <h3 class="section-title">Last Invoices</h3>
+        <div class="invoices-list">
+          @for (inv of orderDetail().invoices; track inv.id) {
+            <div class="invoice-item" (click)="goToInvoice(inv.id)">
+              <span class="invoice-name text-primary">{{ inv.id }}</span>
+              <span class="badge badge-success">{{ inv.status }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="order__products">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Products</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Taxes</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (prod of orderDetail().products; track prod.name) {
+              <tr>
+                <td class="text-primary">{{ prod.name }}</td>
+                <td>{{ prod.qty }} Unit</td>
+                <td>{{ prod.price }} Rs</td>
+                <td>{{ prod.tax }}</td>
+                <td>{{ prod.amount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="order__summary">
+          <div class="summary-row">
+            <span>Untaxed Amount</span>
+            <span>{{ orderDetail().subtotal }}</span>
+          </div>
+          <div class="summary-row text-primary font-bold">
+            <span>Tax 15%</span>
+            <span>{{ orderDetail().taxAmount }}</span>
+          </div>
+          <div class="summary-row summary-total">
+            <span>Total</span>
+            <span>{{ orderDetail().total }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

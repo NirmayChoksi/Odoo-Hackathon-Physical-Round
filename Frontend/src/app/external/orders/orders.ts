@@ -1,0 +1,25 @@
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { NavbarComponent } from '../shared/navbar/navbar';
+
+@Component({
+  selector: 'app-orders',
+  standalone: true,
+  imports: [CommonModule, NavbarComponent],
+  templateUrl: './orders.html',
+  styleUrl: './orders.css',
+})
+export class OrdersComponent {
+  
+  orders = signal([
+    { id: 'S0001', date: '06/02/2026', total: 1200 },
+    { id: 'S0002', date: '06/02/2026', total: 1800 }
+  ]);
+
+  constructor(private router: Router) {}
+
+  goToOrder(orderId: string) {
+    this.router.navigate(['/order', orderId]);
+  }
+}
