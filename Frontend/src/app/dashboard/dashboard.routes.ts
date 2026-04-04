@@ -32,10 +32,6 @@ export const dashboardRoutes: Routes = [
       {
         path: 'internal',
         canActivate: [dashboardRoleGuard(['Internal'])],
-        loadComponent: () =>
-          import('./pages/internal/internal-dashboard-layout.component').then(
-            (m) => m.InternalDashboardLayoutComponent,
-          ),
         children: [
           { path: '', pathMatch: 'full', redirectTo: '/subscription' },
           ...buildEcommerceRoutes(INTERNAL_DASHBOARD_NAV_BASE),

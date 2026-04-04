@@ -1,137 +1,208 @@
 <app-external-navbar [linkBase]="navLinkBase" />
 
 <div class="shop">
-
-  <!-- Page Header -->
   <div class="shop__header">
     <div class="shop__header-inner">
       <div>
         <h1 class="shop__heading">All Products</h1>
-        <p class="shop__subheading">{{ filteredProducts().length }} products available</p>
+        <p class="shop__subheading">
+          @if (shopStore.isListingLoading()) {
+            Loading…
+          } @else {
+            {{ shopStore.totalProducts() }} products available
+          }
+        </p>
       </div>
     </div>
   </div>
 
+  @if (shopStore.filtersError()) {
+    <div class="shop__banner shop__banner--warn" role="alert">
+      {{ shopStore.filtersError() }}
+    </div>
+  }
+
   <div class="shop__body">
-
-    <!-- ── Sidebar ── -->
     <aside class="shop__sidebar">
-
-      <!-- Category -->
       <div class="filter-group">
         <h3 class="filter-group__title">Category</h3>
         <div class="filter-group__list">
-          @for (cat of categories; track cat) {
-            <button class="filter-cat-btn"
-                    [class.filter-cat-btn--active]="selectedCategory() === cat"
-                    (click)="selectCategory(cat)">
+          @for (cat of shopStore.categories(); track cat) {
+            <button
+              type="button"
+              class="filter-cat-btn"
+              [class.filter-cat-btn--active]="shopStore.selectedCategory() === cat"
+              (click)="shopStore.selectCategory(cat)"
+            >
               {{ cat }}
             </button>
           }
         </div>
       </div>
 
-      <!-- Price Range -->
       <div class="filter-group">
         <h3 class="filter-group__title">Price Range</h3>
         <p class="filter-group__price-label">
-          ₹{{ minPrice() }} – ₹{{ maxPrice() }}/month
+          ₹{{ shopStore.minPrice() | number }} – ₹{{ shopStore.maxPrice() | number }}
         </p>
         <div class="filter-range-wrap">
           <label class="filter-range-label">Min</label>
-          <input type="range" class="filter-range"
-                 min="0" max="5000" step="100"
-                 [value]="minPrice()"
-                 (input)="minPrice.set(+$any($event.target).value)" />
+          <input
+            type="range"
+            class="filter-range"
+            [attr.min]="shopStore.rangeMin()"
+            [attr.max]="shopStore.rangeMax()"
+            step="1"
+            [value]="shopStore.minPrice()"
+            (input)="shopStore.setMinPrice(+$any($event.target).value)"
+          />
           <label class="filter-range-label">Max</label>
-          <input type="range" class="filter-range"
-                 min="0" max="5000" step="100"
-                 [value]="maxPrice()"
-                 (input)="maxPrice.set(+$any($event.target).value)" />
+          <input
+            type="range"
+            class="filter-range"
+            [attr.min]="shopStore.rangeMin()"
+            [attr.max]="shopStore.rangeMax()"
+            step="1"
+            [value]="shopStore.maxPrice()"
+            (input)="shopStore.setMaxPrice(+$any($event.target).value)"
+          />
         </div>
       </div>
 
-      <!-- Reset -->
-      <button class="filter-reset-btn" (click)="resetFilters()">Reset Filters</button>
+      <button type="button" class="filter-reset-btn" (click)="shopStore.resetFilters()">Reset Filters</button>
     </aside>
 
-    <!-- ── Main Content ── -->
     <main class="shop__main">
-
-      <!-- Product Type / Breadcrumb -->
       <div class="shop__type-bar">
         <span class="shop__breadcrumb">
           All Products
-          @if (selectedCategory() !== 'All') {
-            <span> / {{ selectedCategory() }}</span>
+          @if (shopStore.selectedCategory() !== 'All') {
+            <span> / {{ shopStore.selectedCategory() }}</span>
           }
         </span>
       </div>
 
-      <!-- Search + Sort bar -->
       <div class="shop__toolbar">
-        <div class="shop__search-wrap" style="flex:1;">
+        <div class="shop__search-wrap" style="flex: 1">
           <span class="material-symbols-outlined shop__search-icon">search</span>
-          <input type="text" class="shop__search" placeholder="Search products..." 
-                 [value]="searchQuery()" (input)="onSearchInput($event)" />
-          @if (searchQuery()) {
-            <button class="shop__search-clear material-symbols-outlined" (click)="resetSearch()">close</button>
+          <input
+            type="text"
+            class="shop__search"
+            placeholder="Search products..."
+            [value]="shopStore.searchQuery()"
+            (input)="shopStore.setSearchQueryFromInput($any($event.target).value)"
+          />
+          @if (shopStore.searchQuery()) {
+            <button type="button" class="shop__search-clear material-symbols-outlined" (click)="shopStore.resetSearch()">
+              close
+            </button>
           }
         </div>
         <div class="shop__sort-wrap">
           <label class="shop__sort-label">Sort By:</label>
-          <app-select 
+          <app-select
             class="shop__sort-custom"
-            [options]="sortOptions" 
-            [value]="sortBy()" 
+            [options]="sortOptions"
+            [value]="shopStore.sortBy()"
             (valueChange)="onSort($any($event))"
-            placeholder="Default">
+            placeholder="Default"
+          >
           </app-select>
         </div>
       </div>
 
-      <!-- Product Grid -->
-      @if (filteredProducts().length > 0) {
+      @if (shopStore.listError()) {
+        <div class="shop__banner shop__banner--error" role="alert">{{ shopStore.listError() }}</div>
+      }
+
+      @if (shopStore.isListingLoading() && shopStore.products().length === 0) {
+        <div class="shop__empty">
+          <p>Loading products…</p>
+        </div>
+      } @else if (!shopStore.isListingLoading() && shopStore.products().length > 0) {
         <div class="shop__grid">
-          @for (product of filteredProducts(); track product.id) {
-            <app-card class="shop-card" variant="outlined" [hasFooter]="true" (click)="goToProduct(product.id)">
+          @for (product of shopStore.products(); track product.id) {
+            <app-card
+              class="shop-card"
+              variant="outlined"
+              [hasFooter]="true"
+              (click)="goToProduct(product.id)"
+            >
               <div class="shop-card__img-container">
                 <img [src]="product.images[0]" [alt]="product.name" class="shop-card__img" />
                 <div class="shop-card__cat-overlay">
                   <span class="shop-card__cat-tag">{{ product.category }}</span>
                 </div>
               </div>
-              
+
               <div class="shop-card__body">
                 <h3 class="shop-card__name">{{ product.name }}</h3>
                 <p class="shop-card__desc">{{ product.description }}</p>
-                
+
                 <div class="shop-card__price-row">
-                  <span class="shop-card__price-amt">₹{{ product.baseMonthlyPrice | number }}</span>
-                  <span class="shop-card__price-unit">/ month</span>
+                  <span class="shop-card__price-amt">₹{{ product.displayPrice | number }}</span>
+                  @if (product.billingPeriodLabel) {
+                    <span class="shop-card__price-unit">/ {{ product.billingPeriodLabel }}</span>
+                  } @else {
+                    <span class="shop-card__price-unit">from plan</span>
+                  }
                 </div>
 
-                <div class="shop-card__savings">
-                  <span class="shop-card__save-pill">Save 20% — 6M</span>
-                  <span class="shop-card__save-pill">Save 30% — Yearly</span>
-                </div>
+                @if (product.planName) {
+                  <div class="shop-card__savings">
+                    <span class="shop-card__save-pill">{{ product.planName }}</span>
+                  </div>
+                }
               </div>
 
               <div footer class="w-full">
-                <app-button variant="primary" [fullWidth]="true" label="View Plans" icon="arrow_forward" iconPosition="right" (click)="goToProduct(product.id)"></app-button>
+                <app-button
+                  variant="primary"
+                  [fullWidth]="true"
+                  label="View Plans"
+                  icon="arrow_forward"
+                  iconPosition="right"
+                  (click)="$event.stopPropagation(); goToProduct(product.id)"
+                ></app-button>
               </div>
             </app-card>
           }
         </div>
+
+        @if (shopStore.totalPages() > 1) {
+          <div class="shop__pagination">
+            <button
+              type="button"
+              class="filter-reset-btn"
+              [disabled]="shopStore.page() <= 1 || shopStore.isListingLoading()"
+              (click)="shopStore.prevPage()"
+            >
+              Previous
+            </button>
+            <span class="shop__pagination-meta">
+              Page {{ shopStore.page() }} of {{ shopStore.totalPages() }} · {{ shopStore.rangeStart() }}–{{
+                shopStore.rangeEnd()
+              }}
+              of {{ shopStore.totalProducts() }}
+            </span>
+            <button
+              type="button"
+              class="filter-reset-btn"
+              [disabled]="shopStore.page() >= shopStore.totalPages() || shopStore.isListingLoading()"
+              (click)="shopStore.nextPage()"
+            >
+              Next
+            </button>
+          </div>
+        }
       } @else {
         <div class="shop__empty">
-          <div class="shop__empty-icon material-symbols-outlined" style="font-size: 3rem;">search_off</div>
+          <div class="shop__empty-icon material-symbols-outlined" style="font-size: 3rem">search_off</div>
           <h3>No products found</h3>
           <p>Try adjusting your filters or search term.</p>
-            <button class="filter-reset-btn" (click)="resetFilters()">Reset Filters</button>
+          <button type="button" class="filter-reset-btn" (click)="shopStore.resetFilters()">Reset Filters</button>
         </div>
       }
-
     </main>
   </div>
 </div>

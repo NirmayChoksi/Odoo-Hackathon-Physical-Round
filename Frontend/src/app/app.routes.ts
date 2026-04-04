@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { portalPublicRoutes } from './dashboard/pages/portal/portal.routes';
 import { subscriptionStaffGuard } from './dashboard/dashboard.guards';
-import { InternalDashboardLayoutComponent } from './dashboard/pages/internal/internal-dashboard-layout.component';
 import { subscriptionAppChildRoutes } from './internal/subscription-app.routes';
 
 /** Old top-level URLs → `/subscription/...` (bookmarks and old links). */
@@ -36,8 +35,9 @@ export const routes: Routes = [
   ...subscriptionLegacyRedirects,
   {
     path: 'subscription',
-    component: InternalDashboardLayoutComponent,
     canActivate: [subscriptionStaffGuard],
+    loadComponent: () =>
+      import('./internal/subscription-app-shell.component').then((m) => m.SubscriptionAppShellComponent),
     children: subscriptionAppChildRoutes,
   },
   {
