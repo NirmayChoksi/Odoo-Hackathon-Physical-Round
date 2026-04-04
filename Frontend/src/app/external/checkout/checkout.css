@@ -38,10 +38,10 @@
 }
 
 .chk-card {
-  background: var(--color-surface-container);
+  background: var(--color-surface-container-low);
   padding: 32px;
-  border-radius: var(--shape-corner-medium);
-  border: 1px solid var(--color-outline-variant);
+  border-radius: 16px;
+  border: 1.5px solid var(--color-outline-variant);
 }
 
 .chk-title {
@@ -60,10 +60,10 @@
 
 .chk-address-box {
   padding: 16px;
-  border: 1px solid var(--color-outline);
-  border-radius: var(--shape-corner-small);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 12px;
   color: var(--color-on-surface-variant);
-  background: var(--color-surface);
+  background: var(--color-surface-container-low);
 }
 
 .chk-grid {
@@ -74,10 +74,10 @@
 
 /* Summary Box */
 .summary-box {
-  background: var(--color-surface-container);
+  background: var(--color-surface-container-low);
   padding: 32px;
-  border-radius: var(--shape-corner-large);
-  border: 1px solid var(--color-primary);
+  border-radius: 16px;
+  border: 1.5px solid var(--color-outline-variant);
 }
 .summary-row {
   display: flex;
@@ -135,9 +135,9 @@
 
 .success-box {
   padding: 24px;
-  border: 1px solid var(--color-primary);
-  border-radius: var(--shape-corner-medium);
-  background: var(--color-surface-container);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 16px;
+  background: var(--color-surface-container-low);
   color: var(--color-on-surface);
   font-size: 1.1rem;
 }
