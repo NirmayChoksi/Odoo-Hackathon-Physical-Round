@@ -32,14 +32,13 @@ app.get("/health", (_req, res) => {
   res.json({ ok: true });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/external/shop", shopRoutes);
 app.use("/api/external/cart", cartRoutes);
 app.use("/api/external/checkout", checkoutRoutes);
 app.use("/api/external/orders", orderRoutes);
 app.use("/api/external/invoices", invoiceRoutes);
 app.use("/api/external/profile", profileRoutes);
-app.use("/api/auth", authRoutes);
-
 app.use("/api/internal/dashboard", dashboardRoutes);
 app.use("/api/internal/customers", customerRoutes);
 app.use("/api/internal/contacts", contactRoutes);

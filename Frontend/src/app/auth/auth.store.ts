@@ -1,6 +1,7 @@
-import { inject } from '@angular/core';
+import { inject, isDevMode } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { updateState, withDevtools, withDevToolsStub } from '@angular-architects/ngrx-toolkit';
+import { signalStore, withMethods, withState } from '@ngrx/signals';
 import { firstValueFrom } from 'rxjs';
 
 export type UserRole = 'Admin' | 'portal' | 'Internal';
@@ -28,12 +29,15 @@ const initialState: AuthState = {
   error: null,
 };
 
+const authDevtools = isDevMode() ? withDevtools('auth') : withDevToolsStub('auth');
+
 export const AuthStore = signalStore(
   { providedIn: 'root' },
+  authDevtools,
   withState(initialState),
   withMethods((store, http = inject(HttpClient)) => ({
     async login(email: string, password: string): Promise<{success: boolean, error?: string}> {
-      patchState(store, { isLoading: true, error: null });
+      updateState(store, '[Auth] Login', { isLoading: true, error: null });
       try {
         const response = await firstValueFrom(
           http.post<any>('/api/auth/login', { email, password })
@@ -48,74 +52,74 @@ export const AuthStore = signalStore(
           role: 'portal'
         };
         localStorage.setItem('token', token);
-        patchState(store, { user, token, isLoading: false });
+        updateState(store, '[Auth] Login Success', { user, token, isLoading: false });
         return { success: true };
       } catch (err) {
         let errorMsg = 'Failed to login';
         if (err instanceof HttpErrorResponse) {
           errorMsg = err.error?.error || err.error?.message || err.error || err.message;
         }
-        patchState(store, { error: errorMsg, isLoading: false });
+        updateState(store, '[Auth] Login Failure', { error: errorMsg, isLoading: false });
         return { success: false, error: errorMsg };
       }
     },
 
     async signup(name: string, email: string, password: string): Promise<{success: boolean, error?: string}> {
-      patchState(store, { isLoading: true, error: null });
+      updateState(store, '[Auth] Signup', { isLoading: true, error: null });
       try {
         await firstValueFrom(
           http.post<any>('/api/auth/signup', { full_name: name, email, password })
         );
-        patchState(store, { isLoading: false });
+        updateState(store, '[Auth] Signup Success', { isLoading: false });
         return { success: true };
       } catch (err) {
         let errorMsg = 'Signup failed';
         if (err instanceof HttpErrorResponse) {
           errorMsg = err.error?.error || err.error?.message || err.error || err.message;
         }
-        patchState(store, { error: errorMsg, isLoading: false });
+        updateState(store, '[Auth] Signup Failure', { error: errorMsg, isLoading: false });
         return { success: false, error: errorMsg };
       }
     },
 
     async resetPassword(email: string): Promise<{success: boolean, error?: string}> {
-      patchState(store, { isLoading: true, error: null });
+      updateState(store, '[Auth] Reset Password', { isLoading: true, error: null });
       try {
         await firstValueFrom(
           http.post<any>('/api/auth/reset-password', { email })
         );
-        patchState(store, { isLoading: false });
+        updateState(store, '[Auth] Reset Password Success', { isLoading: false });
         return { success: true };
       } catch (err) {
         let errorMsg = 'Failed to reset password';
         if (err instanceof HttpErrorResponse) {
           errorMsg = err.error?.error || err.error?.message || err.error || err.message;
         }
-        patchState(store, { error: errorMsg, isLoading: false });
+        updateState(store, '[Auth] Reset Password Failure', { error: errorMsg, isLoading: false });
         return { success: false, error: errorMsg };
       }
     },
     async verifyReset(email: string, token: string, newPassword: string): Promise<{success: boolean, error?: string}> {
-      patchState(store, { isLoading: true, error: null });
+      updateState(store, '[Auth] Verify Reset', { isLoading: true, error: null });
       try {
         await firstValueFrom(
           http.post<any>('/api/auth/verify-reset', { email, token, newPassword })
         );
-        patchState(store, { isLoading: false });
+        updateState(store, '[Auth] Verify Reset Success', { isLoading: false });
         return { success: true };
       } catch (err) {
         let errorMsg = 'Failed to update password';
         if (err instanceof HttpErrorResponse) {
           errorMsg = err.error?.error || err.error?.message || err.error || err.message;
         }
-        patchState(store, { error: errorMsg, isLoading: false });
+        updateState(store, '[Auth] Verify Reset Failure', { error: errorMsg, isLoading: false });
         return { success: false, error: errorMsg };
       }
     },
     
     logout() {
       localStorage.removeItem('token');
-      patchState(store, { user: null, token: null });
+      updateState(store, '[Auth] Logout', { user: null, token: null });
     }
   }))
 );
