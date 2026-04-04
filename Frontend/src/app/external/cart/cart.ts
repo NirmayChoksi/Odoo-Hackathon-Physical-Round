@@ -36,6 +36,12 @@ export class CartComponent {
   decrement(item: CartItem) {
     if (item.quantity > 1) {
       this.cartService.updateQuantity(item.id, item.quantity - 1);
+    } else {
+      // qty is 1, remove this item and navigate to its product page
+      this.cartService.removeItem(item.id);
+      // Extract the product id from the cart item id (format: productId_variantName_planLabel)
+      const productId = item.id.split('_')[0];
+      this.router.navigate(ecommerceCommands(this.navLinkBase, 'shop', Number(productId)));
     }
   }
 

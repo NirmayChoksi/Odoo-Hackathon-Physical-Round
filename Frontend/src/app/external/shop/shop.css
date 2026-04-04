@@ -203,7 +203,7 @@
   white-space: nowrap;
 }
 .shop__sort {
-  padding: 10px 14px;
+  padding: 10px 36px 10px 14px;
   border: 1.5px solid var(--color-outline-variant);
   border-radius: 10px;
   font-family: var(--font-body);
@@ -212,8 +212,17 @@
   background: var(--color-surface-container-low);
   outline: none;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23b0bec5%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
 }
 .shop__sort:focus { border-color: var(--color-primary); }
+.shop__sort option {
+  background-color: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+}
 
 /* Product Grid */
 .shop__grid {
@@ -225,12 +234,26 @@
 
 .shop-card {
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   background: var(--color-surface-container-low);
   border: 1px solid var(--color-outline-variant);
   border-radius: 20px;
+  cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shop-card ::ng-deep .mat-mdc-card {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box;
+}
+
+.shop-card ::ng-deep .mat-mdc-card-content {
+  flex-grow: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .shop-card:hover {
@@ -291,17 +314,18 @@
   font-size: 1.15rem;
   color: var(--color-on-surface);
   line-height: 1.2;
-  margin: 0;
+  margin: 0 0 4px;
 }
 
 .shop-card__desc {
   font-size: 0.82rem;
   color: var(--color-on-surface-variant);
   line-height: 1.6;
-  margin: 0;
+  margin: 0 0 16px;
+  flex-grow: 1; /* Dynamically pushes the price row to the bottom */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3; /* Allowing up to 3 lines for better readability */
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

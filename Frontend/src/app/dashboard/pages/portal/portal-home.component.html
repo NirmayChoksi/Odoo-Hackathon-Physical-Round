@@ -36,37 +36,36 @@
       </div>
     </div>
     <div class="hero__visual">
-      <app-card variant="glass" class="hero__card hero__card--1">
-        <div class="hero__card-inner">
-          <div class="hero__card-icon material-symbols-outlined">bar_chart</div>
-          <div class="hero__card-text">
-            <strong>DataPulse Analytics</strong>
-            <span>₹1,200 / month</span>
+      <div class="hero__cards-stack">
+        <div class="hero__product-card">
+          <div class="hero__product-card-icon">
+            <span class="material-symbols-outlined">bar_chart</span>
           </div>
-          <app-badge variant="success" size="sm" label="Popular" [dot]="true"></app-badge>
-        </div>
-      </app-card>
-
-      <app-card variant="glass" class="hero__card hero__card--2">
-        <div class="hero__card-inner">
-          <div class="hero__card-icon material-symbols-outlined">lock</div>
-          <div class="hero__card-text">
-            <strong>ShieldGuard Security</strong>
-            <span>₹1,500 / month</span>
+          <div class="hero__product-card-info">
+            <span class="hero__product-card-name">DataPulse Analytics</span>
+            <span class="hero__product-card-price">₹1,200 / month</span>
           </div>
+          <span class="hero__product-card-badge">POPULAR</span>
         </div>
-      </app-card>
-
-      <app-card variant="glass" class="hero__card hero__card--3">
-        <div class="hero__card-inner">
-          <div class="hero__card-icon material-symbols-outlined">bolt</div>
-          <div class="hero__card-text">
-            <strong>AutoFlow Pro</strong>
-            <span>₹800 / month</span>
+        <div class="hero__product-card">
+          <div class="hero__product-card-icon hero__product-card-icon--blue">
+            <span class="material-symbols-outlined">lock</span>
+          </div>
+          <div class="hero__product-card-info">
+            <span class="hero__product-card-name">ShieldGuard Security</span>
+            <span class="hero__product-card-price">₹1,500 / month</span>
           </div>
         </div>
-      </app-card>
-      <div class="hero__glow"></div>
+        <div class="hero__product-card">
+          <div class="hero__product-card-icon hero__product-card-icon--orange">
+            <span class="material-symbols-outlined">bolt</span>
+          </div>
+          <div class="hero__product-card-info">
+            <span class="hero__product-card-name">AutoFlow Pro</span>
+            <span class="hero__product-card-price">₹800 / month</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -117,22 +116,26 @@
 
       <div class="product-grid">
         @for (product of featuredProducts; track product.id) {
-          <app-card class="product-card" variant="outlined" [header]="product.name" [subtitle]="product.category">
-            <div class="product-card__img-wrap">
-              <img [src]="product.images[0]" [alt]="product.name" class="product-card__img" />
+          <div class="product-card" (click)="goToProduct(product.id)">
+            <div class="product-card__img">
+              <img [src]="product.images[0]" [alt]="product.name" />
               @if (product.id === 1) {
-                <app-badge variant="info" size="sm" label="Top Rated" class="product-card__badge"></app-badge>
+                <span class="product-card__badge">⭐ Top Rated</span>
               }
             </div>
-            
-            <div class="product-card__price-row">
-              <div class="product-card__price">
-                <span class="price-val">₹{{ product.baseMonthlyPrice | number }}</span>
-                <span class="price-unit">/ month</span>
+            <div class="product-card__body">
+              <div class="product-card__name">{{ product.name }}</div>
+              <div class="product-card__category">{{ product.category }}</div>
+              <div class="product-card__desc">{{ product.description }}</div>
+              <div class="product-card__footer">
+                <div class="product-card__price">
+                  <span class="price-val">₹{{ product.baseMonthlyPrice | number }}</span>
+                  <span class="price-unit">/ month</span>
+                </div>
               </div>
-              <app-button variant="primary" size="sm" label="View" (click)="goToProduct(product.id)"></app-button>
             </div>
-          </app-card>
+            <button class="product-card__cta-btn">View Product →</button>
+          </div>
         }
       </div>
     </div>
@@ -153,7 +156,7 @@
   <footer class="ext-footer">
     <div class="ext-footer__inner">
       <div class="ext-footer__brand">
-        <span class="ext-footer__logo">SubSync</span>
+        <img src="/images/logo/subsync-logo.svg" alt="SubSync Logo" class="ext-footer__logo-img" />
         <p>Subscription software made simple.</p>
       </div>
       <div class="ext-footer__links">
@@ -176,7 +179,7 @@
         </div>
       </div>
     </div>
-    <div class="ext-footer__copy">© 2024 SubSync. All rights reserved.</div>
+    <div class="ext-footer__copy">© 2026 SubSync. All rights reserved.</div>
   </footer>
 
 </main>

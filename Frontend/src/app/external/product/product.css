@@ -215,7 +215,6 @@
 }
 
 /* Variants */
-.prod__variants-section {}
 .prod__variants { display: flex; flex-wrap: wrap; gap: 8px; }
 .prod__variant-btn {
   padding: 8px 14px;
@@ -300,6 +299,17 @@
   filter: brightness(1.1);
 }
 .prod__add-btn--success { background: var(--color-secondary); color: #fff; }
+.prod__add-btn-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+.prod__add-btn-price {
+  font-size: 0.85rem;
+  font-weight: 700;
+  opacity: 0.9;
+}
 
 /* Trust */
 .prod__trust { display: flex; flex-direction: column; gap: 8px; }

@@ -66,13 +66,17 @@
             <span> / {{ selectedCategory() }}</span>
           }
         </span>
-        <span class="shop__product-type-hint">product type</span>
       </div>
 
       <!-- Search + Sort bar -->
       <div class="shop__toolbar">
         <div class="shop__search-wrap" style="flex:1;">
-          <app-input placeholder="Search products..." prefixIcon="search" [value]="searchQuery()" (valueChange)="onSearchInputComponent($event)"></app-input>
+          <span class="material-symbols-outlined shop__search-icon">search</span>
+          <input type="text" class="shop__search" placeholder="Search products..." 
+                 [value]="searchQuery()" (input)="onSearchInput($event)" />
+          @if (searchQuery()) {
+            <button class="shop__search-clear material-symbols-outlined" (click)="resetSearch()">close</button>
+          }
         </div>
         <div class="shop__sort-wrap">
           <label class="shop__sort-label">Sort By:</label>
@@ -89,7 +93,7 @@
       @if (filteredProducts().length > 0) {
         <div class="shop__grid">
           @for (product of filteredProducts(); track product.id) {
-            <app-card class="shop-card" variant="outlined" [hasFooter]="true">
+            <app-card class="shop-card" variant="outlined" [hasFooter]="true" (click)="goToProduct(product.id)">
               <div class="shop-card__img-container">
                 <img [src]="product.images[0]" [alt]="product.name" class="shop-card__img" />
                 <div class="shop-card__cat-overlay">

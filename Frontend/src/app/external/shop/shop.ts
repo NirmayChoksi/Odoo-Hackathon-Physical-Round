@@ -68,6 +68,8 @@ export class ShopComponent implements OnInit {
 
   selectCategory(cat: string) { this.selectedCategory.set(cat); }
   onSearchInputComponent(value: string) { this.searchQuery.set(value); }
+  onSearchInput(event: Event) { this.searchQuery.set((event.target as HTMLInputElement).value); }
+  resetSearch() { this.searchQuery.set(''); }
   onSort(val: string) { this.sortBy.set(val as any); }
   resetFilters() {
     this.searchQuery.set('');
