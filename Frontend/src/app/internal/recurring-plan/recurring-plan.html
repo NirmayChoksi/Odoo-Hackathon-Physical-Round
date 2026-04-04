@@ -1,0 +1,154 @@
+<div class="internal-container">
+
+  <!-- Navigation Header -->
+  <nav class="internal-nav">
+    <div class="nav-brand">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
+    </div>
+    <div class="nav-links">
+      @for(item of navItems(); track item.label) {
+        <a href="#" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item); $event.preventDefault()">
+          {{ item.label }}
+        </a>
+      }
+    </div>
+    <div class="nav-profile">
+      <a routerLink="/login" class="profile-btn">
+        <span class="material-symbols-outlined">person</span>
+        My Profile
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content Body -->
+  <main class="internal-content">
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-left">
+        <button class="btn-new" (click)="onNew()">
+          <span class="material-symbols-outlined">add</span>
+          New
+        </button>
+        <div class="action-icons">
+          <button class="icon-btn" (click)="onDelete()" title="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+          <button class="icon-btn" (click)="onSave()" title="Save">
+            <span class="material-symbols-outlined">save</span>
+          </button>
+        </div>
+        <button class="btn-subscription" (click)="onSubscriptionClick()">
+           Subscription
+        </button>
+      </div>
+    </div>
+
+    <!-- Recurring Plan Form Container -->
+    <div class="form-container">
+
+      <!-- Recurring Name — large editable title -->
+      <div class="title-group">
+        <input
+          type="text"
+          id="planName"
+          class="title-input"
+          placeholder="Recurring Name"
+          [ngModel]="planName()"
+          (ngModelChange)="planName.set($event)" />
+      </div>
+
+      <!-- Fields Section -->
+      <div class="fields-section">
+
+        <!-- Billing Period Row -->
+        <div class="field-row">
+          <label class="field-label" for="billingValue">Billing Period</label>
+          <div class="dual-input">
+            <input
+              type="number"
+              id="billingValue"
+              class="short-input"
+              [ngModel]="billingValue()"
+              (ngModelChange)="billingValue.set($event)"
+              placeholder="" />
+            <select
+              id="billingUnit"
+              class="unit-select"
+              [value]="billingUnit()"
+              (change)="billingUnit.set($any($event.target).value)">
+              @for(unit of units; track unit) {
+                <option [value]="unit">{{ unit }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Automatic Close Row -->
+        <div class="field-row">
+          <label class="field-label" for="autoCloseDays">Automatic Close.</label>
+          <div class="unit-group">
+            <input
+              type="number"
+              id="autoCloseDays"
+              class="short-input"
+              [ngModel]="autoCloseDays()"
+              (ngModelChange)="autoCloseDays.set($event)"
+              placeholder="" />
+            <span class="unit-label">Days</span>
+          </div>
+        </div>
+
+        <!-- Checkbox Flags -->
+        <div class="flags-section">
+          <div class="checkbox-row">
+            <label class="checkbox-container">
+              <input type="checkbox" [ngModel]="closable()" (ngModelChange)="closable.set($event)" />
+              Closable
+            </label>
+          </div>
+          <div class="checkbox-row">
+            <label class="checkbox-container">
+              <input type="checkbox" [ngModel]="pausable()" (ngModelChange)="pausable.set($event)" />
+              Pausable
+            </label>
+          </div>
+          <div class="checkbox-row">
+            <label class="checkbox-container">
+              <input type="checkbox" [ngModel]="renew()" (ngModelChange)="renew.set($event)" />
+              Renew
+            </label>
+          </div>
+        </div>
+
+        <!-- Product Table -->
+        <div class="table-section">
+           <table class="products-table">
+              <thead>
+                <tr>
+                  <th class="accent-text">Product</th>
+                  <th class="accent-text">Variant</th>
+                  <th class="accent-text">Price</th>
+                  <th class="accent-text">Min Qty.</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(row of products(); track $index) {
+                  <tr>
+                    <td><input type="text" [(ngModel)]="row.product" placeholder="demo" class="table-input" /></td>
+                    <td><input type="text" [(ngModel)]="row.variant" placeholder="" class="table-input" /></td>
+                    <td><input type="text" [(ngModel)]="row.price" placeholder="eg. 4 rs per week" class="table-input" /></td>
+                    <td><input type="text" [(ngModel)]="row.minQty" placeholder="1 qty" class="table-input" /></td>
+                  </tr>
+                }
+              </tbody>
+           </table>
+           <button class="add-row-btn" (click)="addProductRow()">+ Add Product</button>
+          </div>
+
+      </div>
+
+    </div>
+
+  </main>
+</div>

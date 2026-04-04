@@ -16,6 +16,7 @@ export const routes: Routes = [
   { path: 'quotation-template', loadComponent: () => import('./internal/quotation-template/quotation-template').then(m => m.QuotationTemplateComponent) },
   { path: 'discount', loadComponent: () => import('./internal/discount/discount').then(m => m.DiscountComponent) },
   { path: 'taxes', loadComponent: () => import('./internal/taxes/taxes').then(m => m.TaxesComponent) },
+  { path: 'recurring-plan', loadComponent: () => import('./internal/recurring-plan/recurring-plan').then(m => m.RecurringPlanComponent) },
   { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
   { path: 'shop', component: ShopComponent },
   { path: 'shop/:id', component: ProductComponent },
