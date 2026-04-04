@@ -78,6 +78,20 @@
       <!-- Fields Section -->
       <div class="fields-section">
 
+        <!-- Product Type -->
+        <div class="field-row">
+          <label class="field-label" for="productType">Product Type</label>
+          <select
+            id="productType"
+            class="unit-select"
+            [value]="productType()"
+            (change)="productType.set($any($event.target).value)">
+            @for(type of types; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </div>
+
         <!-- Sales Price -->
         <div class="field-row">
           <label class="field-label" for="salesPrice">Sales Price</label>
@@ -90,30 +104,90 @@
             placeholder="0.00" />
         </div>
 
-        <!-- Category -->
+        <!-- Cost Price -->
         <div class="field-row">
-          <label class="field-label" for="category">Product Category</label>
-          <select
-            id="category"
-            class="unit-select"
-            [value]="category()"
-            (change)="category.set($any($event.target).value)">
-            @for(cat of categories; track cat) {
-              <option [value]="cat">{{ cat }}</option>
-            }
-          </select>
+          <label class="field-label" for="costPrice">Cost Price</label>
+          <input
+            type="number"
+            id="costPrice"
+            class="short-input"
+            [ngModel]="costPrice()"
+            (ngModelChange)="costPrice.set($event)"
+            placeholder="0.00" />
         </div>
 
-        <!-- Internal Reference -->
-        <div class="field-row">
-          <label class="field-label" for="internalReference">Internal Reference</label>
+        <!-- Short Description -->
+        <div class="field-row field-row--full">
+          <label class="field-label" for="shortDescription">Short Description</label>
           <input
             type="text"
-            id="internalReference"
+            id="shortDescription"
             class="short-input"
-            [ngModel]="internalReference()"
-            (ngModelChange)="internalReference.set($event)"
-            placeholder="e.g. FURN_001" />
+            style="width: 100%; max-width: 800px;"
+            [ngModel]="shortDescription()"
+            (ngModelChange)="shortDescription.set($event)"
+            placeholder="Brief summary" />
+        </div>
+
+        <!-- Description -->
+        <div class="field-row field-row--full">
+          <label class="field-label" for="description">Description</label>
+          <textarea
+            id="description"
+            class="short-input"
+            style="width: 100%; max-width: 800px; resize: vertical; min-height: 80px;"
+            [ngModel]="description()"
+            (ngModelChange)="description.set($event)"
+            placeholder="Detailed description..."></textarea>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="field-row field-row--full">
+          <label class="field-label" for="termsAndConditions">Terms of Service</label>
+          <textarea
+            id="termsAndConditions"
+            class="short-input"
+            style="width: 100%; max-width: 800px; resize: vertical; min-height: 80px;"
+            [ngModel]="termsAndConditions()"
+            (ngModelChange)="termsAndConditions.set($event)"
+            placeholder="Usage terms..."></textarea>
+        </div>
+
+        <!-- Image URLs -->
+        <div class="field-row field-row--full">
+          <label class="field-label" for="imageUrls">Image URLs</label>
+          <input
+            type="text"
+            id="imageUrls"
+            class="short-input"
+            style="width: 100%; max-width: 800px;"
+            [ngModel]="imageUrls()"
+            (ngModelChange)="imageUrls.set($event)"
+            placeholder="https://... (comma separated)" />
+        </div>
+
+        <!-- Is Recurring -->
+        <div class="field-row">
+          <label class="field-label" for="isRecurring">Recurring Product</label>
+          <input
+            type="checkbox"
+            id="isRecurring"
+            class="is-recurring-checkbox"
+            [ngModel]="isRecurring()"
+            (ngModelChange)="isRecurring.set($event)" />
+        </div>
+
+        <!-- Status -->
+        <div class="field-row">
+          <label class="field-label" for="status">Status</label>
+          <select
+            id="status"
+            class="unit-select"
+            [value]="status()"
+            (change)="status.set($any($event.target).value)">
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
         </div>
 
       </div>

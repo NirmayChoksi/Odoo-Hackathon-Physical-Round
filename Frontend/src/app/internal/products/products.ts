@@ -39,11 +39,19 @@ export class ProductsComponent {
 
   // Form State
   productName = signal<string>('');
-  salesPrice = signal<number | null>(null);
-  category = signal<string>('Services');
-  internalReference = signal<string>('');
+  productType = signal<string>('Service');
+  salesPrice = signal<number | null>(0.00);
+  costPrice = signal<number | null>(0.00);
+  
+  description = signal<string>('');
+  imageUrls = signal<string>('');
+  shortDescription = signal<string>('');
+  termsAndConditions = signal<string>('');
+  
+  isRecurring = signal<boolean>(true);
+  status = signal<string>('ACTIVE');
 
-  categories = ['Services', 'Consumable', 'Storable Product'];
+  types = ['Service', 'Software', 'Cloud Service', 'Consumable', 'Storable Product'];
 
   onNew() {
     alert('Create New Product');
