@@ -1,0 +1,128 @@
+<div class="internal-container">
+  <nav class="internal-nav">
+    <div class="nav-brand">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
+    </div>
+    <div class="nav-links">
+      @for (item of navItems(); track item.label) {
+        @if (item.isDropdown) {
+          <div class="nav-dropdown" [class.nav-dropdown--open]="isDropdownOpen()">
+            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active" (click)="toggleDropdown($event)">
+              {{ item.label }}
+              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
+            </button>
+            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
+              @for (sub of item.dropdownItems; track sub.label) {
+                <a [routerLink]="sub.path" class="dropdown-item">{{ sub.label }}</a>
+              }
+            </div>
+          </div>
+        } @else {
+          <a [routerLink]="item.path" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item)">
+            {{ item.label }}
+          </a>
+        }
+      }
+    </div>
+    <div class="nav-profile">
+      <a routerLink="/login" class="profile-btn">
+        <span class="material-symbols-outlined">person</span>
+        My Profile
+      </a>
+    </div>
+  </nav>
+
+  <main class="sf-main">
+    <header class="sf-page-head">
+      <nav class="sf-breadcrumb" aria-label="Breadcrumb">
+        <a [routerLink]="'/subscription/subscriptions'" class="sf-breadcrumb__link">Users / Contacts</a>
+        <span class="material-symbols-outlined sf-breadcrumb__sep" aria-hidden="true">chevron_right</span>
+        <span class="sf-breadcrumb__current">{{ name() || 'New user' }}</span>
+      </nav>
+      <div class="sf-page-head__row">
+        <div>
+          <h1 class="sf-title">{{ name() || 'New user' }}</h1>
+          <p class="sf-subtitle">Manage user account details and linked contact record.</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="sf-toolbar">
+      <div class="sf-toolbar__left">
+        <button type="button" class="sf-btn sf-btn--ghost" (click)="onNew()">
+          <span class="material-symbols-outlined">add</span>
+          New
+        </button>
+        <span class="sf-toolbar__divider" aria-hidden="true"></span>
+        <button type="button" class="sf-btn sf-btn--primary" (click)="onSave()">
+          <span class="material-symbols-outlined">save</span>
+          Save
+        </button>
+        <div class="sf-toolbar__icons">
+          <button type="button" class="icon-btn" title="Delete" (click)="onDelete()">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+          <button type="button" class="icon-btn" title="Print">
+            <span class="material-symbols-outlined">print</span>
+          </button>
+        </div>
+        <button type="button" class="sf-btn sf-btn--outline" (click)="onChangePassword()">Change password</button>
+      </div>
+    </div>
+
+    <section class="sf-card" aria-labelledby="sf-user-heading">
+      <div class="sf-card__header">
+        <h2 id="sf-user-heading" class="sf-card__title">User details</h2>
+      </div>
+      <div class="sf-fields">
+        <!-- Left column -->
+        <div class="fields-section">
+          <div class="field-row">
+            <label class="field-label" for="uf-name">Name</label>
+            <input id="uf-name" type="text" class="sf-control" placeholder="Full name"
+              [ngModel]="name()" (ngModelChange)="name.set($event)" />
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="uf-email">Email</label>
+            <input id="uf-email" type="email" class="sf-control" placeholder="user@example.com"
+              [ngModel]="email()" (ngModelChange)="email.set($event)" />
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="uf-phone">Phone number</label>
+            <input id="uf-phone" type="text" class="sf-control" placeholder="+1 555-0100"
+              [ngModel]="phone()" (ngModelChange)="phone.set($event)" />
+          </div>
+          <div class="field-section-title">Address</div>
+          <div class="field-row">
+            <label class="field-label" for="uf-addr1">Line 1</label>
+            <input id="uf-addr1" type="text" class="sf-control" placeholder="Street address"
+              [ngModel]="address1()" (ngModelChange)="address1.set($event)" />
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="uf-addr2">Line 2</label>
+            <input id="uf-addr2" type="text" class="sf-control" placeholder="Apt, suite, etc."
+              [ngModel]="address2()" (ngModelChange)="address2.set($event)" />
+          </div>
+          <div class="field-row">
+            <label class="field-label" for="uf-addr3">City / State / Zip</label>
+            <input id="uf-addr3" type="text" class="sf-control" placeholder="New York, NY 10001"
+              [ngModel]="address3()" (ngModelChange)="address3.set($event)" />
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="fields-section">
+          <div class="field-row">
+            <label class="field-label" for="uf-contact">Related contact</label>
+            <input id="uf-contact" type="text" class="sf-control" placeholder="Auto-generated"
+              [ngModel]="relatedContact()" (ngModelChange)="relatedContact.set($event)" />
+          </div>
+          <!-- <p class="sf-info-note">
+            <span class="material-symbols-outlined">info</span>
+            By default one contact record is created and linked here. A user can have multiple contacts since the contact model is separate.
+          </p> -->
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

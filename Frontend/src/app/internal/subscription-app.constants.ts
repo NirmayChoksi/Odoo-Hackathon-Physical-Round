@@ -8,6 +8,7 @@ export const SUBSCRIPTION_APP_PATHS = {
   products: `${SUBSCRIPTION_APP_BASE}/products`,
   reporting: `${SUBSCRIPTION_APP_BASE}/reporting`,
   users: `${SUBSCRIPTION_APP_BASE}/users`,
+  contacts: `${SUBSCRIPTION_APP_BASE}/contacts`,
   quotationTemplate: `${SUBSCRIPTION_APP_BASE}/quotation-template`,
   paymentTerm: `${SUBSCRIPTION_APP_BASE}/payment-term`,
   discount: `${SUBSCRIPTION_APP_BASE}/discount`,

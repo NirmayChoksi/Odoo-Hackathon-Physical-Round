@@ -26,7 +26,16 @@ export class SubscriptionsComponent {
     { label: 'Subscriptions', active: true, path: SUBSCRIPTION_APP_PATHS.subscriptions },
     { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
     { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
-    { label: 'Users/Contacts', active: false, path: SUBSCRIPTION_APP_PATHS.users },
+    {
+      label: 'Users/Contacts',
+      active: false,
+      path: SUBSCRIPTION_APP_PATHS.users,
+      isDropdown: true,
+      dropdownItems: [
+        { label: 'Users', path: SUBSCRIPTION_APP_PATHS.users },
+        { label: 'Contacts', path: SUBSCRIPTION_APP_PATHS.contacts },
+      ],
+    },
     {
       label: 'Configuration',
       active: false,

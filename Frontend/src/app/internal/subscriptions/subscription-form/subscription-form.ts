@@ -15,7 +15,16 @@ export class SubscriptionFormComponent {
     { label: 'Subscriptions', active: true, path: '/subscriptions' },
     { label: 'Products', active: false, path: '/products' },
     { label: 'Reporting', active: false, path: '/reporting' },
-    { label: 'Users/Contacts', active: false, path: '/users' },
+    {
+      label: 'Users/Contacts',
+      active: false,
+      path: '/subscription/users',
+      isDropdown: true,
+      dropdownItems: [
+        { label: 'Users', path: '/subscription/users' },
+        { label: 'Contacts', path: '/subscription/contacts' },
+      ],
+    },
     {
       label: 'Configuration',
       active: false,
