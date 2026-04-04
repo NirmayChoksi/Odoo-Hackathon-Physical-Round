@@ -1,0 +1,119 @@
+<div class="internal-container bg-surface-container-low min-h-screen text-on-surface">
+  
+  <!-- Navigation Header -->
+  <app-navbar 
+    [items]="navItems()" 
+    (itemClick)="onNavClick($event)">
+    <img brandIcon src="/images/logo/subsync-logo.svg" alt="SubSync" class="h-8" />
+    <app-button variant="ghost" size="sm" icon="person">
+      My Profile
+    </app-button>
+  </app-navbar>
+
+  <!-- Main Content Body -->
+  <main class="internal-content flex-1 max-w-[1400px] w-full mx-auto p-6 md:p-8">
+    
+    <!-- Action Bar -->
+    <div class="action-bar flex justify-between items-center mb-8 gap-4">
+      <div class="action-left flex items-center gap-5">
+        <app-button variant="primary" icon="add" (click)="onNew()">
+          New
+        </app-button>
+        <div class="action-icons flex items-center gap-2 pl-3 border-l border-outline-variant">
+          <app-button variant="ghost" icon="delete" (click)="onDelete()"></app-button>
+          <app-button variant="ghost" icon="save" (click)="onSave()"></app-button>
+        </div>
+      </div>
+      <div class="action-right">
+        <div class="breadcrumbs px-4 py-2 bg-surface-container rounded-lg border border-outline-variant text-primary font-semibold text-sm">
+          Subscription
+        </div>
+      </div>
+    </div>
+
+    <!-- Quotation Template Form Container -->
+    <div class="form-container bg-surface-container-lowest border border-outline-variant rounded-2xl p-8 shadow-lg">
+      <h2 class="form-title text-2xl font-bold text-primary mb-8 border-b-2 border-outline-variant pb-2 inline-block">
+        Quotation Template
+      </h2>
+      
+      <div class="form-content flex flex-col gap-6 max-w-3xl">
+        
+        <!-- Validity Days -->
+        <div class="row-group flex items-center gap-4">
+          <span class="form-label font-semibold min-w-[150px]">Quotation validity:-</span>
+          <div class="flex items-center gap-2 w-32 border-b border-outline-variant">
+            <input type="number" class="num-input bg-transparent border-none text-center w-full focus:outline-none" [(ngModel)]="validityDays" />
+          </div>
+          <span class="suffix text-on-surface-variant">days</span>
+          <p class="helper-text text-[#69EFAD] text-xs italic ml-4 max-w-[400px]">
+            If this quation is selected and with this validity days subscription is not confirm then that subscription will auto close.
+          </p>
+        </div>
+
+        <!-- Recurring Plan -->
+        <div class="row-group flex items-center gap-4">
+          <span class="form-label font-semibold min-w-[150px]">Recurring Plan:-</span>
+          <div class="border-b border-outline-variant min-w-[200px]">
+            <input type="text" class="text-input bg-transparent border-none w-full px-2 py-1 focus:outline-none" [(ngModel)]="recurringPlan" />
+          </div>
+        </div>
+
+        <!-- Last Forever -->
+        <div class="row-group flex items-center gap-4">
+          <span class="form-label font-semibold min-w-[150px]">Last Forever:-</span>
+          <app-checkbox [(checked)]="lastForever" (checkedChange)="lastForever.set($event)"></app-checkbox>
+        </div>
+
+        <!-- End After -->
+        <div class="row-group flex items-center gap-4 mt-2">
+          <span class="form-label font-semibold min-w-[150px]">End After:-</span>
+          <div class="flex items-center gap-6" [class.opacity-50]="lastForever()" [class.pointer-events-none]="lastForever()">
+            <div class="border-b border-outline-variant w-24">
+              <input type="number" class="num-input bg-transparent border-none text-center w-full px-2 py-1 focus:outline-none" [(ngModel)]="endAfterAmount" [disabled]="lastForever()" />
+            </div>
+            <div class="w-40">
+              <app-select [options]="timeUnitOptions()" [(value)]="endAfterUnit" (valueChange)="endAfterUnit.set($event)" [disabled]="lastForever()"></app-select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Table -->
+      <div class="data-container mt-12 bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+        <table class="data-table w-full text-left border-collapse">
+          <thead>
+            <tr>
+              <th class="p-4 uppercase tracking-wider text-primary text-[10px] font-bold border-b border-dashed border-primary relative after:content-[''] after:absolute after:right-0 after:top-[10%] after:h-[80%] after:border-r after:border-dashed after:border-primary">Product</th>
+              <th class="p-4 uppercase tracking-wider text-primary text-[10px] font-bold border-b border-dashed border-primary relative after:content-[''] after:absolute after:right-0 after:top-[10%] after:h-[80%] after:border-r after:border-dashed after:border-primary">Description</th>
+              <th class="p-4 uppercase tracking-wider text-primary text-[10px] font-bold border-b border-dashed border-primary">Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(item of products(); track item.id) {
+              <tr class="hover:bg-outline-variant/10 transition-colors">
+                <td class="p-5 text-sm border-b border-dashed border-primary text-primary relative after:content-[''] after:absolute after:right-0 after:top-[10%] after:h-[80%] after:border-r after:border-dashed after:border-primary">{{ item.product }}</td>
+                <td class="p-5 text-sm border-b border-dashed border-primary text-on-surface-variant relative after:content-[''] after:absolute after:right-0 after:top-[10%] after:h-[80%] after:border-r after:border-dashed after:border-primary">{{ item.description }}</td>
+                <td class="p-5 text-sm border-b border-dashed border-primary text-on-surface-variant">{{ item.quantity }} qty</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        
+        @if(products().length === 0) {
+          <div class="empty-state p-16 text-center text-outline">
+            <span class="material-symbols-outlined emoji text-5xl opacity-50 mb-4 block">inventory_2</span>
+            <p class="text-sm font-medium">No products added</p>
+          </div>
+        }
+      </div>
+
+      <div class="form-footer mt-6 flex flex-col gap-2">
+        <p class="text-[#69EFAD] text-xs italic">if no product is selected... for all products. If product... product applicable</p>
+        <p class="text-[#69EFAD] text-xs italic">Dropdown for selected fixed price or product</p>
+      </div>
+
+    </div>
+
+  </main>
+</div>

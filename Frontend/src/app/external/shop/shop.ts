@@ -6,13 +6,12 @@ import { NavbarComponent } from '../shared/navbar/navbar';
 import { MOCK_PRODUCTS, CATEGORIES, Product } from '../mock-products';
 import { InputComponent } from '../../components/input/input';
 import { CardComponent } from '../../components/card/card';
-import { BadgeComponent } from '../../components/badge/badge';
 import { ButtonComponent } from '../../components/button/button';
 
 @Component({
   selector: 'app-shop',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent, InputComponent, CardComponent, BadgeComponent, ButtonComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, InputComponent, CardComponent, ButtonComponent],
   templateUrl: './shop.html',
   styleUrl: './shop.css'
 })

@@ -15,5 +15,7 @@ export const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  namedPlaceholders: true
+  namedPlaceholders: true,
+  // Required for idempotent pre-schema / patch .sql files with multiple statements (SET, PREPARE, etc.)
+  multipleStatements: true
 });

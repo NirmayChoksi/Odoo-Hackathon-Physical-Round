@@ -13,6 +13,7 @@ export const routes: Routes = [
   { path: 'update-password', loadComponent: () => import('./auth/update-password/update-password').then(m => m.UpdatePassword) },
   { path: 'subscriptions/new', loadComponent: () => import('./internal/subscriptions/subscription-form/subscription-form').then(m => m.SubscriptionFormComponent) },
   { path: 'subscriptions', loadComponent: () => import('./internal/subscriptions/subscriptions').then(m => m.SubscriptionsComponent) },
+  { path: 'quotation-template', loadComponent: () => import('./internal/quotation-template/quotation-template').then(m => m.QuotationTemplateComponent) },
   { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent) },
   { path: 'shop', component: ShopComponent },
   { path: 'shop/:id', component: ProductComponent },

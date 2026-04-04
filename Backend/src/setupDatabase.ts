@@ -29,12 +29,37 @@ async function setupDatabase(): Promise<void> {
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;`);
     await connection.query(`USE \`${DB_NAME}\`;`);
 
+    const preSchemaDir = path.join(__dirname, "../sql/pre-schema");
+    if (fs.existsSync(preSchemaDir)) {
+      const preFiles = fs
+        .readdirSync(preSchemaDir)
+        .filter((f) => f.endsWith(".sql"))
+        .sort();
+      for (const name of preFiles) {
+        console.log(`Pre-schema: ${name}`);
+        await connection.query(fs.readFileSync(path.join(preSchemaDir, name), "utf8"));
+      }
+    }
+
     // Read full schema from external .sql file
     const sqlFilePath = path.join(__dirname, '../subscription_management.sql');
     const sqlContent = fs.readFileSync(sqlFilePath, 'utf8');
 
     console.log("Executing SQL file content...");
     await connection.query(sqlContent);
+
+    const patchesDir = path.join(__dirname, "../sql/patches");
+    if (fs.existsSync(patchesDir)) {
+      const patchFiles = fs
+        .readdirSync(patchesDir)
+        .filter((f) => f.endsWith(".sql"))
+        .sort();
+      for (const name of patchFiles) {
+        const patchPath = path.join(patchesDir, name);
+        console.log(`Applying patch: ${name}`);
+        await connection.query(fs.readFileSync(patchPath, "utf8"));
+      }
+    }
 
     // Triggers contain semicolons inside BEGIN…END; mysql2 splits on ";" when multipleStatements is true.
     // Run trigger DDL as its own one-shot query (no DELIMITER — that is mysql CLI only).
