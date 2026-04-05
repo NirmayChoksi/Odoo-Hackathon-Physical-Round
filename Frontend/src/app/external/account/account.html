@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="action-right">
-      @if (!isEditing() && profileStore.profile()) {
+      @if (!isInternalAccount && !isEditing() && profileStore.profile()) {
         <button type="button" class="btn-secondary" (click)="toggleEdit()">
           <span class="material-symbols-outlined">edit</span>
           Edit Profile
@@ -80,14 +80,16 @@
             <label class="field-label">Phone Number</label>
             <span class="acc-field-value">{{ profileStore.profile()?.phone || 'Not provided' }}</span>
           </div>
-          <div class="field-row">
-            <label class="field-label">Member Since</label>
-            <span class="acc-field-value">{{ profileStore.profile()?.created_at | date: 'mediumDate' }}</span>
-          </div>
-          <div class="field-row field-row--full">
-            <label class="field-label">Shipping Address</label>
-            <span class="acc-field-value">{{ profileStore.addressSummary() }}</span>
-          </div>
+          @if (!isInternalAccount) {
+            <div class="field-row">
+              <label class="field-label">Member Since</label>
+              <span class="acc-field-value">{{ profileStore.profile()?.created_at | date: 'mediumDate' }}</span>
+            </div>
+            <div class="field-row field-row--full">
+              <label class="field-label">Shipping Address</label>
+              <span class="acc-field-value">{{ profileStore.addressSummary() }}</span>
+            </div>
+          }
         </div>
       </div>
     }
@@ -131,6 +133,7 @@
         </div>
       </div>
 
+      @if (!isInternalAccount) {
       <!-- Addresses card -->
       <div class="form-container">
         <div class="sf-card__header acc-addr-header">
@@ -270,6 +273,7 @@
           }
         </div>
       </div>
+      }
 
     } <!-- end edit mode -->
   } <!-- end @else -->

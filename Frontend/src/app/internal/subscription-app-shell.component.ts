@@ -56,6 +56,7 @@ export class SubscriptionAppShellComponent {
       `${SUBSCRIPTION_APP_BASE}/attribute`,
       `${SUBSCRIPTION_APP_BASE}/recurring-plans`,
       `${SUBSCRIPTION_APP_BASE}/recurring-plan`,
+      `${SUBSCRIPTION_APP_BASE}/quotation-templates`,
       `${SUBSCRIPTION_APP_BASE}/quotation-template`,
       `${SUBSCRIPTION_APP_BASE}/payment-term`,
       `${SUBSCRIPTION_APP_BASE}/discounts`,

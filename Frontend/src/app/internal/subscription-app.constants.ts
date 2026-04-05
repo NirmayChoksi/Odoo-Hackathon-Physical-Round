@@ -10,6 +10,11 @@ export const SUBSCRIPTION_APP_PATHS = {
   reporting: `${SUBSCRIPTION_APP_BASE}/reporting`,
   users: `${SUBSCRIPTION_APP_BASE}/users`,
   contacts: `${SUBSCRIPTION_APP_BASE}/contacts`,
+  /** Quotation template list (Configuration). */
+  quotationTemplates: `${SUBSCRIPTION_APP_BASE}/quotation-templates`,
+  /** Create / edit template (`?id=` when editing). */
+  quotationTemplateNew: `${SUBSCRIPTION_APP_BASE}/quotation-template/new`,
+  /** Legacy bare URL; redirects to list or form. */
   quotationTemplate: `${SUBSCRIPTION_APP_BASE}/quotation-template`,
   paymentTerm: `${SUBSCRIPTION_APP_BASE}/payment-term`,
   /** Discount rules list (Configuration). */
@@ -45,7 +50,7 @@ export const CONFIGURATION_DROPDOWN_ITEMS: readonly SubscriptionNavDropdownItem[
   { label: 'Overview', path: SUBSCRIPTION_APP_PATHS.configuration, exactActive: true },
   { label: 'Attribute', path: SUBSCRIPTION_APP_PATHS.attribute, exactActive: false },
   { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlans, exactActive: false },
-  { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplate, exactActive: true },
+  { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplates, exactActive: false },
   { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm, exactActive: true },
   { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discounts, exactActive: false },
   { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes, exactActive: false },
@@ -73,7 +78,7 @@ export const CONFIGURATION_HUB_MODULES: readonly {
     {
       title: 'Quotation templates',
       description: 'Default layouts for quotes and orders.',
-      path: SUBSCRIPTION_APP_PATHS.quotationTemplate,
+      path: SUBSCRIPTION_APP_PATHS.quotationTemplates,
       icon: 'description',
     },
     {

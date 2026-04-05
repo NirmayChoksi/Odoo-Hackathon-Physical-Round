@@ -68,5 +68,20 @@ export const quotationTemplateService = {
     if (!row) throw fail("Template item not found", 404);
     await quotationTemplateRepository.deleteItem(templateItemId);
     return { template_item_id: templateItemId, removed: true };
+  },
+
+  async updateTemplateItem(templateId: number, itemId: number, body: PatchTemplateItemBody) {
+    const row = await quotationTemplateRepository.getItem(itemId);
+    if (!row || Number(row.template_id) !== templateId) throw fail("Template item not found", 404);
+    const ok = await quotationTemplateRepository.updateItem(itemId, body);
+    if (!ok) throw fail("Template item not found", 404);
+    return quotationTemplateRepository.getItem(itemId);
+  },
+
+  async deleteTemplateItem(templateId: number, itemId: number) {
+    const row = await quotationTemplateRepository.getItem(itemId);
+    if (!row || Number(row.template_id) !== templateId) throw fail("Template item not found", 404);
+    await quotationTemplateRepository.deleteItem(itemId);
+    return { template_item_id: itemId, removed: true };
   }
 };

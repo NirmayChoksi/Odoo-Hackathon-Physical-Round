@@ -1,7 +1,12 @@
 import type { Request, Response } from "express";
 import { fail, success } from "../../../utils/apiResponse";
 import { getValidatedBody } from "../../../middlewares/validate.middleware";
-import type { CreateTemplateBody, CreateTemplateItemBody, PatchTemplateBody } from "./quotationTemplate.types";
+import type {
+  CreateTemplateBody,
+  CreateTemplateItemBody,
+  PatchTemplateBody,
+  PatchTemplateItemBody
+} from "./quotationTemplate.types";
 import {
   parseCreateTemplate,
   parseCreateTemplateItem,
@@ -55,5 +60,26 @@ export const quotationTemplateController = {
     const body = getValidatedBody<CreateTemplateItemBody>(req);
     const data = await quotationTemplateService.addItem(templateId, body);
     res.status(201).json(success(data));
+  },
+
+  async updateTemplateItem(req: Request, res: Response): Promise<void> {
+    const templateId = Number(req.params.templateId);
+    const itemId = Number(req.params.itemId);
+    if (!Number.isInteger(templateId) || templateId < 1 || !Number.isInteger(itemId) || itemId < 1) {
+      throw fail("Invalid templateId or itemId", 400);
+    }
+    const body = getValidatedBody<PatchTemplateItemBody>(req);
+    const data = await quotationTemplateService.updateTemplateItem(templateId, itemId, body);
+    res.json(success(data));
+  },
+
+  async deleteTemplateItem(req: Request, res: Response): Promise<void> {
+    const templateId = Number(req.params.templateId);
+    const itemId = Number(req.params.itemId);
+    if (!Number.isInteger(templateId) || templateId < 1 || !Number.isInteger(itemId) || itemId < 1) {
+      throw fail("Invalid templateId or itemId", 400);
+    }
+    const data = await quotationTemplateService.deleteTemplateItem(templateId, itemId);
+    res.json(success(data));
   }
 };

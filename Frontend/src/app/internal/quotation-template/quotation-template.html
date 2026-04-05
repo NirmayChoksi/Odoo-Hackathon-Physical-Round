@@ -1,15 +1,66 @@
+<app-confirm-dialog
+  [open]="showDeactivateDialog()"
+  title="Deactivate template"
+  message="This template will be marked inactive. It can still appear in admin lists with an Inactive status."
+  confirmLabel="Deactivate"
+  confirmIcon="delete_forever"
+  variant="danger"
+  [busy]="isDeleting()"
+  (confirmed)="performDeactivate()"
+  (cancelled)="showDeactivateDialog.set(false)"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showClearDraftDialog()"
+  title="Clear form"
+  message="Discard everything on this form? Unsaved data will be cleared from the page."
+  confirmLabel="Clear"
+  confirmIcon="delete_sweep"
+  variant="warning"
+  (confirmed)="performClearDraft()"
+  (cancelled)="showClearDraftDialog.set(false)"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showNoticeDialog()"
+  [title]="noticeTitle()"
+  [message]="noticeMessage()"
+  confirmLabel="OK"
+  confirmIcon="check"
+  variant="primary"
+  [showCancel]="false"
+  (confirmed)="closeNoticeDialog()"
+  (cancelled)="closeNoticeDialog()"
+></app-confirm-dialog>
+
 <main class="internal-content">
-  <!-- Action Bar -->
   <div class="action-bar">
     <div class="action-left">
-      <button type="button" class="btn-new" (click)="onNew()">New</button>
+      <a
+        [routerLink]="paths.quotationTemplates"
+        class="qt-back-link"
+        title="Back to quotation templates list"
+      >
+        <span class="material-symbols-outlined">arrow_back</span>
+        Templates
+      </a>
+      <button
+        type="button"
+        class="btn-new"
+        (click)="onNew()"
+        [disabled]="store.isSaving() || store.isLoading()"
+        title="Empty template name: clear the form. With a name: save (creates or updates)."
+      >
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
       <div class="action-icons">
         <button
           type="button"
           class="icon-btn"
           (click)="onDelete()"
-          title="Delete"
-          [disabled]="!templateId()"
+          title="Deactivate or clear"
+          [disabled]="store.isSaving() || store.isLoading() || isDeleting()"
         >
           <span class="material-symbols-outlined">delete</span>
         </button>
@@ -18,168 +69,153 @@
           class="icon-btn"
           (click)="onSave()"
           title="Save"
-          [disabled]="isLoading()"
+          [disabled]="store.isSaving() || store.isLoading()"
         >
           <span class="material-symbols-outlined">save</span>
         </button>
       </div>
     </div>
-    <div class="action-right">
-      <div class="search-bar">
-        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Search quotation templates..."
-          [ngModel]="searchQuery()"
-          (ngModelChange)="onSearch($event)"
-        />
-      </div>
-    </div>
   </div>
 
-  <!-- Loading State -->
-  @if (isLoading()) {
-    <div class="loading-state">
-      <span class="material-symbols-outlined spinning">progress_activity</span>
-      <p>Loading...</p>
+  @if (lookupsError()) {
+    <div class="qt-banner qt-banner--warn" role="status">
+      <span class="material-symbols-outlined">warning</span>
+      {{ lookupsError() }}
     </div>
   }
 
-  <!-- Quotation Template Form Container -->
-  @if (!isLoading()) {
+  @if (store.loadError()) {
+    <div class="qt-banner qt-banner--error" role="alert">
+      <span class="material-symbols-outlined">error</span>
+      {{ store.loadError() }}
+    </div>
+  }
+
+  @if (store.isLoading()) {
+    <div class="loading-state">
+      <span class="material-symbols-outlined spinning">progress_activity</span>
+      <p>Loading…</p>
+    </div>
+  }
+
+  @if (!store.isLoading()) {
     <div class="form-container">
       <div class="title-group">
         <input
           type="text"
           class="title-input"
-          placeholder="Template Name"
-          [ngModel]="templateName()"
-          (ngModelChange)="templateName.set($event)"
+          placeholder="Template name"
+          [ngModel]="store.templateName()"
+          (ngModelChange)="store.patchDraft({ templateName: $event })"
         />
       </div>
 
       <div class="form-content">
         <div class="form-group row-group">
-          <label class="form-label" for="validity">Quotation validity:-</label>
+          <label class="form-label" for="validity">Quotation validity</label>
           <div class="input-with-suffix">
             <input
               type="number"
               id="validity"
               class="form-input num-input"
-              [ngModel]="validityDays()"
-              (ngModelChange)="validityDays.set(+$event)"
+              min="1"
+              [ngModel]="store.validityDays()"
+              (ngModelChange)="store.patchDraft({ validityDays: +$event })"
             />
             <span class="suffix">days</span>
           </div>
         </div>
 
         <div class="form-group row-group">
-          <label class="form-label" for="plan">Recurring Plan:-</label>
-          <input
-            type="text"
+          <label class="form-label" for="plan">Recurring plan</label>
+          <select
             id="plan"
-            class="form-input text-input"
-            [ngModel]="recurringPlanId()"
-            (ngModelChange)="recurringPlanId.set($event ? +$event : null)"
-          />
+            class="form-input text-input qt-select"
+            [ngModel]="store.planId() ?? ''"
+            (ngModelChange)="onPlanSelect($event)"
+          >
+            <option value="">None</option>
+            @for (p of planOptions(); track p.plan_id) {
+              <option [value]="p.plan_id">{{ p.plan_name }}</option>
+            }
+          </select>
         </div>
 
-        <div class="form-group row-group">
-          <label class="form-label" for="lastForever">Last Forever:-</label>
-          <input
-            type="checkbox"
-            id="lastForever"
-            class="form-checkbox"
-            [checked]="lastForever()"
-            (change)="lastForever.set($any($event.target).checked)"
-          />
-        </div>
-
-        <div class="form-group row-group">
-          <label class="form-label" for="endAfterAmount">End After:-</label>
-          <div class="input-with-select">
-            <input
-              type="number"
-              id="endAfterAmount"
-              class="form-input num-input"
-              [ngModel]="endAfterAmount()"
-              (ngModelChange)="endAfterAmount.set(+$event)"
-              [disabled]="lastForever()"
-            />
-            <div class="select-wrapper">
-              <select
-                class="form-select"
-                [value]="endAfterUnit()"
-                (change)="endAfterUnit.set($any($event.target).value)"
-                [disabled]="lastForever()"
-              >
-                @for (unit of timeUnits; track unit) {
-                  <option [value]="unit">{{ unit }}</option>
-                }
-              </select>
-            </div>
-          </div>
+        <div class="form-group row-group qt-desc">
+          <label class="form-label" for="desc">Description</label>
+          <textarea
+            id="desc"
+            class="form-input qt-textarea"
+            rows="2"
+            placeholder="Optional notes for staff"
+            [ngModel]="store.description()"
+            (ngModelChange)="store.patchDraft({ description: $event })"
+          ></textarea>
         </div>
       </div>
 
-      <!-- Products Table -->
       <div class="data-container">
         <table class="data-table">
           <thead>
             <tr>
               <th class="table-header">Product</th>
-              <th class="table-header">Description</th>
               <th class="table-header">Quantity</th>
-              <th class="table-header">Unit Price</th>
+              <th class="table-header">Unit price</th>
+              <th class="table-header">Tax</th>
               <th class="table-header">Actions</th>
             </tr>
           </thead>
           <tbody>
-            @for (item of products(); track $index) {
+            @for (item of store.items(); track item.clientKey; let idx = $index) {
               <tr class="data-row">
                 <td class="col-product">
-                  <input
-                    type="text"
-                    class="form-input table-input"
-                    [ngModel]="item.product"
-                    (ngModelChange)="updateProduct($index, 'product', $event)"
-                    placeholder="Product name"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    class="form-input table-input"
-                    [ngModel]="item.description"
-                    (ngModelChange)="updateProduct($index, 'description', $event)"
-                    placeholder="Description"
-                  />
+                  <select
+                    class="form-input table-input qt-select"
+                    [ngModel]="item.product_id ?? ''"
+                    (ngModelChange)="onProductSelect(idx, $event)"
+                  >
+                    <option value="">Select product…</option>
+                    @for (p of productOptions(); track p.product_id) {
+                      <option [value]="p.product_id">{{ p.product_name }}</option>
+                    }
+                  </select>
                 </td>
                 <td>
                   <input
                     type="number"
                     class="form-input num-input table-input"
-                    [ngModel]="item.quantity"
-                    (ngModelChange)="updateProduct($index, 'quantity', +$event)"
                     min="1"
+                    [ngModel]="item.quantity"
+                    (ngModelChange)="store.patchItem(idx, { quantity: +$event })"
                   />
                 </td>
                 <td>
                   <input
                     type="number"
                     class="form-input num-input table-input"
-                    [ngModel]="item.unit_price"
-                    (ngModelChange)="updateProduct($index, 'unit_price', +$event)"
                     min="0"
-                    placeholder="0.00"
+                    step="0.01"
+                    [ngModel]="item.unit_price"
+                    (ngModelChange)="store.patchItem(idx, { unit_price: +$event })"
                   />
+                </td>
+                <td>
+                  <select
+                    class="form-input table-input qt-select"
+                    [ngModel]="item.tax_id ?? ''"
+                    (ngModelChange)="onTaxSelect(idx, $event)"
+                  >
+                    <option value="">None</option>
+                    @for (t of taxOptions(); track t.tax_id) {
+                      <option [value]="t.tax_id">{{ t.tax_name }}</option>
+                    }
+                  </select>
                 </td>
                 <td>
                   <button
                     type="button"
                     class="icon-btn remove-btn"
-                    (click)="removeProduct($index)"
+                    (click)="store.removeItemAt(idx)"
                     title="Remove row"
                   >
                     <span class="material-symbols-outlined">remove_circle</span>
@@ -190,22 +226,20 @@
           </tbody>
         </table>
 
-        @if (products().length === 0) {
+        @if (store.items().length === 0) {
           <div class="empty-state">
             <span class="material-symbols-outlined emoji">inventory_2</span>
-            <p>No products added</p>
+            <p>No line items yet. Add products that appear on quotes using this template.</p>
           </div>
         }
 
         <div class="table-footer">
-          <button type="button" class="btn-add-row" (click)="addProductRow()">
+          <button type="button" class="btn-add-row" (click)="store.addItemRow()">
             <span class="material-symbols-outlined">add</span>
-            Add Product
+            Add line
           </button>
         </div>
       </div>
-
-      <div class="form-footer"></div>
     </div>
   }
 </main>
