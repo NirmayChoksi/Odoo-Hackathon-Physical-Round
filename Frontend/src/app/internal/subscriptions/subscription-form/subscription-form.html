@@ -176,9 +176,12 @@
                 id="sf-start"
                 type="date"
                 class="sf-control"
+                min="1900-01-01"
+                max="2100-12-31"
                 [ngModel]="startDate()"
-                (ngModelChange)="startDate.set($event)"
+                (ngModelChange)="onStartDateChange($event)"
                 [disabled]="isEditMode()" />
+              <p class="sf-date-hint">Pick a date or type <strong>YYYY-MM-DD</strong> (four-digit year, 1900–2100).</p>
             </div>
           </div>
 
@@ -214,8 +217,11 @@
                 id="sf-expiration"
                 type="date"
                 class="sf-control"
+                min="1900-01-01"
+                max="2100-12-31"
                 [ngModel]="expiration()"
-                (ngModelChange)="expiration.set($event)" />
+                (ngModelChange)="onExpirationDateChange($event)" />
+              <p class="sf-date-hint">Pick a date or type <strong>YYYY-MM-DD</strong> (four-digit year, 1900–2100).</p>
             </div>
           </div>
         </div>

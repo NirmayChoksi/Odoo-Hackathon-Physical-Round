@@ -193,8 +193,11 @@ export class SubscriptionFormComponent implements OnInit {
       }
       this.templateId.set(s.template_id ? String(s.template_id) : '');
       this.paymentTermId.set(s.payment_terms ?? '');
-      this.expiration.set(s.expiration_date ? s.expiration_date.slice(0, 10) : '');
-      this.startDate.set(s.start_date ? s.start_date.slice(0, 10) : '');
+      const expRaw = s.expiration_date ? String(s.expiration_date).slice(0, 10) : '';
+      this.expiration.set(this.parseStrictIsoDate(expRaw) ?? '');
+      const startRaw = s.start_date ? String(s.start_date).slice(0, 10) : '';
+      const startOk = this.parseStrictIsoDate(startRaw);
+      this.startDate.set(startOk ?? new Date().toISOString().slice(0, 10));
       this.orderLines.set(itemsRes.data?.items ?? []);
     } catch (e: any) {
       this.saveError.set(e?.error?.message || e?.message || 'Failed to load subscription');
@@ -214,10 +217,65 @@ export class SubscriptionFormComponent implements OnInit {
     this.saveError.set(`To create customer "${name}", please use the Customers module.`);
   }
 
+  /**
+   * HTML date inputs use value YYYY-MM-DD. Reject impossible years (e.g. 6 digits) and invalid calendar dates.
+   */
+  private parseStrictIsoDate(s: string): string | null {
+    const t = String(s ?? '')
+      .trim()
+      .slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return null;
+    const y = Number(t.slice(0, 4));
+    const m = Number(t.slice(5, 7));
+    const d = Number(t.slice(8, 10));
+    if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return null;
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return null;
+    return t;
+  }
+
+  onStartDateChange(raw: string) {
+    const prev = this.startDate();
+    if (raw === '' || raw == null) {
+      this.startDate.set('');
+      return;
+    }
+    const ok = this.parseStrictIsoDate(raw);
+    if (ok) {
+      this.startDate.set(ok);
+      return;
+    }
+    this.startDate.set(prev);
+  }
+
+  onExpirationDateChange(raw: string) {
+    const prev = this.expiration();
+    if (raw === '' || raw == null) {
+      this.expiration.set('');
+      return;
+    }
+    const ok = this.parseStrictIsoDate(raw);
+    if (ok) {
+      this.expiration.set(ok);
+      return;
+    }
+    this.expiration.set(prev);
+  }
+
   // ── Save ──────────────────────────────────────────────────
   async onSave() {
     if (!this.customerId()) { this.saveError.set('Customer is required.'); return; }
     if (!this.recurringPlanId()) { this.saveError.set('Recurring plan is required.'); return; }
+    const start = this.startDate().trim();
+    if (start && !this.parseStrictIsoDate(start)) {
+      this.saveError.set('Start date is not valid. Use the calendar or a four-digit year (1900–2100), format YYYY-MM-DD.');
+      return;
+    }
+    const exp = this.expiration().trim();
+    if (exp && !this.parseStrictIsoDate(exp)) {
+      this.saveError.set('Expiration date is not valid. Use the calendar or a four-digit year (1900–2100), format YYYY-MM-DD.');
+      return;
+    }
     this.isSaving.set(true);
     this.saveError.set(null);
     this.saveSuccess.set(false);
