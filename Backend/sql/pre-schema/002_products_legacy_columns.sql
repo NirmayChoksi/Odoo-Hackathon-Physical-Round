@@ -8,9 +8,9 @@ SET @t := (
 
 SET @c := (
   SELECT COUNT(*) FROM information_schema.columns
-  WHERE table_schema = @dbname AND table_name = 'products' AND column_name = 'image_url'
+  WHERE table_schema = @dbname AND table_name = 'products' AND column_name = 'image_urls'
 );
-SET @s := IF(@t > 0 AND @c = 0, 'ALTER TABLE products ADD COLUMN image_url VARCHAR(500) NULL', 'SELECT 1');
+SET @s := IF(@t > 0 AND @c = 0, 'ALTER TABLE products ADD COLUMN image_urls VARCHAR(500) NULL', 'SELECT 1');
 PREPARE p FROM @s;
 EXECUTE p;
 DEALLOCATE PREPARE p;

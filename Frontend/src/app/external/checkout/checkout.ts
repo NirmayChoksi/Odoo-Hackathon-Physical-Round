@@ -1,16 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NavbarComponent } from '../shared/navbar/navbar';
-import { CartService, CartItem } from '../services/cart.service';
-import { ButtonComponent } from '../../components/button/button';
-import { InputComponent } from '../../components/input/input';
 import { ecommerceCommands } from '../ecommerce-navigation';
+import { CartItem, CartService } from '../services/cart.service';
+import { NavbarComponent } from '../shared/navbar/navbar';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, ButtonComponent, InputComponent],
+  imports: [CommonModule, NavbarComponent],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css',
 })

@@ -35,19 +35,23 @@ export const subscriptionRepository = {
       params.push(q.customerId);
     }
     if (q.search) {
-      where.push(`s.subscription_number LIKE ?`);
-      params.push(`%${q.search}%`);
+      where.push(`(s.subscription_number LIKE ? OR c.full_name LIKE ?)`);
+      const s = `%${q.search}%`;
+      params.push(s, s);
     }
     const w = where.join(" AND ");
     const [countRows] = await pool.query<RowDataPacket[]>(
-      `SELECT COUNT(*) AS c FROM subscriptions s WHERE ${w}`,
+      `SELECT COUNT(*) AS c 
+       FROM subscriptions s 
+       LEFT JOIN users c ON c.user_id = s.customer_id
+       WHERE ${w}`,
       params
     );
     const total = Number(countRows[0]?.c ?? 0);
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT s.*, c.customer_name
+      `SELECT s.*, c.full_name AS customer_name
        FROM subscriptions s
-       LEFT JOIN customers c ON c.customer_id = s.customer_id
+       LEFT JOIN users c ON c.user_id = s.customer_id
        WHERE ${w}
        ORDER BY s.subscription_id DESC
        LIMIT ? OFFSET ?`,

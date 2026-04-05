@@ -88,21 +88,20 @@ export const ProductStore = signalStore(
         const [prodReq, plansReq, imagesReq] = await Promise.all([
           firstValueFrom(http.get<ApiSuccess<ShopProductDetail>>(`${apiBase}/products/${productId}`)),
           firstValueFrom(http.get<ApiSuccess<{ product_id: number; plans: ProductPlan[] }>>(`${apiBase}/products/${productId}/plans`)),
-          firstValueFrom(http.get<ApiSuccess<{ product_id: number; images: { image_url: string; sort_order: number }[] }>>(`${apiBase}/products/${productId}/images`)),
+          firstValueFrom(http.get<ApiSuccess<{ product_id: number; images: { image_urls: string[]; sort_order: number }[] }>>(`${apiBase}/products/${productId}/images`)),
         ]);
 
         const product = prodReq.data;
 
-        // images endpoint returns [{image_url, sort_order}]; extract URL strings.
-        // Fall back to product.image_url, then placeholder.
-        const rawImgs = (imagesReq.data.images || [])
-          .map(i => i.image_url)
-          .filter((u): u is string => !!u);
-        const images = rawImgs.length > 0
-          ? rawImgs
-          : product.image_urls
-            ? product.image_urls
-            : [PLACEHOLDER_IMG];
+        // images endpoint returns [{ image_urls: string[], sort_order }]; flatten to gallery URLs.
+        // Fall back to product.image_urls, then placeholder.
+        const fromEndpoint = (imagesReq.data.images ?? []).flatMap((i) => i.image_urls ?? []);
+        const images =
+          fromEndpoint.length > 0
+            ? fromEndpoint
+            : product.image_urls?.length
+              ? product.image_urls
+              : [PLACEHOLDER_IMG];
 
         updateState(store, '[Product] Load Success', {
           product,

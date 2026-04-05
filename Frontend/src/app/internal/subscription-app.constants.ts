@@ -6,6 +6,7 @@ export const SUBSCRIPTION_APP_PATHS = {
   subscriptionsNew: `${SUBSCRIPTION_APP_BASE}/subscriptions/new`,
   configuration: `${SUBSCRIPTION_APP_BASE}/configuration`,
   products: `${SUBSCRIPTION_APP_BASE}/products`,
+  productsNew: `${SUBSCRIPTION_APP_BASE}/products/new`,
   reporting: `${SUBSCRIPTION_APP_BASE}/reporting`,
   users: `${SUBSCRIPTION_APP_BASE}/users`,
   contacts: `${SUBSCRIPTION_APP_BASE}/contacts`,
@@ -48,43 +49,43 @@ export const CONFIGURATION_HUB_MODULES: readonly {
   readonly path: string;
   readonly icon: string;
 }[] = [
-  {
-    title: 'Attributes',
-    description: 'Product options, values, and extra pricing.',
-    path: SUBSCRIPTION_APP_PATHS.attribute,
-    icon: 'tune',
-  },
-  {
-    title: 'Recurring plans',
-    description: 'Billing cadence and plan templates.',
-    path: SUBSCRIPTION_APP_PATHS.recurringPlan,
-    icon: 'event_repeat',
-  },
-  {
-    title: 'Quotation templates',
-    description: 'Default layouts for quotes and orders.',
-    path: SUBSCRIPTION_APP_PATHS.quotationTemplate,
-    icon: 'description',
-  },
-  {
-    title: 'Payment terms',
-    description: 'Due rules, installments, methods, and discounts.',
-    path: SUBSCRIPTION_APP_PATHS.paymentTerm,
-    icon: 'payments',
-  },
-  {
-    title: 'Discounts',
-    description: 'Promotional and line discount rules.',
-    path: SUBSCRIPTION_APP_PATHS.discount,
-    icon: 'percent',
-  },
-  {
-    title: 'Taxes',
-    description: 'Tax rates and groups for subscriptions.',
-    path: SUBSCRIPTION_APP_PATHS.taxes,
-    icon: 'account_balance',
-  },
-];
+    {
+      title: 'Attributes',
+      description: 'Product options, values, and extra pricing.',
+      path: SUBSCRIPTION_APP_PATHS.attribute,
+      icon: 'tune',
+    },
+    {
+      title: 'Recurring plans',
+      description: 'Billing cadence and plan templates.',
+      path: SUBSCRIPTION_APP_PATHS.recurringPlan,
+      icon: 'event_repeat',
+    },
+    {
+      title: 'Quotation templates',
+      description: 'Default layouts for quotes and orders.',
+      path: SUBSCRIPTION_APP_PATHS.quotationTemplate,
+      icon: 'description',
+    },
+    {
+      title: 'Payment terms',
+      description: 'Due rules, installments, methods, and discounts.',
+      path: SUBSCRIPTION_APP_PATHS.paymentTerm,
+      icon: 'payments',
+    },
+    {
+      title: 'Discounts',
+      description: 'Promotional and line discount rules.',
+      path: SUBSCRIPTION_APP_PATHS.discount,
+      icon: 'percent',
+    },
+    {
+      title: 'Taxes',
+      description: 'Tax rates and groups for subscriptions.',
+      path: SUBSCRIPTION_APP_PATHS.taxes,
+      icon: 'account_balance',
+    },
+  ];
 
 export function subscriptionAttributeDetailPath(id: string | number): string {
   return `${SUBSCRIPTION_APP_BASE}/attribute/${id}`;

@@ -38,7 +38,7 @@ async function constraintExists(tableName: string, constraintName: string): Prom
 async function ensureProductsLegacyColumns(): Promise<void> {
   if (!(await tableExists("products"))) return;
   const steps: Array<[string, string]> = [
-    ["image_url", "ALTER TABLE products ADD COLUMN image_url VARCHAR(500) NULL"],
+    // ["image_urls", "ALTER TABLE products ADD COLUMN image_urls VARCHAR(500) NULL"],
     ["short_description", "ALTER TABLE products ADD COLUMN short_description VARCHAR(255) NULL"],
     ["terms_and_conditions", "ALTER TABLE products ADD COLUMN terms_and_conditions TEXT NULL"],
     ["is_recurring", "ALTER TABLE products ADD COLUMN is_recurring BOOLEAN DEFAULT TRUE"],

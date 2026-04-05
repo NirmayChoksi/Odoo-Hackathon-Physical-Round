@@ -49,7 +49,7 @@ export const productManagementRepository = {
     const status = body.status === "INACTIVE" ? "INACTIVE" : "ACTIVE";
     const [res] = await pool.query<ResultSetHeader>(
       `INSERT INTO products (
-        product_name, product_type, sales_price, cost_price, description, image_url,
+        product_name, product_type, sales_price, cost_price, description, image_urls,
         short_description, terms_and_conditions, is_recurring, status, created_by
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -58,7 +58,7 @@ export const productManagementRepository = {
         body.salesPrice,
         body.costPrice ?? 0,
         body.description ?? null,
-        body.imageUrl ?? null,
+        body.imageUrls ?? null,
         body.shortDescription ?? null,
         body.termsAndConditions ?? null,
         body.isRecurring !== false ? 1 : 0,
@@ -92,9 +92,9 @@ export const productManagementRepository = {
       sets.push("description = ?");
       vals.push(body.description || null);
     }
-    if (body.imageUrl !== undefined) {
-      sets.push("image_url = ?");
-      vals.push(body.imageUrl || null);
+    if (body.imageUrls !== undefined) {
+      sets.push("image_urls = ?");
+      vals.push(body.imageUrls || null);
     }
     if (body.shortDescription !== undefined) {
       sets.push("short_description = ?");

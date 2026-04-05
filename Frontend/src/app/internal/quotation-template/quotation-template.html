@@ -69,21 +69,21 @@
     <!-- Quotation Template Form Container -->
     <div class="form-container">
       <div class="title-group">
-        <input type="text" class="title-input" placeholder="Template Name" [ngModel]="'Quotation Template'" />
+        <input type="text" class="title-input" placeholder="Template Name" [ngModel]="templateName()" (ngModelChange)="templateName.set($event)" />
       </div>
       
       <div class="form-content">
         <div class="form-group row-group">
           <label class="form-label" for="validity">Quotation validity:-</label>
           <div class="input-with-suffix">
-            <input type="number" id="validity" class="form-input num-input" [(ngModel)]="validityDays" />
+            <input type="number" id="validity" class="form-input num-input" [ngModel]="validityDays()" (ngModelChange)="validityDays.set($event)" />
             <span class="suffix">days</span>
           </div>
         </div>
 
         <div class="form-group row-group">
           <label class="form-label" for="plan">Recurring Plan:-</label>
-          <input type="text" id="plan" class="form-input text-input" [(ngModel)]="recurringPlan" />
+          <input type="text" id="plan" class="form-input text-input" [ngModel]="recurringPlanId()" (ngModelChange)="recurringPlanId.set($event)" />
         </div>
 
         <div class="form-group row-group">
@@ -94,7 +94,7 @@
         <div class="form-group row-group">
           <label class="form-label" for="endAfterAmount">End After:-</label>
           <div class="input-with-select">
-            <input type="number" id="endAfterAmount" class="form-input num-input" [(ngModel)]="endAfterAmount" [disabled]="lastForever()" />
+            <input type="number" id="endAfterAmount" class="form-input num-input" [ngModel]="endAfterAmount()" (ngModelChange)="endAfterAmount.set($event)" [disabled]="lastForever()" />
             <div class="select-wrapper">
               <select class="form-select" [value]="endAfterUnit()" (change)="endAfterUnit.set($any($event.target).value)" [disabled]="lastForever()">
                 @for(unit of timeUnits; track unit) {

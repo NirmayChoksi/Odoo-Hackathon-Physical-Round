@@ -9,22 +9,19 @@ export const customerRepository = {
     const where: string[] = ["1=1"];
     const params: unknown[] = [];
     if (q.search) {
-      where.push(`(customer_name LIKE ? OR email LIKE ? OR phone LIKE ? OR company_name LIKE ?)`);
+      where.push(`(full_name LIKE ? OR email LIKE ? OR phone LIKE ?)`);
       const s = `%${q.search}%`;
-      params.push(s, s, s, s);
-    }
-    if (q.status) {
-      where.push(`status = ?`);
-      params.push(q.status);
+      params.push(s, s, s);
     }
     const w = where.join(" AND ");
     const [countRows] = await pool.query<RowDataPacket[]>(
-      `SELECT COUNT(*) AS c FROM customers WHERE ${w}`,
+      `SELECT COUNT(*) AS c FROM users WHERE ${w}`,
       params
     );
     const total = Number(countRows[0]?.c ?? 0);
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT * FROM customers WHERE ${w} ORDER BY customer_id DESC LIMIT ? OFFSET ?`,
+      `SELECT user_id AS customer_id, full_name AS customer_name, email, phone, created_at, 'ACTIVE' as status 
+       FROM users WHERE ${w} ORDER BY user_id DESC LIMIT ? OFFSET ?`,
       [...params, q.limit, off]
     );
     return { rows, total };
@@ -32,7 +29,8 @@ export const customerRepository = {
 
   async getById(customerId: number): Promise<RowDataPacket | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT * FROM customers WHERE customer_id = ? LIMIT 1`,
+      `SELECT user_id AS customer_id, full_name AS customer_name, email, phone, 'ACTIVE' as status 
+       FROM users WHERE user_id = ? LIMIT 1`,
       [customerId]
     );
     return rows[0] ?? null;

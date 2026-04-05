@@ -23,6 +23,9 @@ import reportRoutes from "./modules/internal/reports/report.routes";
 import subscriptionItemRoutes from "./modules/internal/subscription-items/subscriptionItem.routes";
 import subscriptionRoutes from "./modules/internal/subscriptions/subscription.routes";
 import authRoutes from "./modules/auth/auth.routes";
+import taxesRoutes from "./modules/internal/taxes/taxes.routes";
+import discountsRoutes from "./modules/internal/discounts/discounts.routes";
+import attributesRoutes from "./modules/internal/attributes/attributes.routes";
 
 const app = express();
 
@@ -55,6 +58,9 @@ app.use("/api/internal/payments", paymentRoutes);
 app.use("/api/internal/reports", reportRoutes);
 app.use("/api/internal/profile", internalProfileRoutes);
 app.use("/api/internal/config/payment-terms", paymentTermConfigRoutes);
+app.use("/api/internal/taxes", taxesRoutes);
+app.use("/api/internal/discounts", discountsRoutes);
+app.use("/api/internal/attributes", attributesRoutes);
 
 app.use(errorMiddleware);
 

@@ -1,16 +1,14 @@
-import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ecommerceCommands } from '../ecommerce-navigation';
+import { CartItem, CartService } from '../services/cart.service';
 import { NavbarComponent } from '../shared/navbar/navbar';
-import { CartService, CartItem } from '../services/cart.service';
-import { ButtonComponent } from '../../components/button/button';
-import { InputComponent } from '../../components/input/input';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, NavbarComponent, ButtonComponent, InputComponent],
+  imports: [CommonModule, NavbarComponent],
   templateUrl: './cart.html',
   styleUrl: './cart.css'
 })
@@ -48,7 +46,7 @@ export class CartComponent {
   removeItem(id: string) {
     this.cartService.removeItem(id);
   }
-  
+
   onDiscountInput(val: string) {
     this.discountCode = val;
   }

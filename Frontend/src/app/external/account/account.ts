@@ -1,13 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { email, form, required } from '@angular/forms/signals';
-import { InputComponent } from '../../components/input/input';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProfileStore } from '../../profile/profile.store';
-import { ButtonComponent } from '../../components/button/button';
-import { NavbarComponent } from '../shared/navbar/navbar';
 import { INTERNAL_DASHBOARD_NAV_BASE } from '../ecommerce-navigation';
+import { NavbarComponent } from '../shared/navbar/navbar';
 
 @Component({
   selector: 'app-account',
@@ -15,9 +12,7 @@ import { INTERNAL_DASHBOARD_NAV_BASE } from '../ecommerce-navigation';
   imports: [
     CommonModule,
     NavbarComponent,
-    ButtonComponent,
-    RouterModule,
-    InputComponent,
+    RouterModule
   ],
   templateUrl: './account.html',
   styleUrl: './account.css',

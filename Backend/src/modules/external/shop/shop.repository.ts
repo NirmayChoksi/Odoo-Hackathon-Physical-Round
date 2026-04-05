@@ -301,13 +301,18 @@ export const shopRepository = {
     }));
   },
 
-  async getProductImages(productId: number): Promise<{ image_url: string | null; sort_order: number }[]> {
+  async getProductImages(productId: number): Promise<{ image_urls: string[]; sort_order: number }[]> {
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT image_url FROM products WHERE product_id = :id AND status = 'ACTIVE' LIMIT 1`,
+      `SELECT image_urls FROM products WHERE product_id = :id AND status = 'ACTIVE' LIMIT 1`,
       { id: productId }
     );
-    const url = rows[0]?.image_url != null ? String(rows[0].image_url) : null;
-    if (!url) return [];
-    return [{ image_url: url, sort_order: 0 }];
+    const raw = rows[0]?.image_urls;
+    if (raw == null || raw === "") return [];
+    const urls = String(raw)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (!urls.length) return [];
+    return [{ image_urls: urls, sort_order: 0 }];
   }
 };

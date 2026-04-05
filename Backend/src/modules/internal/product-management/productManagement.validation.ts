@@ -49,7 +49,7 @@ export function parseCreateProduct(
       salesPrice: salesPrice!,
       costPrice: num(b.costPrice),
       description: b.description != null ? String(b.description) : undefined,
-      imageUrl: b.imageUrl != null ? String(b.imageUrl).trim() : undefined,
+      imageUrls: b.imageUrls != null ? String(b.imageUrls).trim() : undefined,
       shortDescription: b.shortDescription != null ? String(b.shortDescription).trim() : undefined,
       termsAndConditions: b.termsAndConditions != null ? String(b.termsAndConditions) : undefined,
       isRecurring: b.isRecurring !== undefined ? Boolean(b.isRecurring) : undefined,
@@ -76,7 +76,7 @@ export function parsePatchProduct(
     out.costPrice = n;
   }
   if (b.description !== undefined) out.description = String(b.description);
-  if (b.imageUrl !== undefined) out.imageUrl = String(b.imageUrl).trim();
+  if (b.imageUrls !== undefined) out.imageUrls = String(b.imageUrls).trim();
   if (b.shortDescription !== undefined) out.shortDescription = String(b.shortDescription).trim();
   if (b.termsAndConditions !== undefined) out.termsAndConditions = String(b.termsAndConditions);
   if (b.isRecurring !== undefined) out.isRecurring = Boolean(b.isRecurring);

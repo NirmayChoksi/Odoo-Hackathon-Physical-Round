@@ -1,0 +1,198 @@
+<div class="internal-container">
+
+  <!-- Navigation Header -->
+  <nav class="internal-nav">
+    <div class="nav-brand">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
+    </div>
+    <div class="nav-links">
+      @for(item of navItems(); track item.label) {
+        @if(item.isDropdown) {
+          <div class="nav-dropdown" [class.nav-dropdown--open]="navDropdownOpenKey() === item.label">
+            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active"
+              (click)="toggleNavDropdown($event, item.label)">
+              {{ item.label }}
+              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
+            </button>
+            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
+              @for(sub of item.dropdownItems; track sub.label) {
+                <a [routerLink]="sub.path" class="dropdown-item" routerLinkActive="dropdown-item--current"
+                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
+                  {{ sub.label }}
+                </a>
+              }
+            </div>
+          </div>
+        } @else {
+          <a [routerLink]="item.path" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item)">
+            {{ item.label }}
+          </a>
+        }
+      }
+    </div>
+    <div class="nav-profile">
+      <a routerLink="/login" class="profile-btn">
+        <span class="material-symbols-outlined">person</span>
+        My Profile
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="internal-content">
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-left">
+        <button class="btn-new" (click)="goToNew()">
+          <span class="material-symbols-outlined">add</span>
+          New Product
+        </button>
+        <div class="pl-list-meta">
+          @if (!isLoading()) {
+            <span>{{ filteredProducts().length }} of {{ products().length }} products</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters Toolbar -->
+    <div class="pl-toolbar">
+      <div class="pl-search-wrap">
+        <span class="material-symbols-outlined pl-search-icon">search</span>
+        <input
+          type="text"
+          class="pl-search"
+          placeholder="Search products..."
+          [value]="searchQuery()"
+          (input)="searchQuery.set($any($event.target).value)"
+        />
+        @if (searchQuery()) {
+          <button class="pl-search-clear material-symbols-outlined" (click)="searchQuery.set('')">close</button>
+        }
+      </div>
+
+      <div class="pl-filters">
+        <select class="pl-select" [value]="selectedCategory()" (change)="selectedCategory.set($any($event.target).value)">
+          @for (cat of categories(); track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+
+        <select class="pl-select" [value]="selectedStatus()" (change)="selectedStatus.set($any($event.target).value)">
+          <option value="All">All Status</option>
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Error Banner -->
+    @if (loadError()) {
+      <div class="pl-banner pl-banner--error" role="alert">
+        <span class="material-symbols-outlined">error</span>
+        {{ loadError() }}
+      </div>
+    }
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="pl-empty">
+        <div class="pl-spinner"></div>
+        <p>Loading products…</p>
+      </div>
+    }
+
+    <!-- Products Table -->
+    @if (!isLoading() && filteredProducts().length > 0) {
+      <div class="pl-table-wrap">
+        <table class="pl-table">
+          <thead>
+            <tr>
+              <th class="pl-th pl-th--img"></th>
+              <th class="pl-th">Product Name</th>
+              <th class="pl-th">Type</th>
+              <th class="pl-th pl-th--right">Sales Price</th>
+              <th class="pl-th">Status</th>
+              <th class="pl-th"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of filteredProducts(); track p.product_id) {
+              <tr class="pl-row" (click)="goToProduct(p.product_id)">
+                <td class="pl-td pl-td--img">
+                  @if (productPreviewUrl(p); as src) {
+                    <img [src]="src" [alt]="p.product_name" class="pl-row-img" />
+                  } @else {
+                    <div class="pl-row-img-placeholder">
+                      <span class="material-symbols-outlined">inventory_2</span>
+                    </div>
+                  }
+                </td>
+                <td class="pl-td">
+                  <div class="pl-prod-name">{{ p.product_name }}</div>
+                  @if (p.short_description) {
+                    <div class="pl-prod-desc">{{ p.short_description }}</div>
+                  }
+                </td>
+                <td class="pl-td">
+                  <span class="pl-type-pill">{{ p.product_type }}</span>
+                </td>
+                <td class="pl-td pl-td--right">
+                  <span class="pl-price">₹{{ p.sales_price | number:'1.2-2' }}</span>
+                </td>
+                <td class="pl-td">
+                  <span class="pl-status-pill"
+                        [class.pl-status-pill--active]="p.status === 'ACTIVE'"
+                        [class.pl-status-pill--inactive]="p.status === 'INACTIVE'">
+                    {{ p.status === 'ACTIVE' ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="pl-td pl-td--action">
+                  <button class="pl-edit-btn" (click)="$event.stopPropagation(); goToProduct(p.product_id)"
+                          title="Edit product">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+        <div class="pl-pagination">
+          <button class="pl-page-btn" [disabled]="page() <= 1 || isLoading()" (click)="prevPage()">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <span class="pl-page-info">Page {{ page() }} of {{ totalPages() }} · {{ total() }} products</span>
+          <button class="pl-page-btn" [disabled]="page() >= totalPages() || isLoading()" (click)="nextPage()">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      }
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading() && !loadError() && filteredProducts().length === 0) {
+      <div class="pl-empty">
+        <span class="material-symbols-outlined pl-empty-icon">inventory_2</span>
+        <h3>No products found</h3>
+        @if (searchQuery() || selectedCategory() !== 'All' || selectedStatus() !== 'All') {
+          <p>Try clearing your filters.</p>
+          <button class="btn-new" style="margin-top: 12px;" (click)="searchQuery.set(''); selectedCategory.set('All'); selectedStatus.set('All')">
+            Clear Filters
+          </button>
+        } @else {
+          <p>Get started by creating your first product.</p>
+          <button class="btn-new" style="margin-top: 12px;" (click)="goToNew()">
+            <span class="material-symbols-outlined">add</span>
+            New Product
+          </button>
+        }
+      </div>
+    }
+
+  </main>
+</div>

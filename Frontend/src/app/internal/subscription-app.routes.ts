@@ -17,8 +17,14 @@ export const subscriptionAppChildRoutes: Routes = [
     loadComponent: () => import('./configuration/configuration').then((m) => m.ConfigurationComponent),
   },
   {
+    path: 'products/new',
+    loadComponent: () =>
+      import('./products/product-form/products').then((m) => m.ProductsComponent),
+  },
+  {
     path: 'products',
-    loadComponent: () => import('./products/products').then((m) => m.ProductsComponent),
+    loadComponent: () =>
+      import('./products/product-list/product-list').then((m) => m.ProductListComponent),
   },
   {
     path: 'reporting',

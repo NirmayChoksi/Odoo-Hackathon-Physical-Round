@@ -11,7 +11,7 @@ export interface CreateProductBody {
   salesPrice: number;
   costPrice?: number;
   description?: string;
-  imageUrl?: string;
+  imageUrls?: string;
   shortDescription?: string;
   termsAndConditions?: string;
   isRecurring?: boolean;

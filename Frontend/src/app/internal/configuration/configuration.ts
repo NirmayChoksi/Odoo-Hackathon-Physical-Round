@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,8 @@ import {
   SUBSCRIPTION_APP_PATHS,
   USERS_CONTACTS_DROPDOWN_ITEMS,
 } from '../subscription-app.constants';
+import { AttributeApiService } from '../attribute/attribute-api.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-configuration',
@@ -16,7 +18,9 @@ import {
   templateUrl: './configuration.html',
   styleUrl: './configuration.css'
 })
-export class ConfigurationComponent {
+export class ConfigurationComponent implements OnInit {
+  private readonly attributeApi = inject(AttributeApiService);
+
   readonly paths = SUBSCRIPTION_APP_PATHS;
   readonly hubModules = CONFIGURATION_HUB_MODULES;
 
@@ -40,16 +44,49 @@ export class ConfigurationComponent {
   ]);
 
   searchQuery = signal('');
+  isLoading = signal(false);
 
-  /** Mock rows — mockup example: attribute name brand, value color, extra price */
-  rows = signal([
-    { id: '1', attributeName: 'brand', value: 'color', extraPrice: '20 R.s' },
-    { id: '2', attributeName: '', value: '', extraPrice: '' },
-    { id: '3', attributeName: '', value: '', extraPrice: '' },
-    { id: '4', attributeName: '', value: '', extraPrice: '' },
-    { id: '5', attributeName: '', value: '', extraPrice: '' },
-    { id: '6', attributeName: '', value: '', extraPrice: '' }
-  ]);
+  /** Rows fetched from Attribute API */
+  rows = signal<any[]>([]);
+
+  async ngOnInit() {
+    await this.loadAttributes();
+  }
+
+  async loadAttributes() {
+    this.isLoading.set(true);
+    try {
+      const res = await firstValueFrom(this.attributeApi.list());
+      if (res.success) {
+        // Flatten attributes into value rows for the simplified hub view
+        const flatRows: any[] = [];
+        res.data.forEach((attr: any) => {
+          if (attr.values && attr.values.length > 0) {
+            attr.values.forEach((val: any) => {
+              flatRows.push({
+                id: `${attr.attribute_id}-${val.value_id}`,
+                attributeName: attr.display_name,
+                value: val.value_name,
+                extraPrice: val.extra_price ? `${val.extra_price} R.s` : '0 R.s'
+              });
+            });
+          } else {
+            flatRows.push({
+              id: `attr-${attr.attribute_id}`,
+              attributeName: attr.display_name,
+              value: '-',
+              extraPrice: '-'
+            });
+          }
+        });
+        this.rows.set(flatRows);
+      }
+    } catch (err) {
+      console.error('Hub failed to load attributes', err);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
 
   filteredRows = computed(() => {
     const q = this.searchQuery().trim().toLowerCase();
@@ -76,7 +113,7 @@ export class ConfigurationComponent {
   }
 
   onNavClick(item: { label: string }) {
-    const items = this.navItems().map(i => ({ ...i, active: i.label === item.label }));
+    const items = this.navItems().map((i: any) => ({ ...i, active: i.label === item.label }));
     this.navItems.set(items);
   }
 

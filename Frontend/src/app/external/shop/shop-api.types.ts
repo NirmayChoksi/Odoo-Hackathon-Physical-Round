@@ -80,6 +80,7 @@ export function toShopProductCard(row: ShopProductRow): ShopProductCard {
   const fallback = Number.parseFloat(String(row.sales_price));
   const price = Number.isFinite(display) ? display : Number.isFinite(fallback) ? fallback : 0;
   const img = row.image_urls ? row.image_urls : [SHOP_PLACEHOLDER_IMAGE];
+
   return {
     id: row.product_id,
     name: row.product_name,
