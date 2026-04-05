@@ -11,12 +11,21 @@
   "private": true,
   "packageManager": "npm@11.11.0",
   "dependencies": {
+    "@angular-architects/ngrx-toolkit": "^21.0.1",
+    "@angular/animations": "^21.2.7",
+    "@angular/cdk": "^21.2.5",
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
     "@angular/forms": "^21.2.0",
+    "@angular/material": "^21.2.5",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "@ngrx/signals": "^21.1.0",
+    "@ngrx/store": "^21.1.0",
+    "@ngrx/store-devtools": "^21.1.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -26,10 +35,15 @@
     "@angular/compiler-cli": "^21.2.0",
     "@tailwindcss/postcss": "^4.1.12",
     "jsdom": "^28.0.0",
+    "lmdb": "^3.5.3",
     "postcss": "^8.5.3",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "@rollup/rollup-win32-x64-msvc": "^4.60.1",
+    "@esbuild/win32-x64": "0.27.3",
+    "lightningcss-win32-x64-msvc": "^1.28.1",
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.1.12"
   }
 }

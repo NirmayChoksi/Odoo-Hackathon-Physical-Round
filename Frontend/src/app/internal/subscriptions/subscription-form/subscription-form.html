@@ -1,0 +1,396 @@
+<app-confirm-dialog
+  [open]="showCloseDialog()"
+  title="Close Subscription"
+  [message]="'Close subscription ' + subscriptionNumber() + '? This will mark it as CLOSED and cannot be undone.'"
+  confirmLabel="Close Subscription"
+  confirmIcon="lock"
+  variant="warning"
+  [busy]="isActioning()"
+  (confirmed)="performClose()"
+  (cancelled)="showCloseDialog.set(false)"
+></app-confirm-dialog>
+
+<main class="internal-content sf-main">
+
+    <!-- Page header -->
+    <header class="sf-page-head">
+      <nav class="sf-breadcrumb" aria-label="Breadcrumb">
+        <a [routerLink]="paths.subscriptions" class="sf-breadcrumb__link">Subscriptions</a>
+        <span class="material-symbols-outlined sf-breadcrumb__sep" aria-hidden="true">chevron_right</span>
+        <span class="sf-breadcrumb__current">{{ isEditMode() ? subscriptionNumber() : 'New subscription' }}</span>
+      </nav>
+      <div class="sf-page-head__row">
+        <div>
+          <h1 class="sf-title">{{ isEditMode() ? 'Edit subscription' : 'New subscription' }}</h1>
+          <p class="sf-subtitle">{{ isEditMode() ? 'Update details, manage items, or change status.' : 'Create a subscription, add lines, then send or confirm.' }}</p>
+        </div>
+        <!-- Subscription number chip with SO prefix -->
+        <div class="sf-number-chip">
+          <span class="sf-number-chip__label">Number</span>
+          <span class="sf-number-chip__value">{{ subscriptionNumber() }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toolbar / Action bar -->
+    <div class="sf-toolbar">
+      <div class="sf-toolbar__left">
+        <a [routerLink]="paths.subscriptions" class="sf-btn sf-btn--ghost">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Back to list
+        </a>
+        <span class="sf-toolbar__divider" aria-hidden="true"></span>
+
+        <button type="button" class="sf-btn sf-btn--primary" (click)="onSave()" [disabled]="isSaving() || isLoading()">
+          <span class="material-symbols-outlined">{{ isSaving() ? 'hourglass_empty' : 'save' }}</span>
+          {{ isSaving() ? 'Saving…' : 'Save' }}
+        </button>
+
+        @if (isEditMode()) {
+          <div class="sf-toolbar__icons">
+            <button type="button" class="icon-btn" title="Print">
+              <span class="material-symbols-outlined">print</span>
+            </button>
+          </div>
+
+          <!-- Status action buttons (context-aware) -->
+          @if (!isClosed) {
+            @if (currentStatus() === 'DRAFT') {
+              <button type="button" class="sf-btn sf-btn--outline" (click)="onSend()" [disabled]="isActioning()">
+                Send
+              </button>
+            }
+            @if (currentStatus() === 'QUOTATION') {
+              <button type="button" class="sf-btn sf-btn--outline" (click)="onConfirm()" [disabled]="isActioning()">
+                Confirm
+              </button>
+            }
+            @if (currentStatus() === 'CONFIRMED') {
+              <button type="button" class="sf-btn sf-btn--outline" (click)="onActivate()" [disabled]="isActioning()">
+                Activate
+              </button>
+            }
+            @if (isActive) {
+              <button type="button" class="sf-btn sf-btn--outline" (click)="onGenerateInvoice()" [disabled]="isActioning()">
+                <span class="material-symbols-outlined">receipt_long</span>
+                Invoice
+              </button>
+              <button type="button" class="sf-btn sf-btn--outline" (click)="onRenew()" [disabled]="isActioning()">
+                <span class="material-symbols-outlined">autorenew</span>
+                Renew
+              </button>
+            }
+            <button type="button" class="sf-btn sf-btn--danger" (click)="onClose()" [disabled]="isActioning()">
+              <span class="material-symbols-outlined">lock</span>
+              Close
+            </button>
+          }
+        }
+      </div>
+
+      <!-- Status stepper -->
+      <ol class="sf-stepper" aria-label="Workflow status">
+        @for (status of statusFlow; track status; let i = $index) {
+          <li
+            class="sf-stepper__item"
+            [class.sf-stepper__item--done]="isStepComplete(status)"
+            [class.sf-stepper__item--current]="isStepCurrent(status)">
+            @if (i > 0) {
+              <span class="sf-stepper__connector" aria-hidden="true"></span>
+            }
+            <span class="sf-stepper__dot"></span>
+            <span class="sf-stepper__label">{{ statusLabel[status] }}</span>
+          </li>
+        }
+      </ol>
+    </div>
+
+    <!-- Feedback banners -->
+    @if (saveSuccess()) {
+      <div class="sf-banner sf-banner--success" role="status">
+        <span class="material-symbols-outlined">check_circle</span>
+        Subscription saved successfully!
+      </div>
+    }
+    @if (saveError()) {
+      <div class="sf-banner sf-banner--error" role="alert">
+        <span class="material-symbols-outlined">error</span>
+        {{ saveError() }}
+      </div>
+    }
+    @if (actionSuccess()) {
+      <div class="sf-banner sf-banner--success" role="status">
+        <span class="material-symbols-outlined">check_circle</span>
+        {{ actionSuccess() }}
+      </div>
+    }
+    @if (actionError()) {
+      <div class="sf-banner sf-banner--error" role="alert">
+        <span class="material-symbols-outlined">error</span>
+        {{ actionError() }}
+      </div>
+    }
+
+    <!-- Loading spinner -->
+    @if (isLoading()) {
+      <div class="sf-loading">
+        <div class="sf-spinner"></div>
+        <p>Loading subscription…</p>
+      </div>
+    }
+
+    @if (!isLoading()) {
+      <!-- Subscription details card -->
+      <section class="sf-card" aria-labelledby="sf-details-heading">
+        <div class="sf-card__header">
+          <h2 id="sf-details-heading" class="sf-card__title">Subscription details</h2>
+        </div>
+        <div class="sf-fields">
+          <!-- Left column -->
+          <div class="sf-fields__col fields-section">
+            <div class="field-row">
+              <label class="field-label" for="sf-customer">Customer <span class="sf-required">*</span></label>
+              <app-customer-typeahead
+                [customerId]="customerId()"
+                [customerLabel]="selectedCustomerLabel()"
+                [disabled]="isEditMode()"
+                [createBusy]="isCreatingCustomer()"
+                (customerSelected)="onCustomerSelected($event)"
+                (createNew)="onCreateCustomer($event)">
+              </app-customer-typeahead>
+            </div>
+            <div class="field-row">
+              <label class="field-label" for="sf-template">Quotation template</label>
+              <select
+                id="sf-template"
+                class="sf-control sf-control--select"
+                [ngModel]="templateId()"
+                (ngModelChange)="templateId.set($event)">
+                @for (opt of templateOptions(); track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label" for="sf-start">Start Date</label>
+              <input
+                id="sf-start"
+                type="date"
+                class="sf-control"
+                min="1900-01-01"
+                max="2100-12-31"
+                [ngModel]="startDate()"
+                (ngModelChange)="onStartDateChange($event)"
+                [disabled]="isEditMode()" />
+              <p class="sf-date-hint">Pick a date or type <strong>YYYY-MM-DD</strong> (four-digit year, 1900–2100).</p>
+            </div>
+          </div>
+
+          <!-- Right column -->
+          <div class="sf-fields__col fields-section">
+            <div class="field-row">
+              <label class="field-label" for="sf-plan">Recurring plan <span class="sf-required">*</span></label>
+              <select
+                id="sf-plan"
+                class="sf-control sf-control--select"
+                [ngModel]="recurringPlanId()"
+                (ngModelChange)="recurringPlanId.set($event)">
+                @for (opt of recurringPlanOptions(); track opt.value) {
+                  <option [value]="opt.value" [disabled]="opt.value === ''">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label" for="sf-payment-term">Payment term</label>
+              <select
+                id="sf-payment-term"
+                class="sf-control sf-control--select"
+                [ngModel]="paymentTermId()"
+                (ngModelChange)="paymentTermId.set($event)">
+                @for (opt of paymentTermOptions(); track $index) {
+                  <option [value]="opt.value" [disabled]="opt.value === ''">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="field-row">
+              <label class="field-label" for="sf-expiration">Expiration date</label>
+              <input
+                id="sf-expiration"
+                type="date"
+                class="sf-control"
+                min="1900-01-01"
+                max="2100-12-31"
+                [ngModel]="expiration()"
+                (ngModelChange)="onExpirationDateChange($event)" />
+              <p class="sf-date-hint">Pick a date or type <strong>YYYY-MM-DD</strong> (four-digit year, 1900–2100).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Lines & info tabs -->
+      <section class="sf-card sf-card--tabs" aria-labelledby="sf-lines-heading">
+        <div class="sf-card__header sf-card__header--tabs">
+          <h2 id="sf-lines-heading" class="sf-card__title">Lines &amp; additional info</h2>
+          <p class="sf-card__subtitle">Switch tabs to edit order lines or other subscription data.</p>
+        </div>
+        <div class="sf-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            class="sf-tab"
+            [attr.aria-selected]="activeTab() === 'order-lines'"
+            [class.sf-tab--active]="activeTab() === 'order-lines'"
+            (click)="onTabClick('order-lines')">
+            Order lines
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="sf-tab"
+            [attr.aria-selected]="activeTab() === 'other-info'"
+            [class.sf-tab--active]="activeTab() === 'other-info'"
+            (click)="onTabClick('other-info')">
+            Other info
+          </button>
+        </div>
+
+        @if (activeTab() === 'order-lines') {
+          <div class="sf-tab-panel sf-tab-panel--lines" role="tabpanel">
+            @if (!isEditMode()) {
+              <div class="sf-add-line" aria-label="Add subscription line">
+                <div class="sf-add-line__field sf-add-line__field--product">
+                  <label class="sf-add-line__label" for="sf-draft-product">Product</label>
+                  <select
+                    id="sf-draft-product"
+                    class="sf-control sf-control--select"
+                    [value]="draftProductId()"
+                    (change)="onDraftProductSelect($event)">
+                    <option value="">Select product</option>
+                    @for (p of productCatalog(); track p.product_id) {
+                      <option [value]="p.product_id">{{ p.product_name }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="sf-add-line__field">
+                  <label class="sf-add-line__label" for="sf-draft-qty">Qty</label>
+                  <input
+                    id="sf-draft-qty"
+                    type="number"
+                    class="sf-control"
+                    min="1"
+                    step="1"
+                    [ngModel]="draftQuantity()"
+                    (ngModelChange)="draftQuantity.set($event)" />
+                </div>
+                <div class="sf-add-line__field">
+                  <label class="sf-add-line__label" for="sf-draft-price">Unit price</label>
+                  <input
+                    id="sf-draft-price"
+                    type="number"
+                    class="sf-control"
+                    min="0"
+                    step="0.01"
+                    [ngModel]="draftUnitPrice()"
+                    (ngModelChange)="draftUnitPrice.set($event)" />
+                </div>
+                <button type="button" class="sf-btn sf-btn--outline sf-add-line__btn" (click)="addDraftLine()">
+                  <span class="material-symbols-outlined">add</span>
+                  Add line
+                </button>
+              </div>
+            }
+
+            @if (isEditMode() && orderLines().length > 0) {
+              <div class="sf-lines-table-wrap">
+                <table class="data-table sf-lines-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Product</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Unit price</th>
+                      <th class="col-amount" scope="col">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (line of orderLines(); track line.subscription_item_id) {
+                      <tr class="data-row">
+                        <td class="col-product">{{ line.product_name }}</td>
+                        <td>{{ line.quantity }}</td>
+                        <td>{{ line.unit_price | currency:'INR' }}</td>
+                        <td class="col-amount">{{ line.amount | currency:'INR' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                  <tfoot>
+                    <tr class="sf-lines-total">
+                      <td colspan="3" class="sf-lines-total__label">Total</td>
+                      <td class="col-amount">{{ totalAmount() | currency:'INR' }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            } @else if (!isEditMode() && draftLines().length > 0) {
+              <div class="sf-lines-table-wrap sf-lines-table-wrap--draft">
+                <table class="data-table sf-lines-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Product</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Unit price</th>
+                      <th class="col-amount" scope="col">Amount</th>
+                      <th scope="col" class="sf-col-actions" aria-label="Actions"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (line of draftLines(); track line.key) {
+                      <tr class="data-row">
+                        <td class="col-product">{{ line.product_name }}</td>
+                        <td>{{ line.quantity }}</td>
+                        <td>{{ line.unit_price | currency:'INR' }}</td>
+                        <td class="col-amount">{{ draftLineAmount(line) | currency:'INR' }}</td>
+                        <td class="sf-col-actions">
+                          <button
+                            type="button"
+                            class="sf-icon-btn"
+                            title="Remove line"
+                            (click)="removeDraftLine(line.key)">
+                            <span class="material-symbols-outlined">delete</span>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                  <tfoot>
+                    <tr class="sf-lines-total">
+                      <td colspan="3" class="sf-lines-total__label">Total</td>
+                      <td class="col-amount">{{ draftTotalAmount() | currency:'INR' }}</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            }
+
+            @if (isEditMode() && orderLines().length === 0) {
+              <p class="sf-tab-hint">
+                No order lines yet. Add items via the subscription items API.
+              </p>
+            }
+            @if (!isEditMode() && draftLines().length === 0) {
+              <p class="sf-tab-hint">
+                Add products above; they will be saved when you create the subscription.
+              </p>
+            }
+          </div>
+        }
+
+        @if (activeTab() === 'other-info') {
+          <div class="sf-tab-panel sf-tab-panel--padded" role="tabpanel">
+            <p class="sf-placeholder">Internal notes, delivery address, and custom fields can live here.</p>
+          </div>
+        }
+      </section>
+    }
+
+</main>

@@ -1,0 +1,80 @@
+<main class="sf-main">
+    <header class="sf-page-head">
+      <nav class="sf-breadcrumb" aria-label="Breadcrumb">
+        <a [routerLink]="paths.contacts" class="sf-breadcrumb__link">Contacts</a>
+        <span class="material-symbols-outlined sf-breadcrumb__sep" aria-hidden="true">chevron_right</span>
+        <span class="sf-breadcrumb__current">{{ name() || 'New contact' }}</span>
+      </nav>
+      <div class="sf-page-head__row">
+        <div>
+          <h1 class="sf-title">{{ name() || 'New contact' }}</h1>
+          <p class="sf-subtitle">Manage contact details and linked customer.</p>
+        </div>
+      </div>
+    </header>
+
+    @if (isLoading()) {
+      <div class="sf-loading">
+        <div class="sf-spinner"></div>
+        <p>Loading contact details...</p>
+      </div>
+    } @else {
+      <div class="sf-toolbar">
+        <div class="sf-toolbar__left">
+          <button type="button" class="sf-btn btn-secondary" (click)="onNew()">
+            <span class="material-symbols-outlined">add</span>
+            New
+          </button>
+          <span class="sf-toolbar__divider" aria-hidden="true"></span>
+          <button type="button" class="sf-btn btn-primary" (click)="onSave()">
+            <span class="material-symbols-outlined">save</span>
+            Save
+          </button>
+          <div class="sf-toolbar__icons">
+            <button type="button" class="icon-btn" title="Delete" (click)="onDelete()">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <section class="sf-card" aria-labelledby="sf-contact-heading">
+        <div class="sf-card__header">
+          <h2 id="sf-contact-heading" class="sf-card__title">Contact details</h2>
+        </div>
+        <div class="sf-fields sf-fields--single">
+          <div class="form-layout">
+            <div class="row-group">
+              <label class="form-label" for="cf-customer">Customer</label>
+              <select id="cf-customer" class="sf-control" [ngModel]="customerId()" (ngModelChange)="customerId.set($event)">
+                <option [ngValue]="null" disabled>Select a customer</option>
+                @for (cust of customers(); track cust.customer_id) {
+                  <option [ngValue]="cust.customer_id">{{ cust.customer_name }}</option>
+                }
+              </select>
+            </div>
+            <div class="row-group">
+              <label class="form-label" for="cf-name">Name</label>
+              <input id="cf-name" type="text" class="sf-control" placeholder="Full name"
+                [ngModel]="name()" (ngModelChange)="name.set($event)" />
+            </div>
+            <div class="row-group">
+              <label class="form-label" for="cf-email">Email</label>
+              <input id="cf-email" type="email" class="sf-control" placeholder="contact@example.com"
+                [ngModel]="email()" (ngModelChange)="email.set($event)" />
+            </div>
+            <div class="row-group">
+              <label class="form-label" for="cf-phone">Phone number</label>
+              <input id="cf-phone" type="text" class="sf-control" placeholder="+1 555-0100"
+                [ngModel]="phone()" (ngModelChange)="phone.set($event)" />
+            </div>
+            <div class="row-group">
+              <label class="form-label" for="cf-designation">Designation</label>
+              <input id="cf-designation" type="text" class="sf-control" placeholder="Project Manager"
+                [ngModel]="designation()" (ngModelChange)="designation.set($event)" />
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+  </main>

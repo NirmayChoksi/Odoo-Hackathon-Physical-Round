@@ -1,0 +1,97 @@
+<main class="internal-content">
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-left">
+      <button class="btn-new" (click)="onCreate()">
+        <span class="material-symbols-outlined">add</span>
+        New User
+      </button>
+    </div>
+    <div class="action-right">
+      <!-- Status filter pills -->
+      <div class="subs-status-filters">
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === ''"
+          (click)="onStatusFilter('')">All</button>
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'ACTIVE'"
+          (click)="onStatusFilter('ACTIVE')">Active</button>
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'INACTIVE'"
+          (click)="onStatusFilter('INACTIVE')">Inactive</button>
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'SUSPENDED'"
+          (click)="onStatusFilter('SUSPENDED')">Suspended</button>
+      </div>
+      <div class="search-bar">
+        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search name, email…"
+          (input)="onSearch($event)"
+          title="Search users" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Error banner -->
+  @if (error()) {
+    <div class="pf-banner pf-banner--error" role="alert" style="margin-bottom: 1rem;">
+      <span class="material-symbols-outlined">error</span>
+      {{ error() }}
+      <button class="btn-secondary sf-btn--sm" (click)="loadUsers()" style="margin-left: 1rem;">Retry</button>
+    </div>
+  }
+
+  <!-- Loading spinner -->
+  @if (isLoading()) {
+    <div class="pf-loading">
+      <div class="pf-spinner"></div>
+      <p>Loading users…</p>
+    </div>
+  }
+
+  <!-- Data Table Container -->
+  @if (!isLoading()) {
+    <div class="data-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of filteredUsers(); track user.user_id) {
+            <tr class="data-row" (click)="goToUser(user.user_id)">
+              <td style="font-weight: 600; color: var(--text-primary);">{{ user.full_name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.role_name }}</td>
+              <td>{{ user.phone || '—' }}</td>
+              <td>
+                <span class="status-pill" [attr.data-status]="user.status" [ngClass]="{
+                  'success': user.status === 'ACTIVE',
+                  'warning': user.status === 'INACTIVE',
+                  'error': user.status === 'SUSPENDED'
+                }">
+                  {{ user.status }}
+                </span>
+              </td>
+              <td>{{ user.created_at | date:'mediumDate' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (filteredUsers().length === 0 && !isLoading()) {
+        <div class="empty-state" style="text-align: center; padding: 4rem 2rem; opacity: 0.6;">
+          <span class="material-symbols-outlined" style="font-size: 3rem; display: block; margin-bottom: 1rem;">person_search</span>
+          <p>No users found matching your criteria.</p>
+        </div>
+      }
+    </div>
+  }
+
+</main>

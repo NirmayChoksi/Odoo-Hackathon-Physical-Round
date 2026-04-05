@@ -1,0 +1,92 @@
+<app-external-navbar [linkBase]="navLinkBase" />
+
+<main class="page-container">
+  
+  <!-- ── Breadcrumb Steps ── -->
+  <div class="steps-nav">
+    <span class="step step--active">Order</span>
+    <span class="step-sep"></span>
+    <span class="step">Address</span>
+    <span class="step-sep"></span>
+    <span class="step">Payment</span>
+  </div>
+
+  @if (items().length > 0) {
+    <div class="cart-layout">
+      <!-- ── Left: Items List ── -->
+      <div class="cart-items">
+        @for (item of items(); track item.id) {
+          <div class="cart-item">
+            <div class="cart-item__img">
+              <img [src]="item.image" [alt]="item.productName" />
+            </div>
+            
+            <div class="cart-item__details">
+              <h3 class="cart-item__name">{{ item.productName }}</h3>
+              @if (item.variantName) {
+                <span class="cart-item__variant">Variant: {{ item.variantName }}</span>
+              }
+              <span class="cart-item__plan">Plan: {{ item.planDuration }}</span>
+              <button type="button" class="sf-btn btn-secondary sf-btn--sm" (click)="removeItem(item.id)">Remove</button>
+            </div>
+
+            <div class="cart-item__actions">
+              <span class="cart-item__price">₹{{ item.price | number }}</span>
+              <div class="qty-control">
+                <button class="qty-btn" (click)="decrement(item)">−</button>
+                <span class="qty-val">{{ item.quantity }}</span>
+                <button class="qty-btn" (click)="increment(item)">+</button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- ── Right: Summary Box ── -->
+      <div class="summary-box">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>{{ subtotal() | number }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Taxes</span>
+          <span>{{ taxes() | number:'1.0-0' }}</span>
+        </div>
+        @if (discountAmount() > 0) {
+          <div class="summary-row summary-row--discount">
+            <span>Discount</span>
+            <span>-{{ discountAmount() | number:'1.0-0' }}</span>
+          </div>
+        }
+        <div class="summary-divider"></div>
+        <div class="summary-row summary-row--total">
+          <span>Total</span>
+          <span>{{ total() | number:'1.0-0' }}</span>
+        </div>
+
+        <div class="discount-form">
+          <input type="text" class="sf-control" placeholder="Discount code" [value]="discountCode" (input)="onDiscountInput($any($event.target).value)" />
+          <button type="button" class="sf-btn btn-secondary" (click)="applyDiscount()">Apply</button>
+        </div>
+        
+        @if (discountMessage) {
+          <p class="discount-msg" [class.discount-msg--success]="discountAmount() > 0">{{ discountMessage }}</p>
+        }
+
+        <div style="margin-top: 24px;">
+          <button type="button" class="sf-btn btn-primary sf-btn--full sf-btn--lg" (click)="goToCheckout()">Checkout</button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- Empty State -->
+    <div class="empty-state">
+      <span class="material-symbols-outlined empty-state__icon">shopping_cart</span>
+      <h2>Your cart is empty</h2>
+      <p>Looks like you haven't added any products to your cart yet.</p>
+      <div style="margin-top:24px">
+        <button type="button" class="sf-btn btn-primary" (click)="continueShopping()">Continue Shopping</button>
+      </div>
+    </div>
+  }
+</main>

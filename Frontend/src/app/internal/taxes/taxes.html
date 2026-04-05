@@ -1,0 +1,151 @@
+<app-confirm-dialog
+  [open]="showDeactivateDialog()"
+  title="Deactivate tax"
+  message="This tax will be marked inactive. It can still appear in admin lists with an Inactive status."
+  confirmLabel="Deactivate"
+  confirmIcon="delete_forever"
+  variant="danger"
+  [busy]="isDeleting()"
+  (confirmed)="performDeactivate()"
+  (cancelled)="showDeactivateDialog.set(false)"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showClearDraftDialog()"
+  title="Clear form"
+  message="Discard everything on this form? Unsaved data will be cleared from the page."
+  confirmLabel="Clear"
+  confirmIcon="delete_sweep"
+  variant="warning"
+  (confirmed)="performClearDraft()"
+  (cancelled)="showClearDraftDialog.set(false)"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showNoticeDialog()"
+  [title]="noticeTitle()"
+  [message]="noticeMessage()"
+  confirmLabel="OK"
+  confirmIcon="check"
+  variant="primary"
+  [showCancel]="false"
+  (confirmed)="closeNoticeDialog()"
+  (cancelled)="closeNoticeDialog()"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showSuccessDialog()"
+  [title]="successTitle()"
+  [message]="successMessage()"
+  confirmLabel="OK"
+  confirmIcon="check_circle"
+  variant="primary"
+  [showCancel]="false"
+  (confirmed)="closeSuccessDialog()"
+  (cancelled)="closeSuccessDialog()"
+></app-confirm-dialog>
+
+<main class="internal-content">
+  <div class="action-bar">
+    <div class="action-left">
+      <a [routerLink]="paths.taxes" class="tx-back-link" title="Back to taxes list">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Taxes
+      </a>
+      <button
+        type="button"
+        class="btn-new"
+        (click)="onNew()"
+        [disabled]="store.isSaving() || store.isLoading()"
+        title="Empty tax name: clear the form and start fresh. With a name: save this tax (creates or updates on the server).">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
+      <div class="action-icons">
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onDelete()"
+          title="Clear form or deactivate saved tax"
+          [disabled]="store.isSaving() || store.isLoading() || isDeleting()">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onSave()"
+          title="Save"
+          [disabled]="store.isSaving() || store.isLoading()">
+          <span class="material-symbols-outlined">{{ store.isSaving() ? 'hourglass_empty' : 'save' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (store.loadError()) {
+    <div class="tx-banner tx-banner--error" role="alert">
+      <span class="material-symbols-outlined">error</span>
+      {{ store.loadError() }}
+    </div>
+  }
+
+  @if (store.saveError()) {
+    <div class="tx-banner tx-banner--error" role="alert">
+      <span class="material-symbols-outlined">warning</span>
+      {{ store.saveError() }}
+      <button type="button" class="tx-banner__dismiss" (click)="store.clearSaveError()">Dismiss</button>
+    </div>
+  }
+
+  @if (store.isLoading()) {
+    <div class="tx-loading">
+      <div class="tx-spinner"></div>
+      <p>Loading tax…</p>
+    </div>
+  }
+
+  @if (!store.isLoading()) {
+    <div class="form-container">
+      <div class="title-group">
+        <input
+          type="text"
+          id="taxName"
+          class="title-input"
+          placeholder="Tax Name"
+          [ngModel]="store.taxName()"
+          (ngModelChange)="store.patchDraft({ taxName: $event })" />
+      </div>
+
+      <div class="form-layout">
+        <div class="row-group">
+          <span class="form-label" id="taxComputation">Tax computation</span>
+          <p class="tx-computation-hint" aria-labelledby="taxComputation">Percentage (rate applied to the taxable amount)</p>
+        </div>
+
+        <div class="row-group">
+          <label class="form-label" for="taxAmount">Rate (%)</label>
+          <input
+            type="number"
+            id="taxAmount"
+            class="field-input"
+            min="0"
+            step="any"
+            [ngModel]="store.taxPercentage()"
+            (ngModelChange)="onTaxAmountInput($event)"
+            placeholder="0" />
+        </div>
+
+        <div class="row-group tx-desc-row">
+          <label class="form-label" for="taxDescription">Description</label>
+          <textarea
+            id="taxDescription"
+            class="tx-desc-input"
+            rows="3"
+            placeholder="Optional notes for staff"
+            [ngModel]="store.description()"
+            (ngModelChange)="store.patchDraft({ description: $event })"></textarea>
+        </div>
+      </div>
+    </div>
+  }
+</main>

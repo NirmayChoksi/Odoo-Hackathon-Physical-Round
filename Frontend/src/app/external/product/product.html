@@ -1,0 +1,214 @@
+<app-external-navbar [linkBase]="navLinkBase" />
+
+@if (productStore.isLoading()) {
+  <div class="prod-not-found">
+    <div class="spinner"></div>
+    <p style="margin-top: 16px">Loading product details…</p>
+  </div>
+} @else if (!productStore.product()) {
+  <div class="prod-not-found">
+    <div class="prod-not-found__icon material-symbols-outlined" style="font-size: 3.5rem">
+      search_off
+    </div>
+    <h2>Product not found</h2>
+    <p>{{ productStore.loadError() || "The product you're looking for doesn't exist." }}</p>
+    <app-button variant="primary" label="← Back to Shop" (click)="goBack()"></app-button>
+  </div>
+} @else {
+  <div class="prod">
+    <!-- Breadcrumb -->
+    <div class="prod__breadcrumb">
+      <span (click)="goHome()">All Products</span>
+      <span class="prod__breadcrumb-sep">›</span>
+      <span (click)="goBack()">{{ productStore.product()?.product_type }}</span>
+      <span class="prod__breadcrumb-sep">›</span>
+      <span class="prod__breadcrumb-current">{{ productStore.product()?.product_name }}</span>
+    </div>
+
+    <div class="prod__layout">
+      <!-- ── LEFT: Image Carousel ── -->
+      <div class="prod__carousel">
+        <!-- Slide strip -->
+        <div class="prod__carousel-track-wrap">
+          <div
+            class="prod__carousel-track"
+            [style.transform]="'translateX(-' + selectedImageIndex() * 100 + '%)'"
+          >
+            @for (img of productStore.images(); track $index) {
+              <div class="prod__carousel-slide">
+                <img
+                  [src]="img"
+                  [alt]="productStore.product()?.product_name + ' — image ' + ($index + 1)"
+                  class="prod__carousel-img"
+                />
+              </div>
+            }
+          </div>
+
+          <!-- Prev / Next arrows -->
+          @if (productStore.images().length > 1) {
+            <button
+              class="prod__carousel-arrow prod__carousel-arrow--prev"
+              (click)="prevImage()"
+              aria-label="Previous image"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button
+              class="prod__carousel-arrow prod__carousel-arrow--next"
+              (click)="nextImage()"
+              aria-label="Next image"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          }
+
+          <!-- Image counter badge -->
+          @if (productStore.images().length > 1) {
+            <div class="prod__carousel-counter">
+              {{ selectedImageIndex() + 1 }} / {{ productStore.images().length }}
+            </div>
+          }
+        </div>
+
+        <!-- Dot indicators -->
+        @if (productStore.images().length > 1) {
+          <div class="prod__carousel-dots">
+            @for (img of productStore.images(); track $index) {
+              <button
+                class="prod__carousel-dot"
+                [class.prod__carousel-dot--active]="selectedImageIndex() === $index"
+                (click)="selectImage($index)"
+                [attr.aria-label]="'Go to image ' + ($index + 1)"
+              ></button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ── RIGHT: Product Info ── -->
+      <div class="prod__info">
+        <h1 class="prod__name">{{ productStore.product()?.product_name }}</h1>
+        <p class="prod__desc-full">
+          {{ productStore.product()?.description || productStore.product()?.short_description }}
+        </p>
+
+        <!-- ── Pricing Table ── -->
+        @if (productStore.plans().length > 0) {
+          <div class="prod__pricing-card">
+            <h3 class="prod__section-title">Choose Your Plan</h3>
+            <div class="prod__plans">
+              @for (plan of productStore.plans(); track plan.product_plan_id; let i = $index) {
+                <div
+                  class="prod__plan"
+                  [class.prod__plan--active]="selectedPlanIndex() === i"
+                  (click)="selectPlan(i)"
+                >
+                  <div class="prod__plan-left">
+                    <span
+                      class="prod__plan-radio"
+                      [class.prod__plan-radio--on]="selectedPlanIndex() === i"
+                    ></span>
+                    <span class="prod__plan-label">{{ plan.plan_name }}</span>
+                  </div>
+                  <div class="prod__plan-right">
+                    <span class="prod__plan-total">₹{{ plan.price | number }}</span>
+                    <span class="prod__plan-per"
+                      >₹{{ plan.price | number }}/{{ plan.billing_period.toLowerCase() }}</span
+                    >
+                  </div>
+                </div>
+              }
+            </div>
+            <p class="prod__billing-note">
+              Billed
+              {{
+                productStore.plans()[selectedPlanIndex()]?.billing_period?.toLowerCase() ||
+                  'monthly'
+              }}
+            </p>
+          </div>
+        }
+
+        <!-- Category -->
+        <div class="prod__meta">
+          <span class="prod__meta-label">Product category:</span>
+          <span class="prod__meta-val">{{ productStore.product()?.product_type }}</span>
+        </div>
+
+        <!-- Variants -->
+        @if (productStore.variants().length > 0) {
+          <div class="prod__variants-section">
+            <h3 class="prod__section-title">
+              Variants available for {{ productStore.variants()[0].attribute_name }}
+            </h3>
+            <div class="prod__variants">
+              @for (v of productStore.variants(); track v.variant_id) {
+                <button
+                  class="prod__variant-btn"
+                  [class.prod__variant-btn--active]="selectedVariant()?.variant_id === v.variant_id"
+                  (click)="selectVariant(v)"
+                >
+                  {{ v.attribute_value }}
+                  @if (+v.extra_price > 0) {
+                    <span class="prod__variant-extra">+₹{{ v.extra_price }}</span>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="prod__purchase-row">
+          <div class="prod__qty">
+            <button class="prod__qty-btn" (click)="decrement()">−</button>
+            <span class="prod__qty-val">{{ quantity() }}</span>
+            <button class="prod__qty-btn" (click)="increment()">+</button>
+          </div>
+          <div class="prod__add-btn-wrap">
+            <button
+              class="prod__add-btn"
+              [class.prod__add-btn--success]="addedToCart()"
+              (click)="addToCart()"
+            >
+              <span class="material-symbols-outlined">{{
+                addedToCart() ? 'check' : 'shopping_cart'
+              }}</span>
+              <span class="prod__add-btn-label">
+                @if (addedToCart()) {
+                  ✓ Added to Cart!
+                } @else {
+                  <span>Add to Cart</span>
+                  <span class="prod__add-btn-price">
+                    ₹{{ totalPrice() | number: '1.2-2' }}
+                    @if (quantity() > 1) {
+                      <span class="prod__add-btn-unit"
+                        >(₹{{ currentPrice() | number: '1.2-2' }} × {{ quantity() }})</span
+                      >
+                    }
+                  </span>
+                }
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Trust badges -->
+        <div class="prod__trust">
+          <div class="prod__trust-item">
+            <span class="material-symbols-outlined">assignment_turned_in</span>
+            <span>Terms and Conditions apply</span>
+          </div>
+          <div class="prod__trust-item">
+            <span class="material-symbols-outlined">verified_user</span>
+            <span>30-day money-back guarantee</span>
+          </div>
+          <div class="prod__trust-item">
+            <span class="material-symbols-outlined">speed</span>
+            <span>Instant Activation & Setup</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

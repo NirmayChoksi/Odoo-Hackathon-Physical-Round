@@ -1,0 +1,240 @@
+/* ─── Account Settings — alignment with Image Style ─── */
+
+.acc-field-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  word-break: break-word;
+}
+
+.acc-content {
+  padding-top: 0.5rem;
+}
+
+/* ─── Title (matches Product Name in image) ─── */
+.title-group .sf-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--color-primary);
+  display: inline-block;
+  min-width: 300px;
+  max-width: 100%;
+}
+
+.title-group .sf-subtitle {
+  margin-top: 1rem;
+}
+
+
+/* ─── Layout & Fields (Side-by-Side) ─── */
+.fields-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem 4rem;
+}
+
+.field-row {
+  display: flex;
+  align-items: center; /* Side-by-side */
+  gap: 2.5rem;
+  min-height: 48px;
+}
+
+.field-row--full {
+  grid-column: 1 / -1;
+  align-items: flex-start; /* For textareas/addresses */
+}
+
+.field-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  text-transform: none; /* Keep natural case if desired, or match image */
+  min-width: 180px;
+  max-width: 180px;
+  flex-shrink: 0;
+}
+
+/* ─── Underline Inputs ─── */
+.sf-control {
+  width: 100%;
+  height: 36px;
+  border: none !important;
+  border-bottom: 1px solid var(--color-outline-variant) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 0.5rem !important;
+  font-size: 0.9375rem;
+  color: var(--color-primary) !important;
+  transition: border-color var(--transition);
+  outline: none;
+  box-shadow: none !important;
+}
+
+.sf-control:focus {
+  border-bottom-color: var(--color-primary) !important;
+}
+
+/* ─── Addresses ─── */
+.acc-addr-header {
+  gap: 1rem;
+}
+
+.acc-addr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1rem;
+}
+
+.acc-section-label {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+
+.acc-addr-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-outline-variant);
+}
+
+.acc-addr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 1.25rem;
+}
+
+.acc-addr-card {
+  position: relative;
+  background: var(--color-surface-container-low);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.acc-addr-card:hover {
+  border-color: var(--pal-lavender);
+  background: color-mix(in srgb, var(--color-surface-container-low) 95%, var(--pal-lavender));
+}
+
+.acc-default-badge {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.acc-addr-line1 {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-on-surface);
+}
+
+.acc-addr-line {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-on-surface-variant);
+  line-height: 1.6;
+}
+
+/* ─── Feedback & Loading ─── */
+.pf-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: var(--radius-xl);
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.pf-loading {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--color-on-surface-variant);
+}
+
+.acc-inline-error {
+  font-size: 0.75rem;
+  color: var(--color-error);
+  margin-top: 0.35rem;
+  display: block;
+}
+
+/* ─── Toggle switch (matches Recurring Product in image) ─── */
+.pf-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pf-toggle input[type="checkbox"] {
+  display: none;
+}
+
+.pf-toggle-track {
+  width: 44px;
+  height: 24px;
+  background: var(--color-outline-variant);
+  border-radius: 100px;
+  position: relative;
+  transition: background var(--transition);
+}
+
+.pf-toggle input:checked + .pf-toggle-track {
+  background: var(--color-primary);
+}
+
+.pf-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform var(--transition);
+}
+
+.pf-toggle input:checked + .pf-toggle-track .pf-toggle-thumb {
+  transform: translateX(20px);
+}
+
+.pf-toggle-label {
+  font-size: 0.875rem;
+  color: var(--color-on-surface);
+  font-weight: 600;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .fields-section { grid-template-columns: 1fr; }
+  .field-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  .field-label { min-width: unset; max-width: unset; }
+}
+
+
+

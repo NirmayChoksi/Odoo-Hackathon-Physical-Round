@@ -1,0 +1,65 @@
+/* ─── User List — alignment with SubSync Premium ─── */
+
+/* Specific button/filter layout if needed */
+.action-bar {
+  margin-bottom: 2rem;
+}
+
+.subs-status-filters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.subs-filter-pill {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: 1px solid var(--color-outline-variant);
+  background: color-mix(in srgb, var(--pal-navy) 40%, transparent);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.subs-filter-pill:hover {
+  border-color: var(--pal-lavender);
+  color: var(--text-primary);
+}
+
+.subs-filter-pill--active {
+  background: var(--pal-lavender);
+  color: var(--pal-deep);
+  border-color: var(--pal-lavender);
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.empty-state .material-symbols-outlined {
+  color: var(--pal-lavender);
+  opacity: 0.5;
+}
+
+/* Responsive Action Bar */
+@media (max-width: 900px) {
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .action-right {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .subs-status-filters {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}

@@ -1,0 +1,175 @@
+.orders-card {
+  background: var(--color-surface-container-low);
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.orders__header {
+  padding: 32px 40px;
+  border-bottom: 1.5px solid var(--color-outline-variant);
+}
+
+.orders__title {
+  color: var(--color-primary);
+  font-family: var(--font-headline);
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin: 0;
+}
+
+.orders__content {
+  padding: 40px;
+  min-height: 400px;
+}
+
+/* ── Table ────────────────────────────────────────────────────────────────── */
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.orders-table th {
+  color: var(--color-primary);
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--color-outline-variant);
+}
+
+.orders-table td {
+  padding: 20px 0;
+  border-bottom: 1.5px solid var(--color-outline-variant);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+}
+
+.orders-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.orders-row:hover {
+  background-color: var(--color-surface-container-highest);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+/* ── Status Badges ────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-active {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.badge-closed {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.badge-confirmed {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.badge-draft {
+  background: rgba(156, 163, 175, 0.2);
+  color: var(--color-on-surface-variant, #9ca3af);
+}
+
+/* ── Loading / Error / Empty States ──────────────────────────────────────── */
+
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+}
+
+.state-text {
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+}
+
+.state-error {
+  color: #ef4444;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  text-align: center;
+  max-width: 480px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Pagination ───────────────────────────────────────────────────────────── */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.page-btn {
+  padding: 8px 20px;
+  border: 1.5px solid var(--color-outline-variant);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--color-surface-container-highest);
+  border-color: var(--color-primary);
+}
+
+.page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-info {
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}

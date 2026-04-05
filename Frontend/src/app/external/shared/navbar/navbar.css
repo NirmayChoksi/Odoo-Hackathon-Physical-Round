@@ -1,0 +1,27 @@
+/* ──────────────────────────────
+   External Portal Navbar
+   ────────────────────────────── */
+
+/* Logo */
+
+/* Nav Links */
+
+/* Actions */
+
+/* Cart Button */
+
+/* Profile */
+
+/* Dropdown */
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hamburger (mobile) */
+
+/* Mobile Menu */
+
+/* Responsive */
+@media (max-width: 768px) {
+}

@@ -1,0 +1,223 @@
+<app-confirm-dialog
+  [open]="showDeactivateDialog()"
+  title="Deactivate discount"
+  message="This discount will be marked inactive. It can still appear in admin lists with an Inactive status."
+  confirmLabel="Deactivate"
+  confirmIcon="delete_forever"
+  variant="danger"
+  [busy]="isDeleting()"
+  (confirmed)="performDeactivate()"
+  (cancelled)="showDeactivateDialog.set(false)"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showClearDraftDialog()"
+  title="Clear form"
+  message="Discard everything on this form? Unsaved data will be cleared from the page."
+  confirmLabel="Clear"
+  confirmIcon="delete_sweep"
+  variant="warning"
+  (confirmed)="performClearDraft()"
+  (cancelled)="showClearDraftDialog.set(false)"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showNoticeDialog()"
+  [title]="noticeTitle()"
+  [message]="noticeMessage()"
+  confirmLabel="OK"
+  confirmIcon="check"
+  variant="primary"
+  [showCancel]="false"
+  (confirmed)="closeNoticeDialog()"
+  (cancelled)="closeNoticeDialog()"
+></app-confirm-dialog>
+
+<main class="internal-content">
+  <div class="action-bar">
+    <div class="action-left">
+      <a [routerLink]="paths.discounts" class="disc-back-link" title="Back to discounts list">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Discounts
+      </a>
+      <button
+        type="button"
+        class="btn-new"
+        (click)="onNew()"
+        [disabled]="store.isSaving() || store.isLoading()"
+        title="Empty discount name: clear the form and start fresh. With a name: save this discount (creates or updates on the server).">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
+      <div class="action-icons">
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onDelete()"
+          title="Clear form or deactivate saved discount"
+          [disabled]="store.isSaving() || store.isLoading() || isDeleting()">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onSave()"
+          title="Save"
+          [disabled]="store.isSaving() || store.isLoading()">
+          <span class="material-symbols-outlined">{{ store.isSaving() ? 'hourglass_empty' : 'save' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (store.loadError()) {
+    <div class="disc-banner disc-banner--error" role="alert">
+      <span class="material-symbols-outlined">error</span>
+      {{ store.loadError() }}
+    </div>
+  }
+
+  @if (store.saveError()) {
+    <div class="disc-banner disc-banner--error" role="alert">
+      <span class="material-symbols-outlined">warning</span>
+      {{ store.saveError() }}
+      <button type="button" class="disc-banner__dismiss" (click)="store.clearSaveError()">Dismiss</button>
+    </div>
+  }
+
+  @if (store.isLoading()) {
+    <div class="disc-loading">
+      <div class="disc-spinner"></div>
+      <p>Loading discount…</p>
+    </div>
+  }
+
+  @if (!store.isLoading()) {
+    <div class="form-container">
+      <div class="title-group">
+        <input
+          type="text"
+          class="title-input"
+          placeholder="Discount Name"
+          [ngModel]="store.discountName()"
+          (ngModelChange)="store.patchDraft({ discountName: $event })" />
+      </div>
+
+      <div class="form-layout">
+        <div class="form-column">
+          <div class="form-group row-group">
+            <label class="form-label" for="discountType">Fixed Price / percentage</label>
+            <div class="select-wrapper type-select">
+              <select
+                id="discountType"
+                class="form-select type-select"
+                [ngModel]="store.discountType()"
+                (ngModelChange)="store.patchDraft({ discountType: $event })">
+                @for (type of discountTypes; track type) {
+                  <option [value]="type">{{ type }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group row-group">
+            <label class="form-label" for="discountValue">Discount value</label>
+            <input
+              type="number"
+              id="discountValue"
+              class="form-input text-input"
+              min="0"
+              step="0.01"
+              [ngModel]="store.discountValue()"
+              (ngModelChange)="onDiscountValueInput($event)" />
+          </div>
+
+          <div class="form-group row-group">
+            <label class="form-label" for="minPurchase">Minimum purchase</label>
+            <input
+              type="number"
+              id="minPurchase"
+              class="form-input text-input"
+              min="0"
+              step="0.01"
+              [ngModel]="store.minimumPurchase()"
+              (ngModelChange)="onMinPurchaseInput($event)" />
+          </div>
+
+          <div class="form-group row-group">
+            <label class="form-label" for="minQuantity">Minimum quantity</label>
+            <input
+              type="number"
+              id="minQuantity"
+              class="form-input text-input"
+              min="1"
+              step="1"
+              [ngModel]="store.minimumQuantity()"
+              (ngModelChange)="onMinQuantityInput($event)" />
+          </div>
+
+          <div class="form-group row-group">
+            <label class="form-label" for="couponCode">Coupon code</label>
+            <input
+              type="text"
+              id="couponCode"
+              class="form-input text-input"
+              placeholder="Optional"
+              [ngModel]="store.couponCode()"
+              (ngModelChange)="store.patchDraft({ couponCode: $event })" />
+          </div>
+        </div>
+
+        <div class="form-column">
+          <div class="form-group row-group">
+            <label class="form-label" for="startDate">Start Date</label>
+            <input
+              type="date"
+              id="startDate"
+              class="form-input text-input date-input"
+              min="1900-01-01"
+              max="2100-12-31"
+              maxlength="10"
+              [ngModel]="store.startDate()"
+              (ngModelChange)="onDateInput('startDate', $event)" />
+          </div>
+
+          <div class="form-group row-group">
+            <label class="form-label" for="endDate">End Date</label>
+            <input
+              type="date"
+              id="endDate"
+              class="form-input text-input date-input"
+              min="1900-01-01"
+              max="2100-12-31"
+              maxlength="10"
+              [ngModel]="store.endDate()"
+              (ngModelChange)="onDateInput('endDate', $event)" />
+          </div>
+
+          <div class="form-group row-group limit-usage-group">
+            <label class="form-label" for="limitUsage">Limit usage</label>
+            <input
+              type="checkbox"
+              id="limitUsage"
+              class="form-checkbox"
+              [checked]="store.limitUsage()"
+              (change)="store.patchDraft({ limitUsage: $any($event.target).checked })" />
+
+            @if (store.limitUsage()) {
+              <div class="limit-count-wrapper">
+                <input
+                  type="number"
+                  class="form-input num-input inline-num"
+                  placeholder="Count"
+                  min="1"
+                  [ngModel]="store.limitUsageCount()"
+                  (ngModelChange)="onLimitCountInput($event)" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</main>

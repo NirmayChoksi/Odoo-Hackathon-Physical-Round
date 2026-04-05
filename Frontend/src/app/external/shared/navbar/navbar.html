@@ -1,0 +1,94 @@
+<!-- External Portal Navbar -->
+<header class="ext-nav">
+  <div class="ext-nav__inner">
+
+    <!-- Logo -->
+    <a class="ext-nav__logo" [routerLink]="cmd()">
+      <img src="/images/logo/subsync-logo.svg" alt="SubSync Logo" class="ext-nav__logo-img" style="height: 38px;" />
+    </a>
+
+    <!-- Desktop Nav Links (hidden on internal dashboard — use profile menu) -->
+    @if (navItems().length > 0) {
+      <nav class="ext-nav__links">
+        @for (item of navItems(); track item.label) {
+          <a class="ext-nav__link"
+             routerLinkActive="ext-nav__link--active"
+             [routerLinkActiveOptions]="{ exact: !!item.exact }"
+             [routerLink]="item.link">
+            {{ item.label }}
+          </a>
+        }
+      </nav>
+    }
+
+    <!-- Right Actions -->
+    <div class="ext-nav__actions">
+      @if (!isInternalLayout()) {
+        <!-- Cart -->
+        <button class="ext-nav__cart-btn" type="button" [routerLink]="cmd('cart')" title="Cart">
+          <span class="material-symbols-outlined ext-nav__cart-icon" style="font-size: 1.25rem;">shopping_cart</span>
+          @if (cartCount() > 0) {
+            <span class="ext-nav__cart-badge">{{ cartCount() }}</span>
+          }
+          <span class="ext-nav__btn-label">Cart</span>
+        </button>
+      }
+
+      <!-- My Profile -->
+      <div class="ext-nav__profile-wrap" id="profile-menu-container">
+        <button type="button" class="ext-nav__profile-btn" (click)="toggleProfile()">
+          <span class="material-symbols-outlined ext-nav__avatar" style="font-size: 1.1rem;">person</span>
+          <span class="ext-nav__btn-label">My Profile</span>
+          <span class="material-symbols-outlined ext-nav__chevron" [class.flipped]="profileOpen()" style="font-size: 1.1rem;">expand_more</span>
+        </button>
+
+        <!-- Dropdown -->
+        @if (profileOpen()) {
+          <div class="ext-nav__dropdown">
+            <a class="ext-nav__dropdown-item" [routerLink]="cmd('account')" (click)="profileOpen.set(false)">
+              My Account
+            </a>
+            @if (!isInternalLayout()) {
+              <a class="ext-nav__dropdown-item" [routerLink]="cmd('orders')" (click)="profileOpen.set(false)">
+                My Orders
+              </a>
+            }
+            <div class="ext-nav__dropdown-divider"></div>
+            <button type="button" class="ext-nav__dropdown-item ext-nav__dropdown-item--danger" (click)="signOut()">
+              Sign Out
+            </button>
+          </div>
+        }
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button type="button" class="ext-nav__hamburger" (click)="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  @if (mobileMenuOpen()) {
+    <div class="ext-nav__mobile">
+      @for (item of navItems(); track item.label) {
+        <a class="ext-nav__mobile-link"
+           routerLinkActive="ext-nav__mobile-link--active"
+           [routerLinkActiveOptions]="{ exact: !!item.exact }"
+           [routerLink]="item.link"
+           (click)="mobileMenuOpen.set(false)">{{ item.label }}</a>
+      }
+      @if (!isInternalLayout()) {
+        <hr class="ext-nav__mobile-divider" />
+        <a class="ext-nav__mobile-link" [routerLink]="cmd('cart')" (click)="mobileMenuOpen.set(false)">Cart ({{ cartCount() }})</a>
+      } @else if (navItems().length === 0) {
+        <hr class="ext-nav__mobile-divider" />
+      }
+      <a class="ext-nav__mobile-link" [routerLink]="cmd('account')" (click)="mobileMenuOpen.set(false)">My Account</a>
+      @if (!isInternalLayout()) {
+        <a class="ext-nav__mobile-link" [routerLink]="cmd('orders')" (click)="mobileMenuOpen.set(false)">My Orders</a>
+      }
+      <a class="ext-nav__mobile-link ext-nav__mobile-link--danger" (click)="signOut()">Sign Out</a>
+    </div>
+  }
+</header>

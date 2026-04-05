@@ -1,12 +1,19 @@
-import express, { Request, Response } from 'express';
+import dotenv from "dotenv";
 
-const app = express();
-const PORT = 3000;
+dotenv.config();
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello from TypeScript Express!');
-});
+import app from "./app";
+import { ensureDbPatches } from "./db/ensurePatches";
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+const PORT = Number(process.env.PORT) || 3000;
+
+ensureDbPatches()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server listening on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Database ensure failed (missing base tables or DB down?):", err);
+    process.exit(1);
+  });

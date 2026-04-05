@@ -1,0 +1,99 @@
+<div class="sub-shell">
+  <header class="sub-shell__topnav">
+    <div class="sub-shell__topnav-inner">
+      <a [routerLink]="paths.subscriptions" class="sub-shell__brand" (click)="closeFlyouts()">
+        <img src="/images/logo/subsync-logo.svg" alt="SubSync" />
+      </a>
+
+      <nav class="sub-shell__nav" aria-label="Workspace">
+        <a
+          [routerLink]="paths.subscriptions"
+          routerLinkActive="sub-shell__link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="sub-shell__link"
+          (click)="closeFlyouts()">
+          <span class="material-symbols-outlined" aria-hidden="true">subscriptions</span>
+          <span>Subscriptions</span>
+        </a>
+        <a
+          [routerLink]="paths.products"
+          routerLinkActive="sub-shell__link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="sub-shell__link"
+          (click)="closeFlyouts()">
+          <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
+          <span>Products</span>
+        </a>
+        <a
+          [routerLink]="paths.reporting"
+          routerLinkActive="sub-shell__link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="sub-shell__link"
+          (click)="closeFlyouts()">
+          <span class="material-symbols-outlined" aria-hidden="true">bar_chart</span>
+          <span>Reporting</span>
+        </a>
+
+        <div class="sub-shell__group">
+          <button type="button" class="sub-shell__group-btn" [class.sub-shell__group-btn--open]="usersOpen()" (click)="toggleUsers($event)">
+            <span class="material-symbols-outlined" aria-hidden="true">group</span>
+            <span>Users &amp; contacts</span>
+            <span class="material-symbols-outlined sub-shell__chevron">expand_more</span>
+          </button>
+          @if (usersOpen()) {
+            <div class="sub-shell__dropdown" (click)="$event.stopPropagation()">
+              @for (sub of usersItems; track sub.label) {
+                <a
+                  [routerLink]="sub.path"
+                  routerLinkActive="sub-shell__sublink--active"
+                  [routerLinkActiveOptions]="{ exact: sub.exactActive }"
+                  class="sub-shell__sublink"
+                  (click)="closeFlyouts()">
+                  {{ sub.label }}
+                </a>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="sub-shell__group">
+          <button
+            type="button"
+            class="sub-shell__group-btn"
+            [class.sub-shell__group-btn--open]="configOpen()"
+            [class.sub-shell__group-btn--highlight]="isConfigRoute()"
+            (click)="toggleConfig($event)">
+            <span class="material-symbols-outlined" aria-hidden="true">tune</span>
+            <span>Configuration</span>
+            <span class="material-symbols-outlined sub-shell__chevron">expand_more</span>
+          </button>
+          @if (configOpen()) {
+            <div class="sub-shell__dropdown" (click)="$event.stopPropagation()">
+              @for (sub of configItems; track sub.label) {
+                <a
+                  [routerLink]="sub.path"
+                  routerLinkActive="sub-shell__sublink--active"
+                  [routerLinkActiveOptions]="{ exact: sub.exactActive }"
+                  class="sub-shell__sublink"
+                  (click)="closeFlyouts()">
+                  {{ sub.label }}
+                </a>
+              }
+            </div>
+          }
+        </div>
+      </nav>
+
+      <div class="sub-shell__actions">
+        <a [routerLink]="accountLink()" class="sub-shell__action-link" (click)="closeFlyouts()">
+          <span class="material-symbols-outlined" aria-hidden="true">person</span>
+          My profile
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="sub-shell__outlet">
+    <router-outlet />
+  </div>
+</div>

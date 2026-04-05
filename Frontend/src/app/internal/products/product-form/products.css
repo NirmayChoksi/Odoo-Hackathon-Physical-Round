@@ -1,0 +1,363 @@
+.internal-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Navigation Header ── */
+.internal-nav {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  background: var(--color-surface-low);
+  border-bottom: 1px solid var(--color-outline);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 5000;
+  backdrop-filter: blur(10px);
+}
+
+.brand-logo {
+  height: 2rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.nav-link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.nav-link--active {
+  background: rgba(241, 145, 109, 0.12);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 1px rgba(241, 145, 109, 0.25);
+}
+
+/* ── Dropdown: Configuration modules (mockup — pure hover, no dead zone) ── */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+  width: max-content;
+}
+
+.nav-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+}
+
+.dropdown-icon {
+  font-size: 1.25rem;
+  transition: transform 0.2s;
+}
+
+/* Pull panel up under the tab so pointer never crosses empty space (hover stays on .nav-dropdown) */
+.nav-dropdown-content {
+  display: none;
+  position: absolute;
+  top: calc(100% - 10px);
+  right: 0;
+  min-width: 240px;
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-outline);
+  border-radius: 12px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  padding: 0.75rem 0.5rem 0.5rem;
+  z-index: 10050;
+}
+
+.nav-dropdown:hover .dropdown-icon,
+.nav-dropdown--open .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown:hover .nav-dropdown-content,
+.nav-dropdown--open .nav-dropdown-content {
+  display: block;
+  pointer-events: auto;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--color-on-surface-variant);
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.dropdown-item:hover,
+.dropdown-item--current {
+  background: rgba(241, 145, 109, 0.12);
+  color: var(--color-primary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  background: var(--color-surface-mid);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  text-decoration: none;
+  border: 1px solid var(--color-outline);
+}
+
+/* ── Action Bar ── */
+.action-bar {
+  padding: 1.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.action-left { display: flex; align-items: center; gap: 1rem; }
+.action-right { display: flex; align-items: center; gap: 12px; }
+
+/* ── Form mode badge ── */
+.form-mode-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.82rem; font-weight: 600;
+  color: var(--color-on-surface-variant);
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-outline);
+}
+.form-mode-badge .material-symbols-outlined { font-size: 1rem; }
+.form-mode-badge--edit { color: var(--color-primary); border-color: rgba(241,145,109,0.35); background: rgba(241,145,109,0.08); }
+
+/* ── Feedback banners ── */
+.pf-banner {
+  display: flex; align-items: center; gap: 10px;
+  border-radius: 10px; padding: 12px 16px;
+  font-size: 0.875rem; font-weight: 600;
+  margin-bottom: 16px;
+}
+.pf-banner--success {
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+.pf-banner--error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* ── Loading ── */
+.pf-loading {
+  text-align: center; padding: 60px 24px;
+  color: var(--color-on-surface-variant);
+}
+.pf-spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--color-outline);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: pf-spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes pf-spin { to { transform: rotate(360deg); } }
+
+/* ── ID badge ── */
+.pf-id-badge {
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--color-on-surface-variant);
+  background: var(--color-surface-mid, rgba(255,255,255,0.06));
+  border: 1px solid var(--color-outline);
+  padding: 2px 10px; border-radius: 100px;
+  margin-top: 6px; display: inline-block;
+}
+
+/* ── Toggle switch ── */
+.pf-toggle {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+}
+.pf-toggle input[type="checkbox"] { display: none; }
+.pf-toggle-track {
+  width: 40px; height: 22px;
+  background: var(--color-outline);
+  border-radius: 100px;
+  position: relative;
+  transition: background 0.2s;
+}
+.pf-toggle input:checked + .pf-toggle-track { background: var(--color-primary); }
+.pf-toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.pf-toggle input:checked ~ .pf-toggle-track .pf-toggle-thumb,
+.pf-toggle input:checked + .pf-toggle-track .pf-toggle-thumb { transform: translateX(18px); }
+.pf-toggle-label { font-size: 0.875rem; color: var(--color-text); font-weight: 600; }
+
+/* ── Icon button danger variant ── */
+.icon-btn--danger:hover { color: #f87171; }
+
+
+
+.btn-new {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  border: 1px solid var(--color-outline);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.btn-back:hover {
+  background: rgba(241, 145, 109, 0.08);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.action-icons {
+  display: flex;
+  gap: 0.75rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--color-outline);
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-on-surface-variant);
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+}
+
+/* ── Form Content ── */
+.internal-content {
+  flex: 1;
+  padding: 2rem 4rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.form-container {
+  background: var(--color-surface-low);
+  border: 1px solid var(--color-outline);
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+}
+
+.title-group {
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--color-outline);
+  padding-bottom: 1.5rem;
+}
+
+.title-input {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--color-primary);
+  width: 100%;
+  max-width: 500px;
+  outline: none;
+  padding: 0.25rem 0.5rem;
+  font-family: inherit;
+}
+
+.fields-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem 4rem;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.field-row--full {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  min-width: 200px;
+}
+
+.short-input, .unit-select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-outline);
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.375rem 0.5rem;
+  outline: none;
+}
+
+.helper-note {
+  font-size: 0.875rem;
+  color: var(--pal-lavender);
+  line-height: 1.6;
+  font-weight: 500;
+  font-style: italic;
+}

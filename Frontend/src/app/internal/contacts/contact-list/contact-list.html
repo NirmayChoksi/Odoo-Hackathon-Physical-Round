@@ -1,0 +1,78 @@
+<main class="internal-content">
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-left">
+      <button class="btn-new" (click)="onCreate()">
+        <span class="material-symbols-outlined">add</span>
+        New Contact
+      </button>
+    </div>
+    <div class="action-right">
+      <div class="search-bar">
+        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search name, customer, email…"
+          (input)="onSearch($event)"
+          title="Search contacts" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Error banner -->
+  @if (error()) {
+    <div class="pf-banner pf-banner--error" role="alert" style="margin-bottom: 1rem;">
+      <span class="material-symbols-outlined">error</span>
+      {{ error() }}
+      <button class="btn-secondary sf-btn--sm" (click)="loadContacts()" style="margin-left: 1rem;">Retry</button>
+    </div>
+  }
+
+  <!-- Loading spinner -->
+  @if (isLoading()) {
+    <div class="pf-loading">
+      <div class="pf-spinner"></div>
+      <p>Loading contacts…</p>
+    </div>
+  }
+
+  <!-- Data Table Container -->
+  @if (!isLoading()) {
+    <div class="data-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Contact Name</th>
+            <th>Customer</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Designation</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (contact of filteredContacts(); track contact.contact_id) {
+            <tr class="data-row" (click)="goToContact(contact.contact_id)">
+              <td style="font-weight: 600; color: var(--text-primary);">{{ contact.contact_name }}</td>
+              <td>{{ contact.customer_name }}</td>
+              <td>{{ contact.email || '—' }}</td>
+              <td>{{ contact.phone || '—' }}</td>
+              <td>{{ contact.designation || '—' }}</td>
+              <td>{{ contact.created_at | date:'mediumDate' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (filteredContacts().length === 0 && !isLoading()) {
+        <div class="empty-state" style="text-align: center; padding: 4rem 2rem; opacity: 0.6;">
+          <span class="material-symbols-outlined" style="font-size: 3rem; display: block; margin-bottom: 1rem;">contact_page</span>
+          <p>No contacts found matching your criteria.</p>
+        </div>
+      }
+    </div>
+  }
+
+</main>

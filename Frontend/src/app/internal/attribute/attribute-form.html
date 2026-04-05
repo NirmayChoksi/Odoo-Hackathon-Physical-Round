@@ -1,0 +1,119 @@
+<app-confirm-dialog
+  [open]="showDialog()"
+  [title]="dialogTitle()"
+  [message]="dialogMessage()"
+  [confirmLabel]="dialogConfirmLabel()"
+  [variant]="dialogVariant()"
+  [busy]="isBusy() || isDeleting()"
+  (confirmed)="onDialogConfirmed()"
+  (cancelled)="showDialog.set(false)"
+></app-confirm-dialog>
+
+<main class="internal-content">
+  <!-- Header / Action Bar -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="breadcrumbs">
+        <a routerLink="/internal/attribute" class="back-link">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Back to Attributes
+        </a>
+      </div>
+      <div class="header-actions">
+        <button
+          class="btn-icon-danger"
+          (click)="onDelete()"
+          title="Delete"
+          [disabled]="!attributeId()"
+        >
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+        <button
+          class="btn-primary"
+          (click)="onSave()"
+          [disabled]="isBusy() || isDeleting() || isLoading()"
+        >
+          <span class="material-symbols-outlined">{{ isBusy() ? 'hourglass_empty' : 'save' }}</span>
+          {{ isBusy() ? 'Saving…' : 'Save Attribute' }}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Attribute Form Container -->
+  <div class="form-container">
+    <!-- Attribute Name — large editable title -->
+    <div class="title-group">
+      <input
+        type="text"
+        id="attributeName"
+        class="title-input"
+        placeholder="Attribute Name"
+        [ngModel]="attributeName()"
+        (ngModelChange)="attributeName.set($event)"
+      />
+    </div>
+
+    <!-- Values Table Section -->
+    <div class="values-section">
+      <div class="section-header">
+        <h2 class="section-title">Attribute Values</h2>
+        <p class="section-subtitle">
+          Define the options available for this attribute and their extra cost
+        </p>
+      </div>
+
+      <div class="table-card">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="table-header">Value Name</th>
+              <th class="table-header">Extra Price</th>
+              <th class="table-header action-column"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of attributeValues(); track $index) {
+              <tr class="table-row">
+                <td>
+                  <input
+                    type="text"
+                    [(ngModel)]="row.value"
+                    placeholder="e.g. Red, XL, Carbon Fiber"
+                    class="modern-input"
+                  />
+                </td>
+                <td>
+                  <div class="input-with-icon">
+                    <span class="currency-symbol">$</span>
+                    <input
+                      type="number"
+                      [(ngModel)]="row.extraPrice"
+                      placeholder="0.00"
+                      class="modern-input price-input"
+                    />
+                  </div>
+                </td>
+                <td class="action-column">
+                  <button
+                    class="btn-remove-row"
+                    (click)="removeValueRow($index)"
+                    title="Remove value"
+                  >
+                    <span class="material-symbols-outlined">close</span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <div class="table-footer">
+          <button class="btn-add-row" (click)="addValueRow()">
+            <span class="material-symbols-outlined">add</span>
+            Add a value
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

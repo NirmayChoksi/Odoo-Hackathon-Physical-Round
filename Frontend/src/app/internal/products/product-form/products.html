@@ -1,0 +1,211 @@
+<app-confirm-dialog
+  [open]="showDeleteDialog()"
+  title="Delete Product"
+  [message]="deleteMessage"
+  confirmLabel="Delete"
+  confirmIcon="delete_forever"
+  variant="danger"
+  [busy]="isDeleting()"
+  (confirmed)="performDelete()"
+  (cancelled)="showDeleteDialog.set(false)"
+></app-confirm-dialog>
+
+<main class="internal-content">
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <div class="action-left">
+        <a [routerLink]="[paths.products]" class="btn-back">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Products
+        </a>
+        @if(isEditMode()) {
+          <div class="action-icons">
+            <button class="icon-btn icon-btn--danger" (click)="onDelete()" title="Delete product"
+              [disabled]="isDeleting()">
+              <span class="material-symbols-outlined">{{ isDeleting() ? 'hourglass_empty' : 'delete' }}</span>
+            </button>
+          </div>
+        }
+      </div>
+      <div class="action-right">
+        <span class="form-mode-badge" [class.form-mode-badge--edit]="isEditMode()">
+          <span class="material-symbols-outlined">{{ isEditMode() ? 'edit' : 'add_circle' }}</span>
+          {{ isEditMode() ? 'Edit Product' : 'New Product' }}
+        </span>
+        <button class="btn-new" (click)="onSave()" [disabled]="isSaving() || isLoading()">
+          <span class="material-symbols-outlined">{{ isSaving() ? 'hourglass_empty' : 'save' }}</span>
+          {{ isSaving() ? 'Saving…' : 'Save Product' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Feedback Banners -->
+    @if(saveSuccess()) {
+      <div class="pf-banner pf-banner--success" role="status">
+        <span class="material-symbols-outlined">check_circle</span>
+        Product saved successfully!
+      </div>
+    }
+    @if(saveError()) {
+      <div class="pf-banner pf-banner--error" role="alert">
+        <span class="material-symbols-outlined">error</span>
+        {{ saveError() }}
+      </div>
+    }
+
+    <!-- Loading overlay for edit mode -->
+    @if(isLoading()) {
+      <div class="pf-loading">
+        <div class="pf-spinner"></div>
+        <p>Loading product…</p>
+      </div>
+    }
+
+    @if(!isLoading()) {
+      <!-- Product Form Container -->
+      <div class="form-container">
+
+        <!-- Product Name — large editable title -->
+        <div class="title-group">
+          <input
+            type="text"
+            id="productName"
+            class="title-input"
+            placeholder="Product Name"
+            [ngModel]="productName()"
+            (ngModelChange)="productName.set($event)" />
+          @if(isEditMode() && productId()) {
+            <span class="pf-id-badge">ID: {{ productId() }}</span>
+          }
+        </div>
+
+        <!-- Fields Section -->
+        <div class="fields-section">
+
+          <!-- Product Type -->
+          <div class="field-row">
+            <label class="field-label" for="productType">Product Type</label>
+            <select
+              id="productType"
+              class="unit-select"
+              [value]="productType()"
+              (change)="productType.set($any($event.target).value)">
+              @for(type of types; track type) {
+                <option [value]="type">{{ type }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Sales Price -->
+          <div class="field-row">
+            <label class="field-label" for="salesPrice">Sales Price (₹)</label>
+            <input
+              type="number"
+              id="salesPrice"
+              class="short-input"
+              [ngModel]="salesPrice()"
+              (ngModelChange)="salesPrice.set($event)"
+              min="0"
+              step="0.01"
+              placeholder="0.00" />
+          </div>
+
+          <!-- Cost Price -->
+          <div class="field-row">
+            <label class="field-label" for="costPrice">Cost Price (₹)</label>
+            <input
+              type="number"
+              id="costPrice"
+              class="short-input"
+              [ngModel]="costPrice()"
+              (ngModelChange)="costPrice.set($event)"
+              min="0"
+              step="0.01"
+              placeholder="0.00" />
+          </div>
+
+          <!-- Status -->
+          <div class="field-row">
+            <label class="field-label" for="status">Status</label>
+            <select
+              id="status"
+              class="unit-select"
+              [value]="status()"
+              (change)="status.set($any($event.target).value)">
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+            </select>
+          </div>
+
+          <!-- Is Recurring -->
+          <div class="field-row">
+            <label class="field-label" for="isRecurring">Recurring Product</label>
+            <label class="pf-toggle">
+              <input
+                type="checkbox"
+                id="isRecurring"
+                [ngModel]="isRecurring()"
+                (ngModelChange)="isRecurring.set($event)" />
+              <span class="pf-toggle-track">
+                <span class="pf-toggle-thumb"></span>
+              </span>
+              <span class="pf-toggle-label">{{ isRecurring() ? 'Yes' : 'No' }}</span>
+            </label>
+          </div>
+
+          <!-- Short Description -->
+          <div class="field-row field-row--full">
+            <label class="field-label" for="shortDescription">Short Description</label>
+            <input
+              type="text"
+              id="shortDescription"
+              class="short-input"
+              style="width: 100%; max-width: 800px;"
+              [ngModel]="shortDescription()"
+              (ngModelChange)="shortDescription.set($event)"
+              placeholder="Brief summary shown on product cards" />
+          </div>
+
+          <!-- Image URL -->
+          <div class="field-row field-row--full">
+            <label class="field-label" for="imageUrls">Image URLs</label>
+            <input
+              type="url"
+              id="imageUrls"
+              class="short-input"
+              style="width: 100%; max-width: 800px;"
+              [ngModel]="imageUrls()"
+              (ngModelChange)="imageUrls.set($event)"
+              placeholder="https://example.com/product.jpg" />
+          </div>
+
+          <!-- Description -->
+          <div class="field-row field-row--full">
+            <label class="field-label" for="description">Description</label>
+            <textarea
+              id="description"
+              class="short-input"
+              style="width: 100%; max-width: 800px; resize: vertical; min-height: 100px;"
+              [ngModel]="description()"
+              (ngModelChange)="description.set($event)"
+              placeholder="Detailed product description…"></textarea>
+          </div>
+
+          <!-- Terms and Conditions -->
+          <div class="field-row field-row--full">
+            <label class="field-label" for="termsAndConditions">Terms of Service</label>
+            <textarea
+              id="termsAndConditions"
+              class="short-input"
+              style="width: 100%; max-width: 800px; resize: vertical; min-height: 80px;"
+              [ngModel]="termsAndConditions()"
+              (ngModelChange)="termsAndConditions.set($event)"
+              placeholder="Usage terms and license conditions…"></textarea>
+          </div>
+
+        </div>
+      </div>
+    }
+
+</main>

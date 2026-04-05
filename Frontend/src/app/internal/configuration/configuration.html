@@ -1,0 +1,72 @@
+<main class="internal-content">
+    <section class="config-hub" aria-label="Configuration modules">
+      <h2 class="config-hub__title">Configuration modules</h2>
+      <p class="config-hub__intro">Open subscription settings the same way from here or from the Configuration menu above.</p>
+      <div class="config-hub__grid">
+        @for (mod of hubModules; track mod.path) {
+          <a [routerLink]="mod.path" class="config-hub__card">
+            <span class="material-symbols-outlined config-hub__icon" aria-hidden="true">{{ mod.icon }}</span>
+            <span class="config-hub__card-title">{{ mod.title }}</span>
+            <span class="config-hub__card-desc">{{ mod.description }}</span>
+          </a>
+        }
+      </div>
+    </section>
+
+    <div class="action-bar">
+      <div class="action-left">
+        <a class="btn-new" [routerLink]="paths.attributeNew">
+          <span class="material-symbols-outlined">add</span>
+          New
+        </a>
+        <div class="action-icons">
+          <button type="button" class="icon-btn" (click)="onDelete()" title="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+          <button type="button" class="icon-btn" (click)="onGridAction()" title="Filter">
+            <span class="material-symbols-outlined">tune</span>
+          </button>
+        </div>
+      </div>
+      <div class="action-search-wrap">
+        <div class="search-bar search-bar--mockup">
+          <span class="material-symbols-outlined search-icon">search</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="search bar"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)" />
+        </div>
+      </div>
+      <div class="action-right-spacer" aria-hidden="true"></div>
+    </div>
+
+    <div class="config-panel">
+      <div class="config-panel-inner">
+        <table class="config-grid-table" aria-label="Configuration list">
+          <thead>
+            <tr>
+              <th class="col-check"></th>
+              <th>Attribute Name</th>
+              <th>Value</th>
+              <th>Extra price</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredRows(); track row.id) {
+              <tr>
+                <td class="col-check"><input type="checkbox" /></td>
+                <td>{{ row.attributeName }}</td>
+                <td>{{ row.value }}</td>
+                <td>{{ row.extraPrice }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="config-hint">
+        For example: attribute name is <strong>brand</strong>, value is <strong>color</strong>, along with extra price.
+      </p>
+    </div>
+  </main>

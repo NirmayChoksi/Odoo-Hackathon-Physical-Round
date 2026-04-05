@@ -1,0 +1,334 @@
+<main class="internal-content rep-main">
+    <header class="rep-head">
+      <div>
+        <h1 class="rep-title">Reporting</h1>
+        <p class="rep-sub">Analytics for subscriptions, revenue, payments, and overdue invoices.</p>
+      </div>
+      <div class="rep-export rep-export--screen">
+        <button type="button" class="rep-btn rep-btn--ghost" (click)="downloadCsv('revenue')">CSV — Revenue trend</button>
+        <button type="button" class="rep-btn rep-btn--ghost" (click)="downloadCsv('revenue_table')">CSV — Revenue table</button>
+        <button type="button" class="rep-btn rep-btn--ghost" (click)="downloadCsv('payments')">CSV — Payments</button>
+        <button type="button" class="rep-btn rep-btn--ghost" (click)="downloadCsv('subscriptions')">CSV — Subscriptions</button>
+        <button type="button" class="rep-btn rep-btn--ghost" (click)="downloadCsv('invoices')">CSV — Overdue</button>
+        <button type="button" class="rep-btn rep-btn--ghost" (click)="exportExcel()">Excel (CSV)</button>
+        <button type="button" class="rep-btn rep-btn--ghost" (click)="printPage()">Print</button>
+        <button type="button" class="rep-btn rep-btn--ghost" (click)="exportPdf()">PDF (Print)</button>
+      </div>
+    </header>
+
+    <section class="rep-filters" aria-label="Report filters">
+      <div class="rep-filters__grid">
+        <label class="rep-field">
+          <span class="rep-field__label">From</span>
+          <input type="date" class="rep-input" [ngModel]="fromDate()" (ngModelChange)="fromDate.set($event)" />
+        </label>
+        <label class="rep-field">
+          <span class="rep-field__label">To</span>
+          <input type="date" class="rep-input" [ngModel]="toDate()" (ngModelChange)="toDate.set($event)" />
+        </label>
+        <label class="rep-field">
+          <span class="rep-field__label">Customer</span>
+          <select class="rep-input" [ngModel]="customerId()" (ngModelChange)="customerId.set($event)">
+            <option value="">All</option>
+            @for (c of meta()?.customers ?? []; track c.id) {
+              <option [value]="'' + c.id">{{ c.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="rep-field">
+          <span class="rep-field__label">Product</span>
+          <select class="rep-input" [ngModel]="productId()" (ngModelChange)="productId.set($event)">
+            <option value="">All</option>
+            @for (p of meta()?.products ?? []; track p.id) {
+              <option [value]="'' + p.id">{{ p.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="rep-field">
+          <span class="rep-field__label">Plan</span>
+          <select class="rep-input" [ngModel]="planId()" (ngModelChange)="planId.set($event)">
+            <option value="">All</option>
+            @for (pl of meta()?.plans ?? []; track pl.id) {
+              <option [value]="'' + pl.id">{{ pl.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="rep-field">
+          <span class="rep-field__label">Subscription status</span>
+          <select class="rep-input" [ngModel]="subscriptionStatus()" (ngModelChange)="subscriptionStatus.set($event)">
+            <option value="">All</option>
+            @for (st of subscriptionStatuses; track st) {
+              <option [value]="st">{{ st }}</option>
+            }
+          </select>
+        </label>
+        <label class="rep-field">
+          <span class="rep-field__label">Invoice status</span>
+          <select class="rep-input" [ngModel]="invoiceStatus()" (ngModelChange)="invoiceStatus.set($event)">
+            <option value="">All</option>
+            @for (st of invoiceStatuses; track st) {
+              <option [value]="st">{{ st }}</option>
+            }
+          </select>
+        </label>
+        <label class="rep-field">
+          <span class="rep-field__label">Payment status</span>
+          <select class="rep-input" [ngModel]="paymentStatus()" (ngModelChange)="paymentStatus.set($event)">
+            <option value="">All</option>
+            @for (st of paymentStatuses; track st) {
+              <option [value]="st">{{ st }}</option>
+            }
+          </select>
+        </label>
+        <label class="rep-field">
+          <span class="rep-field__label">Billing period</span>
+          <select class="rep-input" [ngModel]="billingPeriod()" (ngModelChange)="billingPeriod.set($event)">
+            <option value="">All</option>
+            @for (bp of billingPeriods; track bp) {
+              <option [value]="bp">{{ bp }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <div class="rep-filters__actions">
+        <button type="button" class="rep-btn rep-btn--primary" [disabled]="loading()" (click)="applyFilters()">Apply</button>
+        <button type="button" class="rep-btn rep-btn--ghost" [disabled]="loading()" (click)="resetFilters()">Reset</button>
+      </div>
+    </section>
+
+    @if (error()) {
+      <p class="rep-error" role="alert">{{ error() }}</p>
+    }
+
+    @if (loading()) {
+      <p class="rep-loading">Loading reports…</p>
+    }
+
+    @if (pageData(); as d) {
+      <section class="rep-cards" aria-label="Summary">
+        <article class="rep-card">
+          <h2 class="rep-card__title">Active subscriptions</h2>
+          <p class="rep-card__metric">{{ d.summary.activeSubscriptions }}</p>
+          <ul class="rep-card__list">
+            <li><span>New (range)</span><strong>{{ d.summary.newSubscriptions }}</strong></li>
+            <li><span>Renewed</span><strong>{{ d.summary.renewedSubscriptions }}</strong></li>
+            <li><span>Closed</span><strong>{{ d.summary.closedSubscriptions }}</strong></li>
+          </ul>
+        </article>
+        <article class="rep-card">
+          <h2 class="rep-card__title">Revenue</h2>
+          <p class="rep-card__metric">₹{{ d.summary.totalRevenue | number: '1.0-0' }}</p>
+          <ul class="rep-card__list">
+            <li><span>This month</span><strong>₹{{ d.summary.monthlyRevenue | number: '1.0-0' }}</strong></li>
+            <li><span>This year</span><strong>₹{{ d.summary.yearlyRevenue | number: '1.0-0' }}</strong></li>
+            <li><span>Avg / active sub</span><strong>₹{{ d.summary.avgRevenuePerSubscription | number: '1.0-0' }}</strong></li>
+          </ul>
+        </article>
+        <article class="rep-card">
+          <h2 class="rep-card__title">Payments</h2>
+          <p class="rep-card__metric">{{ d.summary.totalPayments }}</p>
+          <ul class="rep-card__list">
+            <li><span>Success</span><strong>{{ d.summary.successfulPayments }}</strong></li>
+            <li><span>Pending</span><strong>{{ d.summary.pendingPayments }}</strong></li>
+            <li><span>Failed</span><strong>{{ d.summary.failedPayments }}</strong></li>
+            <li><span>Refunded</span><strong>{{ d.summary.refundedPayments }}</strong></li>
+          </ul>
+        </article>
+        <article class="rep-card">
+          <h2 class="rep-card__title">Overdue invoices</h2>
+          <p class="rep-card__metric">{{ d.summary.overdueInvoices }}</p>
+          <ul class="rep-card__list">
+            <li><span>Amount</span><strong>₹{{ d.summary.overdueAmount | number: '1.0-0' }}</strong></li>
+            <li><span>Customers</span><strong>{{ d.summary.overdueCustomers }}</strong></li>
+            <li><span>Highest invoice</span><strong>₹{{ d.summary.highestOverdueAmount | number: '1.0-0' }}</strong></li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="rep-charts" aria-label="Charts">
+        <div class="rep-chart-panel">
+          <h3 class="rep-chart-panel__title">Revenue trend</h3>
+          <div class="rep-bars">
+            @for (row of d.revenueTrend; track row.label) {
+              <div class="rep-bar-wrap">
+                <div class="rep-bar" [style.height.%]="barHeight(row)"></div>
+                <span class="rep-bar-label">{{ row.label }}</span>
+                <span class="rep-bar-val">₹{{ row.revenue | number: '1.0-0' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="rep-chart-panel">
+          <h3 class="rep-chart-panel__title">Subscription status</h3>
+          <div class="rep-donut-row">
+            <div class="rep-donut" [style.background]="donutGradient(d.subscriptionStatusChart)"></div>
+            <ul class="rep-legend">
+              @for (s of d.subscriptionStatusChart; track s.status; let i = $index) {
+                <li>
+                  <span class="rep-legend__swatch" [style.backgroundColor]="legendColor(i)"></span>
+                  {{ s.status }} — {{ s.count }}
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+        <div class="rep-chart-panel">
+          <h3 class="rep-chart-panel__title">Payment status</h3>
+          <div class="rep-donut-row">
+            <div class="rep-donut rep-donut--sm" [style.background]="donutGradient(d.paymentStatusChart)"></div>
+            <ul class="rep-legend">
+              @for (s of d.paymentStatusChart; track s.status; let i = $index) {
+                <li>
+                  <span class="rep-legend__swatch" [style.backgroundColor]="legendColor(i)"></span>
+                  {{ s.status }} — {{ s.count }}
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+        <div class="rep-chart-panel">
+          <h3 class="rep-chart-panel__title">Overdue trend</h3>
+          <div class="rep-bars rep-bars--overdue">
+            @for (row of d.overdueTrend; track row.label) {
+              <div class="rep-bar-wrap">
+                <div class="rep-bar rep-bar--amber" [style.height.%]="overdueBarHeight(row.overdueAmount)"></div>
+                <span class="rep-bar-label">{{ row.label }}</span>
+                <span class="rep-bar-val">₹{{ row.overdueAmount | number: '1.0-0' }} ({{ row.count }})</span>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="rep-tables" aria-label="Detail tables">
+        <div class="rep-tabs">
+          <button type="button" class="rep-tab" [class.rep-tab--on]="tableTab() === 'subs'" (click)="tableTab.set('subs')">
+            Active subscriptions
+          </button>
+          <button type="button" class="rep-tab" [class.rep-tab--on]="tableTab() === 'revenue'" (click)="tableTab.set('revenue')">
+            Revenue
+          </button>
+          <button type="button" class="rep-tab" [class.rep-tab--on]="tableTab() === 'payments'" (click)="tableTab.set('payments')">
+            Payments
+          </button>
+          <button type="button" class="rep-tab" [class.rep-tab--on]="tableTab() === 'overdue'" (click)="tableTab.set('overdue')">
+            Overdue invoices
+          </button>
+        </div>
+
+        @if (tableTab() === 'subs') {
+          <div class="rep-table-wrap">
+            <table class="rep-table">
+              <thead>
+                <tr>
+                  <th>Number</th>
+                  <th>Customer</th>
+                  <th>Plan</th>
+                  <th>Start</th>
+                  <th>Expiration</th>
+                  <th>Status</th>
+                  <th class="rep-num">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of d.activeSubscriptionsTable; track r.subscriptionNumber + r.startDate) {
+                  <tr>
+                    <td>{{ r.subscriptionNumber }}</td>
+                    <td>{{ r.customerName }}</td>
+                    <td>{{ r.planName }}</td>
+                    <td>{{ r.startDate }}</td>
+                    <td>{{ r.expirationDate ?? '—' }}</td>
+                    <td>{{ r.status }}</td>
+                    <td class="rep-num">₹{{ r.totalAmount | number: '1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (tableTab() === 'revenue') {
+          <div class="rep-table-wrap">
+            <table class="rep-table">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th class="rep-num">Invoiced</th>
+                  <th class="rep-num">Paid</th>
+                  <th class="rep-num">Outstanding</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of d.revenueTable; track r.month) {
+                  <tr>
+                    <td>{{ r.month }}</td>
+                    <td class="rep-num">₹{{ r.invoicedRevenue | number: '1.2-2' }}</td>
+                    <td class="rep-num">₹{{ r.paidRevenue | number: '1.2-2' }}</td>
+                    <td class="rep-num">₹{{ r.outstandingRevenue | number: '1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (tableTab() === 'payments') {
+          <div class="rep-table-wrap">
+            <table class="rep-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Invoice</th>
+                  <th>Method</th>
+                  <th class="rep-num">Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of d.paymentsTable; track r.invoiceNumber + r.paymentDate + r.amount) {
+                  <tr>
+                    <td>{{ r.paymentDate }}</td>
+                    <td>{{ r.customerName }}</td>
+                    <td>{{ r.invoiceNumber }}</td>
+                    <td>{{ r.paymentMethod }}</td>
+                    <td class="rep-num">₹{{ r.amount | number: '1.2-2' }}</td>
+                    <td>{{ r.status }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (tableTab() === 'overdue') {
+          <div class="rep-table-wrap">
+            <table class="rep-table">
+              <thead>
+                <tr>
+                  <th>Invoice</th>
+                  <th>Customer</th>
+                  <th>Due</th>
+                  <th class="rep-num">Amount</th>
+                  <th>Days overdue</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of d.overdueInvoicesTable; track r.invoiceNumber) {
+                  <tr>
+                    <td>{{ r.invoiceNumber }}</td>
+                    <td>{{ r.customerName }}</td>
+                    <td>{{ r.dueDate }}</td>
+                    <td class="rep-num">₹{{ r.dueAmount | number: '1.2-2' }}</td>
+                    <td>{{ r.daysOverdue }}</td>
+                    <td>{{ r.invoiceStatus }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+  </main>

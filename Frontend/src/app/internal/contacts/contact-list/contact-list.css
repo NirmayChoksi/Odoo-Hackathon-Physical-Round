@@ -1,0 +1,26 @@
+/* ─── Contact List — alignment with SubSync Premium ─── */
+
+.action-bar {
+  margin-bottom: 2rem;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.empty-state .material-symbols-outlined {
+  color: var(--pal-lavender);
+  opacity: 0.5;
+}
+
+/* Responsive Action Bar */
+@media (max-width: 768px) {
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

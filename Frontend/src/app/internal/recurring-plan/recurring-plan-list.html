@@ -1,0 +1,138 @@
+<app-confirm-dialog
+  [open]="showDeleteConfirm()"
+  title="Deactivate recurring plan"
+  [message]="deleteConfirmMessage()"
+  confirmLabel="Deactivate"
+  confirmIcon="delete_forever"
+  variant="danger"
+  [busy]="isDeletingList()"
+  (confirmed)="performListDelete()"
+  (cancelled)="closeDeleteConfirm()"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showNoticeDialog()"
+  [title]="noticeTitle()"
+  [message]="noticeMessage()"
+  confirmLabel="OK"
+  confirmIcon="check"
+  variant="primary"
+  [showCancel]="false"
+  (confirmed)="closeNoticeDialog()"
+  (cancelled)="closeNoticeDialog()"
+></app-confirm-dialog>
+
+<main class="internal-content rpl-page">
+
+  <div class="action-bar">
+    <div class="action-left">
+      <button type="button" class="btn-new" (click)="goToNew()">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
+      <div class="rpl-meta">
+        @if (!isLoading()) {
+          <span>{{ filteredPlans().length }} shown · {{ total() }} total</span>
+        }
+      </div>
+    </div>
+    <div class="action-right">
+      <div class="search-bar">
+        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by name or period…"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)" />
+      </div>
+      <select
+        class="rpl-status-select"
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="onStatusChange($event)">
+        <option value="ALL">All statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+      </select>
+    </div>
+  </div>
+
+  @if (loadError()) {
+    <div class="rpl-banner rpl-banner--error" role="alert">
+      <span class="material-symbols-outlined">error</span>
+      {{ loadError() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="rpl-loading">
+      <div class="rpl-spinner"></div>
+      <p>Loading recurring plans…</p>
+    </div>
+  }
+
+  @if (!isLoading() && filteredPlans().length > 0) {
+    <div class="data-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Billing</th>
+            <th class="col-right">Price</th>
+            <th>Status</th>
+            <th class="rpl-col-actions" aria-label="Actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of filteredPlans(); track p.plan_id) {
+            <tr class="data-row rpl-row" (click)="goToPlan(p.plan_id)">
+              <td class="rpl-name">{{ p.plan_name }}</td>
+              <td>{{ formatPeriod(p.billing_period) }}</td>
+              <td class="col-right">{{ p.price | number: '1.2-2' }}</td>
+              <td>
+                <span class="status-pill" [attr.data-status]="p.status">{{ p.status }}</span>
+              </td>
+              <td class="rpl-col-actions">
+                <button
+                  type="button"
+                  class="rpl-icon-btn"
+                  [attr.title]="p.status === 'ACTIVE' ? 'Deactivate plan' : 'Already inactive'"
+                  [disabled]="isLoading() || isDeletingList() || p.status !== 'ACTIVE'"
+                  (click)="openDeleteConfirm(p, $event)">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (totalPages() > 1) {
+        <div class="subs-pagination rpl-pagination">
+          <button type="button" class="subs-page-btn" [disabled]="page() <= 1" (click)="prevPage()">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <span class="subs-page-info">Page {{ page() }} of {{ totalPages() }} · {{ total() }} plans</span>
+          <button
+            type="button"
+            class="subs-page-btn"
+            [disabled]="page() >= totalPages()"
+            (click)="nextPage()">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading() && !loadError() && filteredPlans().length === 0) {
+    <div class="rpl-empty">
+      <span class="material-symbols-outlined">event_repeat</span>
+      <p>No recurring plans match your filters.</p>
+      <button type="button" class="btn-new" (click)="goToNew()">
+        <span class="material-symbols-outlined">add</span>
+        Create a plan
+      </button>
+    </div>
+  }
+</main>
