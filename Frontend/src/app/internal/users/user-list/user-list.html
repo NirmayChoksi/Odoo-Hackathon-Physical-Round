@@ -1,0 +1,67 @@
+<div class="sf-page-container">
+  <div class="sf-header">
+    <div class="sf-breadcrumb">
+      <a [routerLink]="paths.subscriptions" class="sf-breadcrumb__link">Dashboard</a>
+      <span class="sf-breadcrumb__separator">/</span>
+      <span class="sf-breadcrumb__current">Users</span>
+    </div>
+    <div class="sf-header__main">
+      <h1 class="sf-title">Users</h1>
+      <div class="sf-actions">
+        <button class="sf-btn sf-btn--primary" (click)="onCreate()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-content">
+    @if (isLoading()) {
+      <div class="sf-loading">
+        <div class="sf-spinner"></div>
+        <p>Loading users...</p>
+      </div>
+    } @else if (error()) {
+      <div class="sf-error">
+        <p>{{ error() }}</p>
+        <button class="sf-btn sf-btn--outline" (click)="loadUsers()">Retry</button>
+      </div>
+    } @else {
+      <div class="sf-card">
+        <table class="sf-table">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users(); track user.user_id) {
+              <tr class="sf-table__row" (click)="goToUser(user.user_id)">
+                <td>{{ user.full_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role_name }}</td>
+                <td>{{ user.phone || '-' }}</td>
+                <td>
+                  <span class="sf-badge" [class.sf-badge--success]="user.status === 'ACTIVE'" 
+                        [class.sf-badge--warning]="user.status === 'INACTIVE'"
+                        [class.sf-badge--danger]="user.status === 'SUSPENDED'">
+                    {{ user.status }}
+                  </span>
+                </td>
+                <td>{{ user.created_at | date:'mediumDate' }}</td>
+              </tr>
+            }
+            @if (users().length === 0) {
+              <tr>
+                <td colspan="6" class="sf-table__empty">No users found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

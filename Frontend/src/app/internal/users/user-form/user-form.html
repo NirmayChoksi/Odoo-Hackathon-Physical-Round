@@ -1,93 +1,96 @@
 <main class="sf-main">
     <header class="sf-page-head">
       <nav class="sf-breadcrumb" aria-label="Breadcrumb">
-        <a [routerLink]="'/subscription/subscriptions'" class="sf-breadcrumb__link">Users / Contacts</a>
+        <a [routerLink]="paths.users" class="sf-breadcrumb__link">Users</a>
         <span class="material-symbols-outlined sf-breadcrumb__sep" aria-hidden="true">chevron_right</span>
         <span class="sf-breadcrumb__current">{{ name() || 'New user' }}</span>
       </nav>
       <div class="sf-page-head__row">
         <div>
           <h1 class="sf-title">{{ name() || 'New user' }}</h1>
-          <p class="sf-subtitle">Manage user account details and linked contact record.</p>
+          <p class="sf-subtitle">Manage user account details and login permissions.</p>
         </div>
       </div>
     </header>
 
-    <div class="sf-toolbar">
-      <div class="sf-toolbar__left">
-        <button type="button" class="sf-btn btn-secondary" (click)="onNew()">
-          <span class="material-symbols-outlined">add</span>
-          New
-        </button>
-        <span class="sf-toolbar__divider" aria-hidden="true"></span>
-        <button type="button" class="sf-btn btn-primary" (click)="onSave()">
-          <span class="material-symbols-outlined">save</span>
-          Save
-        </button>
-        <div class="sf-toolbar__icons">
-          <button type="button" class="icon-btn" title="Delete" (click)="onDelete()">
-            <span class="material-symbols-outlined">delete</span>
+    @if (isLoading()) {
+      <div class="sf-loading">
+        <div class="sf-spinner"></div>
+        <p>Loading user details...</p>
+      </div>
+    } @else {
+      <div class="sf-toolbar">
+        <div class="sf-toolbar__left">
+          <button type="button" class="sf-btn btn-secondary" (click)="onNew()">
+            <span class="material-symbols-outlined">add</span>
+            New
           </button>
-          <button type="button" class="icon-btn" title="Print">
-            <span class="material-symbols-outlined">print</span>
+          <span class="sf-toolbar__divider" aria-hidden="true"></span>
+          <button type="button" class="sf-btn btn-primary" (click)="onSave()">
+            <span class="material-symbols-outlined">save</span>
+            Save
           </button>
+          <div class="sf-toolbar__icons">
+            <button type="button" class="icon-btn" title="Delete" (click)="onDelete()">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+          <button type="button" class="sf-btn btn-secondary" (click)="onChangePassword()">Change password</button>
         </div>
-        <button type="button" class="sf-btn btn-secondary" (click)="onChangePassword()">Change password</button>
       </div>
-    </div>
 
-    <section class="sf-card" aria-labelledby="sf-user-heading">
-      <div class="sf-card__header">
-        <h2 id="sf-user-heading" class="sf-card__title">User details</h2>
-      </div>
-      <div class="sf-fields">
-        <!-- Left column -->
-        <div class="form-layout">
-          <div class="row-group">
-            <label class="form-label" for="uf-name">Name</label>
-            <input id="uf-name" type="text" class="sf-control" placeholder="Full name"
-              [ngModel]="name()" (ngModelChange)="name.set($event)" />
-          </div>
-          <div class="row-group">
-            <label class="form-label" for="uf-email">Email</label>
-            <input id="uf-email" type="email" class="sf-control" placeholder="user@example.com"
-              [ngModel]="email()" (ngModelChange)="email.set($event)" />
-          </div>
-          <div class="row-group">
-            <label class="form-label" for="uf-phone">Phone number</label>
-            <input id="uf-phone" type="text" class="sf-control" placeholder="+1 555-0100"
-              [ngModel]="phone()" (ngModelChange)="phone.set($event)" />
-          </div>
-          <div class="field-section-title">Address</div>
-          <div class="row-group">
-            <label class="form-label" for="uf-addr1">Line 1</label>
-            <input id="uf-addr1" type="text" class="sf-control" placeholder="Street address"
-              [ngModel]="address1()" (ngModelChange)="address1.set($event)" />
-          </div>
-          <div class="row-group">
-            <label class="form-label" for="uf-addr2">Line 2</label>
-            <input id="uf-addr2" type="text" class="sf-control" placeholder="Apt, suite, etc."
-              [ngModel]="address2()" (ngModelChange)="address2.set($event)" />
-          </div>
-          <div class="row-group">
-            <label class="form-label" for="uf-addr3">City / State / Zip</label>
-            <input id="uf-addr3" type="text" class="sf-control" placeholder="New York, NY 10001"
-              [ngModel]="address3()" (ngModelChange)="address3.set($event)" />
-          </div>
+      <section class="sf-card" aria-labelledby="sf-user-heading">
+        <div class="sf-card__header">
+          <h2 id="sf-user-heading" class="sf-card__title">User details</h2>
         </div>
+        <div class="sf-fields">
+          <!-- Left column -->
+          <div class="form-layout">
+            <div class="row-group">
+              <label class="form-label" for="uf-name">Name</label>
+              <input id="uf-name" type="text" class="sf-control" placeholder="Full name"
+                [ngModel]="name()" (ngModelChange)="name.set($event)" />
+            </div>
+            <div class="row-group">
+              <label class="form-label" for="uf-email">Email</label>
+              <input id="uf-email" type="email" class="sf-control" placeholder="user@example.com"
+                [ngModel]="email()" (ngModelChange)="email.set($event)" />
+            </div>
+            <div class="row-group">
+              <label class="form-label" for="uf-phone">Phone number</label>
+              <input id="uf-phone" type="text" class="sf-control" placeholder="+1 555-0100"
+                [ngModel]="phone()" (ngModelChange)="phone.set($event)" />
+            </div>
+          </div>
 
-        <!-- Right column -->
-        <div class="form-layout">
-          <div class="row-group">
-            <label class="form-label" for="uf-contact">Related contact</label>
-            <input id="uf-contact" type="text" class="sf-control" placeholder="Auto-generated"
-              [ngModel]="relatedContact()" (ngModelChange)="relatedContact.set($event)" />
+          <!-- Right column -->
+          <div class="form-layout">
+            <div class="row-group">
+              <label class="form-label" for="uf-role">Role</label>
+              <select id="uf-role" class="sf-control" [ngModel]="roleId()" (ngModelChange)="roleId.set($event)">
+                <option [value]="1">Admin</option>
+                <option [value]="2">Internal User</option>
+                <option [value]="3">External User</option>
+              </select>
+            </div>
+            <div class="row-group">
+              <label class="form-label" for="uf-status">Status</label>
+              <select id="uf-status" class="sf-control" [ngModel]="status()" (ngModelChange)="status.set($event)">
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+                <option value="SUSPENDED">Suspended</option>
+              </select>
+            </div>
+            @if (isChangingPassword()) {
+              <div class="row-group">
+                <label class="form-label" for="uf-password">Password</label>
+                <input id="uf-password" type="password" class="sf-control" placeholder="Set new password"
+                  [ngModel]="password()" (ngModelChange)="password.set($event)" />
+                <p class="sf-help-text" *ngIf="userId()">Leave empty to keep current password.</p>
+              </div>
+            }
           </div>
-          <!-- <p class="sf-info-note">
-            <span class="material-symbols-outlined">info</span>
-            By default one contact record is created and linked here. A user can have multiple contacts since the contact model is separate.
-          </p> -->
         </div>
-      </div>
-    </section>
+      </section>
+    }
   </main>

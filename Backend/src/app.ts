@@ -26,6 +26,7 @@ import authRoutes from "./modules/auth/auth.routes";
 import taxesRoutes from "./modules/internal/taxes/taxes.routes";
 import discountsRoutes from "./modules/internal/discounts/discounts.routes";
 import attributesRoutes from "./modules/internal/attributes/attributes.routes";
+import internalUserRoutes from "./modules/internal/users/user.routes";
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use("/api/internal/config/payment-terms", paymentTermConfigRoutes);
 app.use("/api/internal/taxes", taxesRoutes);
 app.use("/api/internal/discounts", discountsRoutes);
 app.use("/api/internal/attributes", attributesRoutes);
+app.use("/api/internal/users", internalUserRoutes);
 
 app.use(errorMiddleware);
 

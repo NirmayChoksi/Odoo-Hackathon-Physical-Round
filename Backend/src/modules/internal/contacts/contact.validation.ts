@@ -6,10 +6,13 @@ export function parseCreateContact(
 ): { ok: true; value: CreateContactBody } | { ok: false; errors: string[] } {
   const b = req.body as Record<string, unknown>;
   const contactName = b.contactName != null ? String(b.contactName).trim() : "";
+  const customerId = Number(b.customerId);
+  if (isNaN(customerId) || customerId < 1) return { ok: false, errors: ["customerId is required and must be a positive number"] };
   if (!contactName) return { ok: false, errors: ["contactName is required"] };
   return {
     ok: true,
     value: {
+      customerId,
       contactName,
       email: b.email != null ? String(b.email).trim() : undefined,
       phone: b.phone != null ? String(b.phone).trim() : undefined,

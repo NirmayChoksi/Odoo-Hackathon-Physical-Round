@@ -32,11 +32,29 @@ export const subscriptionAppChildRoutes: Routes = [
   },
   {
     path: 'users',
-    loadComponent: () => import('./users/user-form/user-form').then((m) => m.UserFormComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./users/user-list/user-list').then((m) => m.UserListComponent),
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./users/user-form/user-form').then((m) => m.UserFormComponent),
+      },
+    ]
   },
   {
     path: 'contacts',
-    loadComponent: () => import('./contacts/contact-form/contact-form').then((m) => m.ContactFormComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./contacts/contact-list/contact-list').then((m) => m.ContactListComponent),
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./contacts/contact-form/contact-form').then((m) => m.ContactFormComponent),
+      },
+    ]
   },
   {
     path: 'payment-term',

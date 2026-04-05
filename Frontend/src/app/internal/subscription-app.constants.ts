@@ -28,8 +28,8 @@ export type SubscriptionNavDropdownItem = {
 };
 
 export const USERS_CONTACTS_DROPDOWN_ITEMS: readonly SubscriptionNavDropdownItem[] = [
-  { label: 'Users', path: SUBSCRIPTION_APP_PATHS.users, exactActive: true },
-  { label: 'Contacts', path: SUBSCRIPTION_APP_PATHS.contacts, exactActive: true },
+  { label: 'Users', path: SUBSCRIPTION_APP_PATHS.users, exactActive: false },
+  { label: 'Contacts', path: SUBSCRIPTION_APP_PATHS.contacts, exactActive: false },
 ];
 
 export const CONFIGURATION_DROPDOWN_ITEMS: readonly SubscriptionNavDropdownItem[] = [

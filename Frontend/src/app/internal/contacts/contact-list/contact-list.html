@@ -1,0 +1,61 @@
+<div class="sf-page-container">
+  <div class="sf-header">
+    <div class="sf-breadcrumb">
+      <a [routerLink]="paths.subscriptions" class="sf-breadcrumb__link">Dashboard</a>
+      <span class="sf-breadcrumb__separator">/</span>
+      <span class="sf-breadcrumb__current">Contacts</span>
+    </div>
+    <div class="sf-header__main">
+      <h1 class="sf-title">Contacts</h1>
+      <div class="sf-actions">
+        <button class="sf-btn sf-btn--primary" (click)="onCreate()">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-content">
+    @if (isLoading()) {
+      <div class="sf-loading">
+        <div class="sf-spinner"></div>
+        <p>Loading contacts...</p>
+      </div>
+    } @else if (error()) {
+      <div class="sf-error">
+        <p>{{ error() }}</p>
+        <button class="sf-btn sf-btn--outline" (click)="loadContacts()">Retry</button>
+      </div>
+    } @else {
+      <div class="sf-card">
+        <table class="sf-table">
+          <thead>
+            <tr>
+              <th>Contact Name</th>
+              <th>Customer</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Designation</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (contact of contacts(); track contact.contact_id) {
+              <tr class="sf-table__row" (click)="goToContact(contact.contact_id)">
+                <td>{{ contact.contact_name }}</td>
+                <td>{{ contact.customer_name }}</td>
+                <td>{{ contact.email || '-' }}</td>
+                <td>{{ contact.phone || '-' }}</td>
+                <td>{{ contact.designation || '-' }}</td>
+                <td>{{ contact.created_at | date:'mediumDate' }}</td>
+              </tr>
+            }
+            @if (contacts().length === 0) {
+              <tr>
+                <td colspan="6" class="sf-table__empty">No contacts found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

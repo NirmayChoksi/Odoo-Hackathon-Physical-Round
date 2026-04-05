@@ -11,6 +11,16 @@ export const contactRepository = {
     return rows;
   },
 
+  async listAll(): Promise<RowDataPacket[]> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT c.*, cust.customer_name 
+       FROM contacts c
+       LEFT JOIN customers cust ON c.customer_id = cust.customer_id
+       ORDER BY c.contact_id DESC`
+    );
+    return rows;
+  },
+
   async getById(contactId: number): Promise<RowDataPacket | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
       `SELECT * FROM contacts WHERE contact_id = ? LIMIT 1`,
