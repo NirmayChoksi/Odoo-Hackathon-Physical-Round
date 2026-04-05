@@ -129,8 +129,8 @@
               <div class="product-card__desc">{{ product.description }}</div>
               <div class="product-card__footer">
                 <div class="product-card__price">
-                  <span class="price-val">₹{{ product.baseMonthlyPrice | number }}</span>
-                  <span class="price-unit">/ month</span>
+                  <span class="price-val">₹{{ product.displayPrice | number }}</span>
+                  <span class="price-unit">/ {{ product.billingPeriodLabel || 'month' }}</span>
                 </div>
               </div>
             </div>
