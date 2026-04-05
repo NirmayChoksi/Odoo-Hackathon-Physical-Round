@@ -1,59 +1,152 @@
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Layout matches wireframe; colours use existing theme tokens only. */
+
+.rp-page {
+  animation: rp-fade-in 0.35s ease-out;
 }
 
-.btn-subscription {
-  background: transparent;
-  border: 1.5px solid var(--color-primary);
-  color: var(--color-primary);
+@keyframes rp-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rp-toolbar.action-bar {
+  margin-bottom: 1.25rem;
+}
+
+.rp-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-lg, 10px);
+  color: var(--text-muted, rgba(255, 255, 255, 0.7));
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.rp-back-link .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.rp-back-link:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--pal-lavender) 10%, transparent);
+}
+
+.rp-subscription-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.35rem;
   padding: 0.5rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* ... existing styles for tables and footnote updated to match theme below ... */
-
-.products-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.products-table th, .products-table td {
-  padding: 1.25rem 1.5rem;
-  text-align: center;
-  border-bottom: 1.5px dotted rgba(241, 145, 109, 0.4) !important;
-}
-
-.products-table th:not(:last-child), .products-table td:not(:last-child) {
-  border-right: 1.5px dotted rgba(241, 145, 109, 0.4) !important;
-}
-
-.products-table tr:last-child td {
-  border-bottom: none;
-}
-
-.add-row-btn {
-  margin-top: 1.5rem;
+  border-radius: var(--radius-xl, 12px);
+  border: 1.5px solid var(--pal-coral, var(--color-primary));
   background: transparent;
-  border: 1px dashed var(--color-primary);
-  color: var(--color-primary);
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  cursor: pointer;
+  color: var(--pal-coral, var(--color-primary));
   font-weight: 600;
-  transition: all 0.2s;
+  font-size: 0.9375rem;
+  font-family: var(--font-body, inherit);
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color var(--transition, 0.2s), background var(--transition, 0.2s);
 }
 
-.add-row-btn:hover {
-  background: rgba(241, 145, 109, 0.06);
+.rp-subscription-btn:hover {
+  background: color-mix(in srgb, var(--pal-coral, var(--color-primary)) 12%, transparent);
+}
+
+.rp-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-xl, 12px);
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.rp-banner--error {
+  background: color-mix(in srgb, var(--pal-coral, #f87171) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pal-coral, #f87171) 35%, transparent);
+  color: var(--text-primary, #fff);
+}
+
+.rp-banner__dismiss {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.rp-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  color: var(--text-muted, rgba(255, 255, 255, 0.7));
+}
+
+.rp-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid color-mix(in srgb, var(--pal-coral, var(--color-primary)) 28%, transparent);
+  border-top-color: var(--pal-coral, var(--color-primary));
+  border-radius: 50%;
+  animation: rp-spin 0.75s linear infinite;
+}
+
+@keyframes rp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rp-form.form-container {
+  padding: 1.5rem 1.5rem 2rem;
+}
+
+.rp-form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.rp-row .form-label {
+  margin-bottom: 0.35rem;
 }
 
 .dual-input {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rp-inline-num {
+  width: 5.5rem;
+  min-width: 5.5rem;
+  flex: 0 0 auto;
+}
+
+.rp-unit-select {
+  flex: 1 1 12rem;
+  max-width: 16rem;
+  min-width: 8rem;
 }
 
 .unit-group {
@@ -62,14 +155,26 @@
   gap: 1rem;
 }
 
-/* Checkbox styling */
+.unit-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+}
+
+.rp-flags-wire {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2rem;
+  padding-top: 0.25rem;
+}
+
 .checkbox-container {
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text);
+  color: var(--text-primary, #fff);
   cursor: pointer;
   user-select: none;
 }
@@ -77,14 +182,227 @@
 .checkbox-container input {
   width: 18px;
   height: 18px;
-  accent-color: var(--color-primary);
+  accent-color: var(--pal-coral, var(--color-primary));
   cursor: pointer;
 }
 
-.helper-note {
+.rp-table-wrap.data-container {
+  margin-top: 0.5rem;
+  padding: 0;
+  overflow-x: auto;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.rp-form .rp-table-wrap {
+  border-radius: var(--radius-xl, 12px);
+  border: 1px solid var(--color-outline-variant);
+  background: color-mix(in srgb, var(--pal-navy) 40%, transparent);
+  padding: 0.5rem;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.products-table th,
+.products-table td {
+  padding: 1.1rem 1.25rem;
+  text-align: center;
+  border-bottom: 1.5px dotted color-mix(in srgb, var(--pal-coral, var(--color-primary)) 42%, transparent);
+}
+
+.products-table th:not(:last-child),
+.products-table td:not(:last-child) {
+  border-right: 1.5px dotted color-mix(in srgb, var(--pal-coral, var(--color-primary)) 42%, transparent);
+}
+
+.products-table tr:last-child td {
+  border-bottom: none;
+}
+
+.products-table .table-header {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-muted, rgba(255, 255, 255, 0.65));
+  letter-spacing: 0.03em;
+}
+
+.rp-products-meta {
+  margin: 0 0 0.75rem;
   font-size: 0.875rem;
-  color: var(--color-sketch-green);
-  line-height: 1.6;
+  color: var(--text-muted, rgba(255, 255, 255, 0.65));
+}
+
+.rp-products-meta--error {
+  color: color-mix(in srgb, var(--pal-coral, var(--color-primary)) 85%, #fff);
+}
+
+.rp-product-cell {
+  min-width: 12rem;
+}
+
+.table-select {
+  width: 100%;
+  min-width: 10rem;
+  max-width: 100%;
+  background: color-mix(in srgb, var(--pal-navy) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pal-coral, var(--color-primary)) 45%, transparent);
+  border-radius: var(--radius-lg, 8px);
+  color: var(--text-primary, #fff);
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.45rem 0.5rem;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.table-select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.table-select option {
+  background: var(--pal-navy, #1a1a24);
+  color: var(--text-primary, #fff);
+}
+
+.table-input {
+  width: 100%;
+  min-width: 4rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid color-mix(in srgb, var(--pal-coral, var(--color-primary)) 55%, transparent);
+  color: var(--pal-coral, var(--color-primary));
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-align: center;
+  padding: 0.35rem 0.25rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.table-input::placeholder {
+  color: color-mix(in srgb, var(--pal-lavender) 50%, transparent);
   font-weight: 500;
-  font-style: italic;
+}
+
+.table-input:focus {
+  border-bottom-color: var(--pal-coral, var(--color-primary));
+}
+
+.add-row-btn {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  background: transparent;
+  border: 1px dashed var(--pal-coral, var(--color-primary));
+  color: var(--pal-coral, var(--color-primary));
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-xl, 10px);
+  cursor: pointer;
+  font-weight: 600;
+  font-family: var(--font-body, inherit);
+  transition: background 0.2s;
+}
+
+.add-row-btn:hover {
+  background: color-mix(in srgb, var(--pal-coral, var(--color-primary)) 8%, transparent);
+}
+
+/* Screen: printable summary hidden (values still update for when user prints). */
+.rp-print-only {
+  display: none;
+}
+
+@media print {
+  .rp-toolbar,
+  .add-row-btn,
+  .rp-banner,
+  .rp-banner__dismiss,
+  .rp-loading,
+  .rp-products-meta {
+    display: none !important;
+  }
+
+  .rp-interactive {
+    display: none !important;
+  }
+
+  .rp-print-only {
+    display: block !important;
+    padding: 0;
+    color: #111;
+    font-family: system-ui, sans-serif;
+  }
+
+  .rp-print-title {
+    margin: 0 0 0.35rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #111;
+    border-bottom: 2px solid #333;
+    padding-bottom: 0.35rem;
+  }
+
+  .rp-print-meta {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    color: #444;
+  }
+
+  .rp-print-subtitle {
+    margin: 1.25rem 0 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111;
+  }
+
+  .rp-print-dl {
+    display: grid;
+    grid-template-columns: 10rem 1fr;
+    gap: 0.35rem 1rem;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .rp-print-dl dt {
+    margin: 0;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .rp-print-dl dd {
+    margin: 0;
+    color: #111;
+  }
+
+  .rp-print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-top: 0.35rem;
+  }
+
+  .rp-print-table th,
+  .rp-print-table td {
+    border: 1px solid #333;
+    padding: 0.4rem 0.5rem;
+    text-align: left;
+  }
+
+  .rp-print-table th {
+    background: #eee;
+    font-weight: 700;
+  }
+
+  .rp-form.form-container,
+  .rp-page {
+    background: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #111 !important;
+  }
 }

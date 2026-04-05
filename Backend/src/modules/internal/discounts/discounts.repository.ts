@@ -51,9 +51,9 @@ export const discountsRepository = {
         limit_usage, status, created_by
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        body.discountName, 
-        body.couponCode ?? null, 
-        body.discountType, 
+        body.discountName,
+        body.couponCode != null && String(body.couponCode).trim() !== "" ? String(body.couponCode).trim() : null,
+        body.discountType,
         body.discountValue,
         body.minimumPurchase ?? 0,
         body.minimumQuantity ?? 1,

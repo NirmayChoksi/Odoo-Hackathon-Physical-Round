@@ -71,6 +71,10 @@
   width: 100%;
 }
 
+.cd-actions--single .cd-btn--confirm {
+  flex: 1;
+}
+
 .cd-btn {
   flex: 1;
   padding: 11px 20px;

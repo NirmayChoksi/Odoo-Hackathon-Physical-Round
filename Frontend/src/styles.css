@@ -863,3 +863,20 @@ h3,
   outline: 2px solid var(--pal-lavender);
   outline-offset: 2px;
 }
+
+/* Recurring plan print: shell hidden while printing (class toggled from component). */
+@media print {
+  body.rp-print-mode .sub-shell__topnav {
+    display: none !important;
+  }
+
+  body.rp-print-mode .sub-shell {
+    background: #fff !important;
+    min-height: 0;
+  }
+
+  body.rp-print-mode .sub-shell__outlet {
+    max-width: none;
+    padding: 0;
+  }
+}

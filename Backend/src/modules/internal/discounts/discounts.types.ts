@@ -36,4 +36,9 @@ export interface CreateDiscountBody {
   status?: 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
 }
 
-export interface PatchDiscountBody extends Partial<CreateDiscountBody> {}
+export type PatchDiscountBody = Partial<Omit<CreateDiscountBody, "couponCode" | "limitUsage">> & {
+  /** Explicit null clears coupon in DB (avoids UNIQUE("") collisions). */
+  couponCode?: string | null;
+  /** Explicit null clears usage cap in DB. */
+  limitUsage?: number | null;
+};

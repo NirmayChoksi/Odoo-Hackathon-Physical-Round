@@ -1,129 +1,283 @@
-<main class="internal-content">
+<app-confirm-dialog
+  [open]="showDeactivateDialog()"
+  title="Deactivate recurring plan"
+  message="This plan will be marked inactive. It will still appear in the list with an Inactive status."
+  confirmLabel="Deactivate"
+  confirmIcon="delete_forever"
+  variant="danger"
+  [busy]="isDeleting()"
+  (confirmed)="performDeactivate()"
+  (cancelled)="showDeactivateDialog.set(false)"
+></app-confirm-dialog>
 
-    <!-- Action Bar -->
-    <div class="action-bar">
-      <div class="action-left">
-        <button class="btn-new" (click)="onNew()">
-          <span class="material-symbols-outlined">add</span>
-          New
+<app-confirm-dialog
+  [open]="showClearDraftDialog()"
+  title="Clear form"
+  message="Discard everything on this form? Unsaved data will be cleared from the page."
+  confirmLabel="Clear"
+  confirmIcon="delete_sweep"
+  variant="warning"
+  (confirmed)="performClearDraft()"
+  (cancelled)="showClearDraftDialog.set(false)"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showNoticeDialog()"
+  [title]="noticeTitle()"
+  [message]="noticeMessage()"
+  confirmLabel="OK"
+  confirmIcon="check"
+  variant="primary"
+  [showCancel]="false"
+  (confirmed)="closeNoticeDialog()"
+  (cancelled)="closeNoticeDialog()"
+></app-confirm-dialog>
+
+<main class="internal-content rp-page" id="rp-main">
+
+  <div class="action-bar rp-toolbar">
+    <div class="action-left">
+      <a [routerLink]="paths.recurringPlans" class="rp-back-link" title="Back to plans list">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Plans
+      </a>
+      <button
+        type="button"
+        class="btn-new"
+        (click)="onNew()"
+        [disabled]="store.isSaving() || store.isLoading()"
+        title="With a recurring name: save plan, link selected products, open New subscription with this plan. Empty name: clear the form.">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
+      <div class="action-icons">
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onDelete()"
+          title="Clear form or deactivate saved plan"
+          [disabled]="store.isSaving() || store.isLoading() || isDeleting()">
+          <span class="material-symbols-outlined">delete</span>
         </button>
-        <div class="action-icons">
-          <button class="icon-btn" (click)="onDelete()" title="Delete">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
-          <button class="icon-btn" (click)="onSave()" title="Save">
-            <span class="material-symbols-outlined">save</span>
-          </button>
-        </div>
-        <button class="btn-subscription" (click)="onSubscriptionClick()">
-           Subscription
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onPrint()"
+          title="Print"
+          [disabled]="store.isLoading()">
+          <span class="material-symbols-outlined">print</span>
+        </button>
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="onSave()"
+          title="Save plan (creates or updates on the server)"
+          [disabled]="store.isSaving() || store.isLoading()">
+          <span class="material-symbols-outlined">{{ store.isSaving() ? 'hourglass_empty' : 'save' }}</span>
         </button>
       </div>
+      <a [routerLink]="paths.subscriptions" class="rp-subscription-btn">
+        Subscription
+      </a>
     </div>
+  </div>
 
-    <!-- Recurring Plan Form Container -->
-    <div class="form-container">
+  @if (store.loadError()) {
+    <div class="rp-banner rp-banner--error" role="alert">
+      <span class="material-symbols-outlined">error</span>
+      {{ store.loadError() }}
+    </div>
+  }
 
-      <!-- Recurring Name — large editable title -->
+  @if (store.saveError()) {
+    <div class="rp-banner rp-banner--error" role="alert">
+      <span class="material-symbols-outlined">warning</span>
+      {{ store.saveError() }}
+      <button type="button" class="rp-banner__dismiss" (click)="store.clearSaveError()">Dismiss</button>
+    </div>
+  }
+
+  @if (store.isLoading()) {
+    <div class="rp-loading">
+      <div class="rp-spinner"></div>
+      <p>Loading plan…</p>
+    </div>
+  }
+
+  @if (!store.isLoading()) {
+    <div class="form-container rp-form">
+      <div class="rp-interactive">
       <div class="title-group">
         <input
           type="text"
           id="planName"
           class="title-input"
           placeholder="Recurring Name"
-          [ngModel]="planName()"
-          (ngModelChange)="planName.set($event)" />
+          [ngModel]="store.planName()"
+          (ngModelChange)="store.patchDraft({ planName: $event })" />
       </div>
 
-      <!-- Fields Section -->
-      <div class="form-layout">
-
-        <!-- Billing Period Row -->
-        <div class="row-group">
-          <label class="form-label" for="billingValue">Billing Period</label>
+      <div class="rp-form-layout">
+        <div class="row-group rp-row">
+          <label class="form-label" for="billingEvery">Billing Period</label>
           <div class="dual-input">
             <input
               type="number"
-              id="billingValue"
-              class="text-input"
-              [ngModel]="billingValue()"
-              (ngModelChange)="billingValue.set($event)"
-              placeholder="" />
+              id="billingEvery"
+              class="text-input rp-inline-num"
+              min="1"
+              step="1"
+              [ngModel]="store.billingEvery()"
+              (ngModelChange)="onBillingEveryInput($event)" />
             <select
               id="billingUnit"
-              class="type-select"
-              [value]="billingUnit()"
-              (change)="billingUnit.set($any($event.target).value)">
-              @for(unit of units; track unit) {
-                <option [value]="unit">{{ unit }}</option>
+              class="type-select rp-unit-select"
+              [ngModel]="store.billingPeriod()"
+              (ngModelChange)="store.patchDraft({ billingPeriod: $event })">
+              @for (opt of billingUnitOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
               }
             </select>
           </div>
         </div>
 
-        <!-- Automatic Close Row -->
-        <div class="row-group">
-          <label class="form-label" for="autoCloseDays">Automatic Close.</label>
+        <div class="row-group rp-row">
+          <label class="form-label" for="autoCloseDays">Automatic close.</label>
           <div class="unit-group">
             <input
               type="number"
               id="autoCloseDays"
-              class="text-input"
-              [ngModel]="autoCloseDays()"
-              (ngModelChange)="autoCloseDays.set($event)"
-              placeholder="" />
+              class="text-input rp-inline-num"
+              min="0"
+              step="1"
+              [ngModel]="store.autoCloseDays()"
+              (ngModelChange)="onAutoCloseDaysInput($event)" />
             <span class="unit-label">Days</span>
           </div>
         </div>
 
-        <!-- Checkbox Flags -->
-        <div class="flags-section">
-          <div class="checkbox-row">
-            <label class="checkbox-container">
-              <input type="checkbox" [ngModel]="closable()" (ngModelChange)="closable.set($event)" />
-              Closable
-            </label>
-          </div>
-          <div class="checkbox-row">
-            <label class="checkbox-container">
-              <input type="checkbox" [ngModel]="pausable()" (ngModelChange)="pausable.set($event)" />
-              Pausable
-            </label>
-          </div>
-          <div class="checkbox-row">
-            <label class="checkbox-container">
-              <input type="checkbox" [ngModel]="renew()" (ngModelChange)="renew.set($event)" />
-              Renew
-            </label>
-          </div>
+        <div class="rp-flags-wire">
+          <label class="checkbox-container">
+            <input
+              type="checkbox"
+              [ngModel]="store.closable()"
+              (ngModelChange)="store.patchDraft({ closable: $event })" />
+            Closable
+          </label>
+          <label class="checkbox-container">
+            <input
+              type="checkbox"
+              [ngModel]="store.pausable()"
+              (ngModelChange)="store.patchDraft({ pausable: $event })" />
+            Pausable
+          </label>
+          <label class="checkbox-container">
+            <input
+              type="checkbox"
+              [ngModel]="store.renewable()"
+              (ngModelChange)="store.patchDraft({ renewable: $event })" />
+            Renew
+          </label>
         </div>
 
-        <!-- Product Table -->
-        <div class="data-container">
-           <table class="products-table">
-              <thead>
+        @if (productsLoadError()) {
+          <p class="rp-products-meta rp-products-meta--error" role="status">
+            {{ productsLoadError() }}
+          </p>
+        } @else if (productsLoading()) {
+          <p class="rp-products-meta" role="status">Loading products…</p>
+        }
+
+        <div class="data-container rp-table-wrap">
+          <table class="products-table">
+            <thead>
+              <tr>
+                <th class="table-header">Product</th>
+                <th class="table-header">Variant</th>
+                <th class="table-header">Price</th>
+                <th class="table-header">Min Qty.</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of productRows(); track $index) {
                 <tr>
-                  <th class="table-header">Product</th>
-                  <th class="table-header">Variant</th>
-                  <th class="table-header">Price</th>
-                  <th class="table-header">Min Qty.</th>
+                  <td class="rp-product-cell">
+                    <select
+                      class="table-select"
+                      [attr.name]="'rp-product-' + $index"
+                      [disabled]="productsLoading() || !!productsLoadError()"
+                      [(ngModel)]="row.productId"
+                      (ngModelChange)="onProductRowChange(row)">
+                      <option [ngValue]="null">Select product</option>
+                      @for (p of productCatalog(); track p.product_id) {
+                        <option [ngValue]="p.product_id">{{ p.product_name }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.variant" placeholder="" class="table-input" />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      [(ngModel)]="row.price"
+                      placeholder="eg. 4 rs per week"
+                      class="table-input" />
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.minQty" placeholder="1 qty" class="table-input" />
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                @for(row of products(); track $index) {
-                  <tr>
-                    <td><input type="text" [(ngModel)]="row.product" placeholder="demo" class="table-input" /></td>
-                    <td><input type="text" [(ngModel)]="row.variant" placeholder="" class="table-input" /></td>
-                    <td><input type="text" [(ngModel)]="row.price" placeholder="eg. 4 rs per week" class="table-input" /></td>
-                    <td><input type="text" [(ngModel)]="row.minQty" placeholder="1 qty" class="table-input" /></td>
-                  </tr>
-                }
-              </tbody>
-           </table>
+              }
+            </tbody>
+          </table>
         </div>
+
         <button type="button" class="add-row-btn" (click)="addProductRow()">+ Add Product</button>
       </div>
+      </div>
 
+      <section class="rp-print-only" aria-hidden="true">
+        <h1 class="rp-print-title">Recurring plan</h1>
+        @if (store.isEditMode()) {
+          <p class="rp-print-meta">Plan ID: {{ store.editingPlanId() }}</p>
+        }
+        <dl class="rp-print-dl">
+          <dt>Recurring name</dt>
+          <dd>{{ store.planName() || '—' }}</dd>
+          <dt>Billing period</dt>
+          <dd>{{ store.billingEvery() ?? '—' }} × {{ billingUnitLabel() }}</dd>
+          <dt>Automatic close</dt>
+          <dd>{{ autoClosePrintLabel() }}</dd>
+          <dt>Closable</dt>
+          <dd>{{ store.closable() ? 'Yes' : 'No' }}</dd>
+          <dt>Pausable</dt>
+          <dd>{{ store.pausable() ? 'Yes' : 'No' }}</dd>
+          <dt>Renew</dt>
+          <dd>{{ store.renewable() ? 'Yes' : 'No' }}</dd>
+        </dl>
+        <h2 class="rp-print-subtitle">Products</h2>
+        <table class="rp-print-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Variant</th>
+              <th>Price</th>
+              <th>Min Qty.</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of productRows(); track $index) {
+              <tr>
+                <td>{{ productDisplayName(row.productId) }}</td>
+                <td>{{ row.variant || '—' }}</td>
+                <td>{{ row.price || '—' }}</td>
+                <td>{{ row.minQty || '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
     </div>
-
-  </main>
+  }
+</main>

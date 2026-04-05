@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog';
 import { CustomerTypeaheadComponent } from '../../../shared/customer-typeahead/customer-typeahead';
@@ -102,18 +102,40 @@ export class SubscriptionFormComponent implements OnInit {
         this.isEditMode.set(true);
         await this.loadSubscription(id);
       }
+    } else {
+      const planParam = this.route.snapshot.queryParamMap.get('plan');
+      if (planParam) {
+        const pid = Number(planParam);
+        if (pid > 0) {
+          const idStr = String(pid);
+          if (this.recurringPlanOptionValues().has(idStr)) {
+            this.recurringPlanId.set(idStr);
+          }
+        }
+      }
     }
+  }
+
+  /** Active-plan option ids (excludes the empty placeholder). */
+  private recurringPlanOptionValues(): Set<string> {
+    return new Set(
+      this.recurringPlanOptions()
+        .map((o) => o.value)
+        .filter((v) => v !== ''),
+    );
   }
 
   // ── Data loaders ──────────────────────────────────────────
   private async loadPlans() {
     try {
+      const params = new HttpParams().set('page', '1').set('limit', '200').set('status', 'ACTIVE');
       const res = await firstValueFrom(
-        this.http.get<{ success: boolean; data: { plans?: any[]; rows?: any[] } }>(
-          `${PLAN_API}?page=1&limit=200`
-        )
+        this.http.get<{ success: boolean; data: { plans?: any[]; rows?: any[] } }>(PLAN_API, { params }),
       );
-      const list = res.data.plans ?? res.data.rows ?? [];
+      const raw = res.data.plans ?? res.data.rows ?? [];
+      const list = raw.filter(
+        (p: { status?: string }) => String(p.status ?? 'ACTIVE').toUpperCase() === 'ACTIVE',
+      );
       this.recurringPlanOptions.set([
         { value: '', label: 'Select plan' },
         ...list.map((p: any) => ({ value: String(p.plan_id), label: p.plan_name ?? p.name ?? String(p.plan_id) })),
@@ -161,7 +183,14 @@ export class SubscriptionFormComponent implements OnInit {
       this.currentStatus.set(s.status ?? 'DRAFT');
       this.customerId.set(String(s.customer_id ?? ''));
       this.selectedCustomerLabel.set(s.customer_name ?? '');
-      this.recurringPlanId.set(String(s.plan_id ?? ''));
+      const planIdStr = String(s.plan_id ?? '');
+      this.recurringPlanId.set(planIdStr);
+      if (planIdStr && planIdStr !== '0' && !this.recurringPlanOptionValues().has(planIdStr)) {
+        this.recurringPlanId.set('');
+        this.saveError.set(
+          "This subscription's recurring plan is inactive or no longer available. Select an active plan before saving.",
+        );
+      }
       this.templateId.set(s.template_id ? String(s.template_id) : '');
       this.paymentTermId.set(s.payment_terms ?? '');
       this.expiration.set(s.expiration_date ? s.expiration_date.slice(0, 10) : '');

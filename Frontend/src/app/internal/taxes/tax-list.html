@@ -1,0 +1,154 @@
+<app-confirm-dialog
+  [open]="showDeleteConfirm()"
+  title="Deactivate tax"
+  [message]="deleteConfirmMessage()"
+  confirmLabel="Deactivate"
+  confirmIcon="delete_forever"
+  variant="danger"
+  [busy]="isDeletingList()"
+  (confirmed)="performListDelete()"
+  (cancelled)="closeDeleteConfirm()"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showNoticeDialog()"
+  [title]="noticeTitle()"
+  [message]="noticeMessage()"
+  confirmLabel="OK"
+  confirmIcon="check"
+  variant="primary"
+  [showCancel]="false"
+  (confirmed)="closeNoticeDialog()"
+  (cancelled)="closeNoticeDialog()"
+></app-confirm-dialog>
+
+<main class="internal-content tx-page">
+  <div class="action-bar">
+    <div class="action-left">
+      <button type="button" class="btn-new" (click)="goToNew()">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
+      <div class="tx-meta">
+        @if (!isLoading()) {
+          <span>{{ taxes().length }} on this page · {{ total() }} matching</span>
+        }
+      </div>
+    </div>
+    <div class="action-right">
+      <div class="search-bar">
+        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by tax name…"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInput($event)" />
+        @if (searchQuery().trim()) {
+          <button
+            type="button"
+            class="tx-search-clear material-symbols-outlined"
+            aria-label="Clear search"
+            (click)="clearSearch()">
+            close
+          </button>
+        }
+      </div>
+      <select
+        class="tx-status-select"
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="onStatusChange($event)">
+        <option value="ALL">All statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+      </select>
+    </div>
+  </div>
+
+  @if (loadError()) {
+    <div class="tx-banner tx-banner--error" role="alert">
+      <span class="material-symbols-outlined">error</span>
+      {{ loadError() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="tx-loading">
+      <div class="tx-spinner"></div>
+      <p>Loading taxes…</p>
+    </div>
+  }
+
+  @if (!isLoading() && taxes().length > 0) {
+    <div class="data-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Tax name</th>
+            <th>Type</th>
+            <th class="col-right">Amount</th>
+            <th>Status</th>
+            <th class="tx-col-actions" aria-label="Actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of taxes(); track t.tax_id) {
+            <tr class="data-row tx-row" (click)="goToTax(t.tax_id)">
+              <td class="tx-name">{{ t.tax_name }}</td>
+              <td>{{ formatType(t.tax_type) }}</td>
+              <td class="col-right">{{ t.tax_percentage | number: '1.2-2' }}</td>
+              <td>
+                <span class="status-pill" [attr.data-status]="t.status">{{ t.status }}</span>
+              </td>
+              <td class="tx-col-actions">
+                <button
+                  type="button"
+                  class="tx-icon-btn"
+                  [attr.title]="isRowActive(t) ? 'Deactivate tax' : 'Already inactive'"
+                  [disabled]="isLoading() || isDeletingList() || !isRowActive(t)"
+                  (click)="openDeleteConfirm(t, $event)">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (totalPages() > 1) {
+        <div class="subs-pagination tx-pagination">
+          <button type="button" class="subs-page-btn" [disabled]="page() <= 1" (click)="prevPage()">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <span class="subs-page-info">Page {{ page() }} of {{ totalPages() }} · {{ total() }} taxes</span>
+          <button
+            type="button"
+            class="subs-page-btn"
+            [disabled]="page() >= totalPages()"
+            (click)="nextPage()">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading() && !loadError() && taxes().length === 0) {
+    <div class="tx-empty">
+      <span class="material-symbols-outlined">account_balance</span>
+      @if (searchQuery().trim()) {
+        <p>No taxes match “{{ searchQuery().trim() }}”. Try another name or clear the search.</p>
+        <button type="button" class="btn-new" (click)="clearSearch()">
+          <span class="material-symbols-outlined">close</span>
+          Clear search
+        </button>
+      } @else {
+        <p>No taxes match your filters.</p>
+        <button type="button" class="btn-new" (click)="goToNew()">
+          <span class="material-symbols-outlined">add</span>
+          Create a tax
+        </button>
+      }
+    </div>
+  }
+</main>

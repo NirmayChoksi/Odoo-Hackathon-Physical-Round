@@ -24,4 +24,6 @@ export interface CreateTaxBody {
   status?: 'ACTIVE' | 'INACTIVE';
 }
 
-export interface PatchTaxBody extends Partial<CreateTaxBody> {}
+export type PatchTaxBody = Partial<Omit<CreateTaxBody, 'description'>> & {
+  description?: string | null;
+};

@@ -16,6 +16,7 @@ const subscriptionLegacyRedirects: Routes = [
   { path: 'quotation-template', redirectTo: 'subscription/quotation-template', pathMatch: 'full' },
   { path: 'discount', redirectTo: 'subscription/discount', pathMatch: 'full' },
   { path: 'taxes', redirectTo: 'subscription/taxes', pathMatch: 'full' },
+  { path: 'tax', redirectTo: 'subscription/tax', pathMatch: 'full' },
   { path: 'attribute/new', redirectTo: 'subscription/attribute/new', pathMatch: 'full' },
   { path: 'attribute', redirectTo: 'subscription/attribute', pathMatch: 'full' },
   { path: 'attribute/:id', redirectTo: 'subscription/attribute/:id', pathMatch: 'full' },

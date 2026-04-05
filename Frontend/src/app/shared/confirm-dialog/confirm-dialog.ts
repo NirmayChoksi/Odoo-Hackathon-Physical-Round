@@ -1,10 +1,4 @@
-import {
-  Component,
-  signal,
-  input,
-  output,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -33,11 +27,14 @@ import { CommonModule } from '@angular/common';
         <p  class="cd-desc"  [id]="'cd-desc-' + uid">{{ message() }}</p>
 
         <!-- Actions -->
-        <div class="cd-actions">
-          <button class="cd-btn cd-btn--cancel" (click)="onCancel()">
-            {{ cancelLabel() }}
-          </button>
+        <div class="cd-actions" [class.cd-actions--single]="!showCancel()">
+          @if (showCancel()) {
+            <button type="button" class="cd-btn cd-btn--cancel" (click)="onCancel()">
+              {{ cancelLabel() }}
+            </button>
+          }
           <button
+            type="button"
             class="cd-btn cd-btn--confirm cd-btn--{{ variant() }}"
             (click)="onConfirm()"
             [disabled]="busy()">
@@ -64,6 +61,8 @@ export class ConfirmDialogComponent {
   confirmIcon  = input('check');
   variant      = input<'danger' | 'warning' | 'primary'>('danger');
   busy         = input(false);
+  /** When false, only the confirm button is shown (e.g. OK to dismiss). */
+  showCancel   = input(true);
 
   // Outputs
   confirmed = output<void>();

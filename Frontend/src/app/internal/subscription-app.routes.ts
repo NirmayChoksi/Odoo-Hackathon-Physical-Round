@@ -66,12 +66,30 @@ export const subscriptionAppChildRoutes: Routes = [
       import('./quotation-template/quotation-template').then((m) => m.QuotationTemplateComponent),
   },
   {
-    path: 'discount',
+    path: 'discount/new',
     loadComponent: () => import('./discount/discount').then((m) => m.DiscountComponent),
   },
   {
-    path: 'taxes',
+    path: 'discounts',
+    loadComponent: () => import('./discount/discount-list').then((m) => m.DiscountListComponent),
+  },
+  {
+    path: 'discount',
+    loadComponent: () =>
+      import('./discount/discount-legacy-redirect.component').then((m) => m.DiscountLegacyRedirectComponent),
+  },
+  {
+    path: 'tax/new',
     loadComponent: () => import('./taxes/taxes').then((m) => m.TaxesComponent),
+  },
+  {
+    path: 'taxes',
+    loadComponent: () => import('./taxes/tax-list').then((m) => m.TaxListComponent),
+  },
+  {
+    path: 'tax',
+    loadComponent: () =>
+      import('./taxes/tax-legacy-redirect.component').then((m) => m.TaxLegacyRedirectComponent),
   },
   {
     path: 'attribute/new',
@@ -86,7 +104,19 @@ export const subscriptionAppChildRoutes: Routes = [
     loadComponent: () => import('./attribute/attribute-form').then((m) => m.AttributeFormComponent),
   },
   {
-    path: 'recurring-plan',
+    path: 'recurring-plan/new',
     loadComponent: () => import('./recurring-plan/recurring-plan').then((m) => m.RecurringPlanComponent),
+  },
+  {
+    path: 'recurring-plans',
+    loadComponent: () =>
+      import('./recurring-plan/recurring-plan-list').then((m) => m.RecurringPlanListComponent),
+  },
+  {
+    path: 'recurring-plan',
+    loadComponent: () =>
+      import('./recurring-plan/recurring-plan-legacy-redirect.component').then(
+        (m) => m.RecurringPlanLegacyRedirectComponent,
+      ),
   },
 ];

@@ -1,0 +1,156 @@
+<app-confirm-dialog
+  [open]="showDeleteConfirm()"
+  title="Deactivate discount"
+  [message]="deleteConfirmMessage()"
+  confirmLabel="Deactivate"
+  confirmIcon="delete_forever"
+  variant="danger"
+  [busy]="isDeletingList()"
+  (confirmed)="performListDelete()"
+  (cancelled)="closeDeleteConfirm()"
+></app-confirm-dialog>
+
+<app-confirm-dialog
+  [open]="showNoticeDialog()"
+  [title]="noticeTitle()"
+  [message]="noticeMessage()"
+  confirmLabel="OK"
+  confirmIcon="check"
+  variant="primary"
+  [showCancel]="false"
+  (confirmed)="closeNoticeDialog()"
+  (cancelled)="closeNoticeDialog()"
+></app-confirm-dialog>
+
+<main class="internal-content dl-page">
+  <div class="action-bar">
+    <div class="action-left">
+      <button type="button" class="btn-new" (click)="goToNew()">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
+      <div class="dl-meta">
+        @if (!isLoading()) {
+          <span>{{ discounts().length }} on this page · {{ total() }} matching</span>
+        }
+      </div>
+    </div>
+    <div class="action-right">
+      <div class="search-bar">
+        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by discount name…"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInput($event)" />
+        @if (searchQuery().trim()) {
+          <button
+            type="button"
+            class="dl-search-clear material-symbols-outlined"
+            aria-label="Clear search"
+            (click)="clearSearch()">
+            close
+          </button>
+        }
+      </div>
+      <select
+        class="dl-status-select"
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="onStatusChange($event)">
+        <option value="ALL">All statuses</option>
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+      </select>
+    </div>
+  </div>
+
+  @if (loadError()) {
+    <div class="dl-banner dl-banner--error" role="alert">
+      <span class="material-symbols-outlined">error</span>
+      {{ loadError() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="dl-loading">
+      <div class="dl-spinner"></div>
+      <p>Loading discounts…</p>
+    </div>
+  }
+
+  @if (!isLoading() && discounts().length > 0) {
+    <div class="data-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Discount name</th>
+            <th>Coupon</th>
+            <th>Type</th>
+            <th class="col-right">Value</th>
+            <th>Status</th>
+            <th class="dl-col-actions" aria-label="Actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of discounts(); track d.discount_id) {
+            <tr class="data-row dl-row" (click)="goToDiscount(d.discount_id)">
+              <td class="dl-name">{{ d.discount_name }}</td>
+              <td class="dl-coupon">{{ formatCoupon(d.coupon_code) }}</td>
+              <td>{{ formatType(d.discount_type) }}</td>
+              <td class="col-right">{{ d.discount_value | number: '1.2-2' }}</td>
+              <td>
+                <span class="status-pill" [attr.data-status]="d.status">{{ d.status }}</span>
+              </td>
+              <td class="dl-col-actions">
+                <button
+                  type="button"
+                  class="dl-icon-btn"
+                  [attr.title]="isRowActive(d) ? 'Deactivate discount' : 'Already inactive'"
+                  [disabled]="isLoading() || isDeletingList() || !isRowActive(d)"
+                  (click)="openDeleteConfirm(d, $event)">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (totalPages() > 1) {
+        <div class="subs-pagination dl-pagination">
+          <button type="button" class="subs-page-btn" [disabled]="page() <= 1" (click)="prevPage()">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+          <span class="subs-page-info">Page {{ page() }} of {{ totalPages() }} · {{ total() }} discounts</span>
+          <button
+            type="button"
+            class="subs-page-btn"
+            [disabled]="page() >= totalPages()"
+            (click)="nextPage()">
+            <span class="material-symbols-outlined">chevron_right</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading() && !loadError() && discounts().length === 0) {
+    <div class="dl-empty">
+      <span class="material-symbols-outlined">percent</span>
+      @if (searchQuery().trim()) {
+        <p>No discounts match “{{ searchQuery().trim() }}”. Try another name or clear the search.</p>
+        <button type="button" class="btn-new" (click)="clearSearch()">
+          <span class="material-symbols-outlined">close</span>
+          Clear search
+        </button>
+      } @else {
+        <p>No discounts match your filters.</p>
+        <button type="button" class="btn-new" (click)="goToNew()">
+          <span class="material-symbols-outlined">add</span>
+          Create a discount
+        </button>
+      }
+    </div>
+  }
+</main>

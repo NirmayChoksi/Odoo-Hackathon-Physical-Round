@@ -1,0 +1,130 @@
+.rpl-page .action-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.rpl-meta {
+  font-size: 0.875rem;
+  color: var(--text-muted, rgba(255, 255, 255, 0.65));
+  margin-left: 0.5rem;
+}
+
+.rpl-status-select {
+  min-width: 10rem;
+  height: 48px;
+  border-radius: var(--radius-xl, 12px);
+  border: 1px solid var(--color-outline-variant);
+  background: color-mix(in srgb, var(--pal-navy) 75%, var(--pal-deep));
+  color: var(--text-primary);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rpl-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-xl);
+  margin-bottom: 1rem;
+}
+
+.rpl-banner--error {
+  background: color-mix(in srgb, var(--pal-coral) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pal-coral) 35%, transparent);
+}
+
+.rpl-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+.rpl-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid color-mix(in srgb, var(--pal-coral) 28%, transparent);
+  border-top-color: var(--pal-coral);
+  border-radius: 50%;
+  animation: rpl-spin 0.75s linear infinite;
+}
+
+@keyframes rpl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rpl-row {
+  cursor: pointer;
+}
+
+.rpl-row:hover {
+  background: color-mix(in srgb, var(--pal-lavender) 8%, transparent);
+}
+
+.rpl-name {
+  font-weight: 600;
+}
+
+.rpl-pagination {
+  margin-top: 1rem;
+}
+
+.rpl-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-muted);
+}
+
+.rpl-empty .material-symbols-outlined {
+  font-size: 3rem;
+  opacity: 0.5;
+  margin-bottom: 0.75rem;
+}
+
+.rpl-empty .btn-new {
+  margin-top: 1rem;
+}
+
+.rpl-col-actions {
+  width: 3.25rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.rpl-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-lg, 10px);
+  background: transparent;
+  color: var(--text-muted, rgba(255, 255, 255, 0.65));
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.rpl-icon-btn:hover:not(:disabled) {
+  color: var(--pal-coral, var(--color-primary));
+  background: color-mix(in srgb, var(--pal-coral) 12%, transparent);
+}
+
+.rpl-icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.rpl-icon-spin {
+  animation: rpl-spin 0.75s linear infinite;
+}

@@ -3,6 +3,79 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+.disc-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-lg, 10px);
+  color: var(--text-muted, rgba(255, 255, 255, 0.7));
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.disc-back-link .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.disc-back-link:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--pal-lavender) 10%, transparent);
+}
+
+.disc-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-xl, 12px);
+  margin-bottom: 1rem;
+}
+
+.disc-banner--error {
+  background: color-mix(in srgb, var(--pal-coral) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pal-coral) 35%, transparent);
+}
+
+.disc-banner__dismiss {
+  margin-left: auto;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-outline-variant);
+  background: transparent;
+  color: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.disc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+.disc-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid color-mix(in srgb, var(--pal-coral) 28%, transparent);
+  border-top-color: var(--pal-coral);
+  border-radius: 50%;
+  animation: disc-spin 0.75s linear infinite;
+}
+
+@keyframes disc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .nav-profile {
   margin-left: auto;
 }

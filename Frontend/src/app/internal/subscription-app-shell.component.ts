@@ -54,11 +54,14 @@ export class SubscriptionAppShellComponent {
     const prefixes = [
       `${SUBSCRIPTION_APP_BASE}/configuration`,
       `${SUBSCRIPTION_APP_BASE}/attribute`,
+      `${SUBSCRIPTION_APP_BASE}/recurring-plans`,
       `${SUBSCRIPTION_APP_BASE}/recurring-plan`,
       `${SUBSCRIPTION_APP_BASE}/quotation-template`,
       `${SUBSCRIPTION_APP_BASE}/payment-term`,
+      `${SUBSCRIPTION_APP_BASE}/discounts`,
       `${SUBSCRIPTION_APP_BASE}/discount`,
       `${SUBSCRIPTION_APP_BASE}/taxes`,
+      `${SUBSCRIPTION_APP_BASE}/tax`,
     ];
     return prefixes.some((p) => u.startsWith(p));
   }

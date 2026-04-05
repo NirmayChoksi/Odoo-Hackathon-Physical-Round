@@ -12,11 +12,20 @@ export const SUBSCRIPTION_APP_PATHS = {
   contacts: `${SUBSCRIPTION_APP_BASE}/contacts`,
   quotationTemplate: `${SUBSCRIPTION_APP_BASE}/quotation-template`,
   paymentTerm: `${SUBSCRIPTION_APP_BASE}/payment-term`,
-  discount: `${SUBSCRIPTION_APP_BASE}/discount`,
+  /** Discount rules list (Configuration). */
+  discounts: `${SUBSCRIPTION_APP_BASE}/discounts`,
+  /** Create / edit discount (`?id=` when editing). */
+  discountNew: `${SUBSCRIPTION_APP_BASE}/discount/new`,
+  /** Tax rules list (Configuration). */
   taxes: `${SUBSCRIPTION_APP_BASE}/taxes`,
+  /** Create / edit tax (`?id=` when editing). */
+  taxNew: `${SUBSCRIPTION_APP_BASE}/tax/new`,
   attribute: `${SUBSCRIPTION_APP_BASE}/attribute`,
   attributeNew: `${SUBSCRIPTION_APP_BASE}/attribute/new`,
-  recurringPlan: `${SUBSCRIPTION_APP_BASE}/recurring-plan`,
+  /** List of recurring billing plans (entry from Configuration). */
+  recurringPlans: `${SUBSCRIPTION_APP_BASE}/recurring-plans`,
+  /** Create / edit plan form (`?id=` when editing). */
+  recurringPlanNew: `${SUBSCRIPTION_APP_BASE}/recurring-plan/new`,
 } as const;
 
 /** Shared shape for Configuration and Users/Contacts nav dropdown entries. */
@@ -35,11 +44,11 @@ export const USERS_CONTACTS_DROPDOWN_ITEMS: readonly SubscriptionNavDropdownItem
 export const CONFIGURATION_DROPDOWN_ITEMS: readonly SubscriptionNavDropdownItem[] = [
   { label: 'Overview', path: SUBSCRIPTION_APP_PATHS.configuration, exactActive: true },
   { label: 'Attribute', path: SUBSCRIPTION_APP_PATHS.attribute, exactActive: false },
-  { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlan, exactActive: true },
+  { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlans, exactActive: false },
   { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplate, exactActive: true },
   { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm, exactActive: true },
-  { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discount, exactActive: true },
-  { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes, exactActive: true },
+  { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discounts, exactActive: false },
+  { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes, exactActive: false },
 ];
 
 /** Cards on the configuration overview — same destinations as the Configuration dropdown. */
@@ -58,7 +67,7 @@ export const CONFIGURATION_HUB_MODULES: readonly {
     {
       title: 'Recurring plans',
       description: 'Billing cadence and plan templates.',
-      path: SUBSCRIPTION_APP_PATHS.recurringPlan,
+      path: SUBSCRIPTION_APP_PATHS.recurringPlans,
       icon: 'event_repeat',
     },
     {
@@ -76,7 +85,7 @@ export const CONFIGURATION_HUB_MODULES: readonly {
     {
       title: 'Discounts',
       description: 'Promotional and line discount rules.',
-      path: SUBSCRIPTION_APP_PATHS.discount,
+      path: SUBSCRIPTION_APP_PATHS.discounts,
       icon: 'percent',
     },
     {
