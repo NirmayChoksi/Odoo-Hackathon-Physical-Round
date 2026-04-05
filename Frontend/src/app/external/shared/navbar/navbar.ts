@@ -2,7 +2,7 @@ import { Component, signal, HostListener, inject, computed, input } from '@angul
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { CartService } from '../../services/cart.service';
-import { ecommerceCommands } from '../../ecommerce-navigation';
+import { ecommerceCommands, INTERNAL_DASHBOARD_NAV_BASE } from '../../ecommerce-navigation';
 import { AuthStore } from '../../../auth/auth.store';
 import { ProfileStore } from '../../../profile/profile.store';
 
@@ -27,12 +27,18 @@ export class NavbarComponent {
 
   cartCount = computed(() => this.cartService.totalItems());
 
+  /** Staff view under `/dashboard/internal`: storefront chrome hidden; profile menu is Account + Sign out only. */
+  isInternalLayout = computed(() => this.linkBase() === INTERNAL_DASHBOARD_NAV_BASE);
+
   navItems = computed(() => {
     const b = this.linkBase();
+    if (b === INTERNAL_DASHBOARD_NAV_BASE) {
+      return [] as { label: string; link: (string | number)[]; exact: boolean }[];
+    }
     return [
       { label: 'Home', link: ecommerceCommands(b), exact: true },
-      { label: 'Shop', link: ecommerceCommands(b, 'shop') },
-      { label: 'My Account', link: ecommerceCommands(b, 'account') },
+      { label: 'Shop', link: ecommerceCommands(b, 'shop'), exact: false },
+      { label: 'My Account', link: ecommerceCommands(b, 'account'), exact: false },
     ];
   });
 

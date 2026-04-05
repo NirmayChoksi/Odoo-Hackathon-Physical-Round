@@ -23,6 +23,11 @@ export class AccountComponent implements OnInit {
 
   readonly navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
 
+  /** Account page opened from internal dashboard shell — slimmer UI than storefront. */
+  get isInternalAccount(): boolean {
+    return this.navLinkBase === INTERNAL_DASHBOARD_NAV_BASE;
+  }
+
   readonly isEditing = signal(false);
 
   readonly editModel = signal({ fullName: '', email: '', phone: '' });

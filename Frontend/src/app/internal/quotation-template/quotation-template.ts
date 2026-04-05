@@ -1,199 +1,221 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { distinctUntilChanged, firstValueFrom, map } from 'rxjs';
+import { QuotationTemplateStore } from './quotation-template.store';
 import { SUBSCRIPTION_APP_PATHS } from '../subscription-app.constants';
-import { QuotationTemplateApiService } from './quotation-template-api.service';
-import { firstValueFrom } from 'rxjs';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog';
 
-export interface QuotationProduct {
-  id?: string;
-  product_id?: number;
-  product: string;
-  description: string;
-  quantity: number;
-  unit_price?: number;
-  tax_id?: number;
+interface PlanOption {
+  plan_id: number;
+  plan_name: string;
+}
+
+interface ProductOption {
+  product_id: number;
+  product_name: string;
+}
+
+interface TaxOption {
+  tax_id: number;
+  tax_name: string;
 }
 
 @Component({
   selector: 'app-quotation-template',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, ConfirmDialogComponent],
   templateUrl: './quotation-template.html',
-  styleUrl: './quotation-template.css'
+  styleUrl: './quotation-template.css',
 })
 export class QuotationTemplateComponent implements OnInit {
-  private readonly api = inject(QuotationTemplateApiService);
+  readonly store = inject(QuotationTemplateStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly http = inject(HttpClient);
 
-  templateId = signal<number | null>(null);
-  isLoading = signal(false);
+  readonly paths = SUBSCRIPTION_APP_PATHS;
 
-  // Search
-  searchQuery = signal<string>('');
+  planOptions = signal<PlanOption[]>([]);
+  productOptions = signal<ProductOption[]>([]);
+  taxOptions = signal<TaxOption[]>([]);
+  lookupsError = signal<string | null>(null);
 
-  // Form State
-  templateName = signal<string>('');
-  validityDays = signal<number>(15);
-  recurringPlanId = signal<number | null>(null);
-  lastForever = signal<boolean>(false);
-  endAfterAmount = signal<number>(1);
-  endAfterUnit = signal<string>('Month');
+  readonly showDeactivateDialog = signal(false);
+  readonly showClearDraftDialog = signal(false);
+  readonly showNoticeDialog = signal(false);
+  readonly noticeTitle = signal('Notice');
+  readonly noticeMessage = signal('');
+  readonly isDeleting = signal(false);
 
-  timeUnits = ['Week', 'Month', 'Year'];
+  ngOnInit() {
+    void this.loadLookups();
 
-  products = signal<QuotationProduct[]>([]);
-
-  async ngOnInit() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.templateId.set(Number(id));
-      await this.loadTemplate(this.templateId()!);
-    }
-  }
-
-  async loadTemplate(id: number) {
-    this.isLoading.set(true);
-    try {
-      const res = await firstValueFrom(this.api.get(id));
-      if (res.success) {
-        const t = res.data;
-        this.templateName.set(t.template_name ?? '');
-        this.validityDays.set(t.validity_days ?? 15);
-        this.recurringPlanId.set(t.plan_id ?? null);
-        this.lastForever.set(t.last_forever ?? false);
-        this.endAfterAmount.set(t.end_after_amount ?? 1);
-        this.endAfterUnit.set(t.end_after_unit ?? 'Month');
-
-        if (t.items) {
-          this.products.set(
-            t.items.map((i: any) => ({
-              id: i.template_item_id,
-              product_id: i.product_id,
-              product: i.product_name ?? '',
-              description: i.description ?? i.product_name ?? '',
-              quantity: i.quantity ?? 1,
-              unit_price: i.unit_price ?? 0,
-              tax_id: i.tax_id ?? null
-            }))
-          );
+    this.route.queryParamMap
+      .pipe(
+        map((q) => (q.get('id') ?? '').trim()),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((idStr) => {
+        const id = idStr ? Number(idStr) : NaN;
+        if (Number.isInteger(id) && id > 0) {
+          void this.store.loadTemplate(id);
+        } else {
+          this.store.resetNew();
         }
-      }
-    } catch (err) {
-      console.error('Failed to load template', err);
-    } finally {
-      this.isLoading.set(false);
-    }
+      });
   }
 
-  // Search handler — calls list API with search query
-  onSearch(query: string) {
-    this.searchQuery.set(query);
-    this.loadList(query);
-  }
-
-  async loadList(search?: string) {
-    this.isLoading.set(true);
+  private async loadLookups() {
+    this.lookupsError.set(null);
     try {
-      const res = await firstValueFrom(this.api.list(1, 100, search));
-      if (res.success) {
-        // Handle list result — navigate or populate a list signal as needed
-        console.log('Template list loaded', res.data);
-      }
-    } catch (err) {
-      console.error('Failed to load template list', err);
-    } finally {
-      this.isLoading.set(false);
+      const params = new HttpParams().set('page', '1').set('limit', '500');
+      const taxParams = new HttpParams().set('page', '1').set('limit', '200').set('status', 'ACTIVE');
+      const [plansRes, prodRes, taxRes] = await Promise.all([
+        firstValueFrom(
+          this.http.get<{
+            success: boolean;
+            data: { plans: PlanOption[] };
+          }>('/api/internal/recurring-plans', { params }),
+        ),
+        firstValueFrom(
+          this.http.get<{
+            success: boolean;
+            data: { products: ProductOption[] };
+          }>('/api/internal/products', { params }),
+        ),
+        firstValueFrom(
+          this.http.get<{
+            success: boolean;
+            data: { taxes: TaxOption[] };
+          }>('/api/internal/taxes', { params: taxParams }),
+        ),
+      ]);
+      this.planOptions.set(plansRes.data?.plans ?? []);
+      this.productOptions.set(prodRes.data?.products ?? []);
+      this.taxOptions.set(taxRes.data?.taxes ?? []);
+    } catch {
+      this.lookupsError.set('Could not load plans, products, or taxes. Some dropdowns may be empty.');
     }
+  }
+
+  openNotice(title: string, message: string) {
+    this.noticeTitle.set(title);
+    this.noticeMessage.set(message);
+    this.showNoticeDialog.set(true);
+  }
+
+  closeNoticeDialog() {
+    this.showNoticeDialog.set(false);
+  }
+
+  onPlanSelect(value: string) {
+    if (!value) {
+      this.store.patchDraft({ planId: null });
+      return;
+    }
+    const n = Number(value);
+    this.store.patchDraft({ planId: Number.isFinite(n) && n > 0 ? n : null });
+  }
+
+  onProductSelect(index: number, value: string) {
+    const pid = value ? Number(value) : NaN;
+    const p = this.productOptions().find((x) => x.product_id === pid);
+    this.store.patchItem(index, {
+      product_id: Number.isFinite(pid) && pid > 0 ? pid : null,
+      product_name: p?.product_name ?? '',
+    });
+  }
+
+  onTaxSelect(index: number, value: string) {
+    if (!value) {
+      this.store.patchItem(index, { tax_id: null });
+      return;
+    }
+    const n = Number(value);
+    this.store.patchItem(index, { tax_id: Number.isFinite(n) && n > 0 ? n : null });
   }
 
   onNew() {
-    this.templateId.set(null);
-    this.templateName.set('');
-    this.validityDays.set(15);
-    this.recurringPlanId.set(null);
-    this.lastForever.set(false);
-    this.endAfterAmount.set(1);
-    this.endAfterUnit.set('Month');
-    this.products.set([]);
-    this.searchQuery.set('');
+    this.store.clearSaveError();
+    if (!this.store.templateName().trim()) {
+      this.store.resetNew();
+      void this.router.navigate([this.paths.quotationTemplateNew], {
+        queryParams: {},
+        replaceUrl: true,
+      });
+      return;
+    }
+    void this.onSave();
   }
 
-  async onDelete() {
-    if (!this.templateId()) return;
-    if (!confirm('Are you sure you want to delete this template?')) return;
-
-    try {
-      await firstValueFrom(this.api.remove(this.templateId()!));
-      alert('Template deleted');
-      this.router.navigate([SUBSCRIPTION_APP_PATHS.configuration]);
-    } catch (err) {
-      console.error('Delete failed', err);
-      alert('Delete failed');
+  onDelete() {
+    if (this.store.isSaving() || this.store.isLoading() || this.isDeleting()) return;
+    if (this.store.isEditMode()) {
+      this.showDeactivateDialog.set(true);
+    } else {
+      this.showClearDraftDialog.set(true);
     }
+  }
+
+  async performDeactivate() {
+    const id = this.store.editingTemplateId();
+    if (!id) {
+      this.showDeactivateDialog.set(false);
+      return;
+    }
+    this.isDeleting.set(true);
+    try {
+      const r = await this.store.remove(id);
+      this.showDeactivateDialog.set(false);
+      if (r.success) {
+        void this.router.navigate([this.paths.quotationTemplates]);
+      } else {
+        this.openNotice('Could not deactivate', r.error ?? 'Request failed.');
+      }
+    } finally {
+      this.isDeleting.set(false);
+    }
+  }
+
+  performClearDraft() {
+    this.showClearDraftDialog.set(false);
+    this.store.clearSaveError();
+    this.store.resetNew();
+    void this.router.navigate([this.paths.quotationTemplateNew], {
+      queryParams: {},
+      replaceUrl: true,
+    });
   }
 
   async onSave() {
-    if (!this.templateName().trim()) {
-      alert('Please enter a template name.');
+    this.store.clearSaveError();
+    const beforeId = this.store.editingTemplateId();
+    const r = await this.store.save();
+    if (!r.success) {
+      const title = this.store.isEditMode() ? 'Template not saved' : 'Template not created';
+      this.openNotice(
+        title,
+        r.error ?? 'Please fill in all required fields and correct any errors, then try again.',
+      );
       return;
     }
 
-    const body = {
-      templateName: this.templateName(),
-      validityDays: this.validityDays(),
-      planId: this.recurringPlanId(),
-      lastForever: this.lastForever(),
-      endAfterAmount: this.lastForever() ? null : this.endAfterAmount(),
-      endAfterUnit: this.lastForever() ? null : this.endAfterUnit(),
-      items: this.products().map(p => ({
-        productId: p.product_id ?? null,
-        quantity: p.quantity,
-        unitPrice: p.unit_price ?? 0,
-        taxId: p.tax_id ?? null
-      }))
-    };
-
-    this.isLoading.set(true);
-    try {
-      if (this.templateId()) {
-        await firstValueFrom(this.api.update(this.templateId()!, body));
-        alert('Template updated');
-      } else {
-        const res = await firstValueFrom(this.api.create(body));
-        if (res.success) {
-          alert('Template created');
-          this.templateId.set(res.data.templateId);
-        }
-      }
-    } catch (err) {
-      console.error('Save failed', err);
-      alert('Save failed');
-    } finally {
-      this.isLoading.set(false);
+    const afterId = this.store.editingTemplateId();
+    if (afterId && afterId !== beforeId) {
+      void this.router.navigate([this.paths.quotationTemplateNew], {
+        queryParams: { id: afterId },
+        replaceUrl: true,
+      });
+      this.openNotice(
+        'Template created',
+        'Your quotation template was created successfully. You can keep editing or return to the list.',
+      );
     }
-  }
-
-  // Add a blank product row
-  addProductRow() {
-    this.products.set([
-      ...this.products(),
-      { product: '', description: '', quantity: 1, unit_price: 0 }
-    ]);
-  }
-
-  // Update a specific field in a product row
-  updateProduct(index: number, field: keyof QuotationProduct, value: any) {
-    const updated = [...this.products()];
-    updated[index] = { ...updated[index], [field]: value };
-    this.products.set(updated);
-  }
-
-  // Remove a product row by index
-  removeProduct(index: number) {
-    const updated = this.products().filter((_, i) => i !== index);
-    this.products.set(updated);
   }
 }

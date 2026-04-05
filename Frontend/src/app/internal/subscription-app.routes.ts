@@ -67,9 +67,21 @@ export const subscriptionAppChildRoutes: Routes = [
       import('./payment-term/payment-term-list').then((m) => m.PaymentTermListComponent),
   },
   {
-    path: 'quotation-template',
+    path: 'quotation-template/new',
     loadComponent: () =>
       import('./quotation-template/quotation-template').then((m) => m.QuotationTemplateComponent),
+  },
+  {
+    path: 'quotation-templates',
+    loadComponent: () =>
+      import('./quotation-template/quotation-template-list').then((m) => m.QuotationTemplateListComponent),
+  },
+  {
+    path: 'quotation-template',
+    loadComponent: () =>
+      import('./quotation-template/quotation-template-legacy-redirect.component').then(
+        (m) => m.QuotationTemplateLegacyRedirectComponent,
+      ),
   },
   {
     path: 'discount/new',

@@ -5,7 +5,8 @@ import { requireInternalStaffSync } from "../../../middlewares/role.middleware";
 import {
   parseCreateTemplate,
   parseCreateTemplateItem,
-  parsePatchTemplate
+  parsePatchTemplate,
+  parsePatchTemplateItem
 } from "./quotationTemplate.validation";
 import { quotationTemplateController } from "./quotationTemplate.controller";
 
@@ -24,6 +25,16 @@ router.post(
   "/:templateId/items",
   validateBody(parseCreateTemplateItem),
   asyncHandler(quotationTemplateController.addItem.bind(quotationTemplateController))
+);
+
+router.patch(
+  "/:templateId/items/:itemId",
+  validateBody(parsePatchTemplateItem),
+  asyncHandler(quotationTemplateController.updateTemplateItem.bind(quotationTemplateController))
+);
+router.delete(
+  "/:templateId/items/:itemId",
+  asyncHandler(quotationTemplateController.deleteTemplateItem.bind(quotationTemplateController))
 );
 
 router.get("/:templateId", asyncHandler(quotationTemplateController.get.bind(quotationTemplateController)));

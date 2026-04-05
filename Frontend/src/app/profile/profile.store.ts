@@ -52,7 +52,16 @@ const initialState: ProfileState = {
 
 function httpErrorMessage(err: unknown): string {
   if (err instanceof HttpErrorResponse) {
-    return err.error?.error || err.error?.message || err.error || err.message || 'Request failed';
+    const body = err.error;
+    if (typeof body === 'string') {
+      const t = body.trim();
+      if (t.startsWith('<!DOCTYPE') || t.startsWith('<html')) {
+        if (err.status === 404) return 'That API path was not found (404).';
+        return `Request failed (${err.status || 'error'}).`;
+      }
+      return t || err.message || 'Request failed';
+    }
+    return body?.error || body?.message || err.message || 'Request failed';
   }
   return 'Request failed';
 }

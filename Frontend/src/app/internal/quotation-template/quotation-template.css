@@ -3,6 +3,65 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+.qt-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-right: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-lg, 10px);
+  color: var(--text-muted, rgba(255, 255, 255, 0.7));
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.qt-back-link .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.qt-back-link:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--pal-lavender) 10%, transparent);
+}
+
+.qt-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-xl, 12px);
+  margin-bottom: 1rem;
+}
+
+.qt-banner--warn {
+  background: color-mix(in srgb, var(--pal-amber, #f5a623) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pal-amber, #f5a623) 35%, transparent);
+}
+
+.qt-banner--error {
+  background: color-mix(in srgb, var(--pal-coral) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pal-coral) 35%, transparent);
+}
+
+.qt-select {
+  width: 100%;
+  min-width: 8rem;
+}
+
+.qt-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 3rem;
+}
+
+.qt-desc {
+  align-items: flex-start;
+}
+
 .nav-profile {
   margin-left: auto;
 }
