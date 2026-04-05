@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink, Router } from '@angular/router';
@@ -27,7 +27,22 @@ export class UserListComponent implements OnInit {
   users = signal<UserRow[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
+  searchTerm = signal('');
+  selectedStatus = signal('');
+
   paths = SUBSCRIPTION_APP_PATHS;
+
+  filteredUsers = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    const status = this.selectedStatus();
+    
+    return this.users().filter(u => {
+      const matchSearch = u.full_name.toLowerCase().includes(term) || 
+                          u.email.toLowerCase().includes(term);
+      const matchStatus = status === '' || u.status === status;
+      return matchSearch && matchStatus;
+    });
+  });
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -56,5 +71,14 @@ export class UserListComponent implements OnInit {
 
   onCreate() {
     this.router.navigate(['/subscription/users/new']);
+  }
+
+  onSearch(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchTerm.set(input.value);
+  }
+
+  onStatusFilter(status: string) {
+    this.selectedStatus.set(status);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink, Router } from '@angular/router';
@@ -27,7 +27,19 @@ export class ContactListComponent implements OnInit {
   contacts = signal<ContactRow[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
+  searchTerm = signal('');
+
   paths = SUBSCRIPTION_APP_PATHS;
+
+  filteredContacts = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    
+    return this.contacts().filter(c => {
+      return c.contact_name.toLowerCase().includes(term) || 
+             (c.email?.toLowerCase().includes(term) ?? false) ||
+             c.customer_name.toLowerCase().includes(term);
+    });
+  });
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -56,5 +68,10 @@ export class ContactListComponent implements OnInit {
 
   onCreate() {
     this.router.navigate(['/subscription/contacts/new']);
+  }
+
+  onSearch(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.searchTerm.set(input.value);
   }
 }

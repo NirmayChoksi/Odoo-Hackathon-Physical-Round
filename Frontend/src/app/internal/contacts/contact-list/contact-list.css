@@ -1,124 +1,26 @@
-.sf-page-container {
-  padding: 24px;
+/* ─── Contact List — alignment with SubSync Premium ─── */
+
+.action-bar {
+  margin-bottom: 2rem;
 }
 
-.sf-header {
-  margin-bottom: 32px;
-}
-
-.sf-breadcrumb {
+/* Empty State */
+.empty-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  color: #64748b;
-  font-size: 14px;
+  color: var(--text-muted);
 }
 
-.sf-breadcrumb__link {
-  color: #64748b;
-  text-decoration: none;
+.empty-state .material-symbols-outlined {
+  color: var(--pal-lavender);
+  opacity: 0.5;
 }
 
-.sf-breadcrumb__link:hover {
-  color: #0f172a;
-}
-
-.sf-breadcrumb__separator {
-  color: #cbd5e1;
-}
-
-.sf-breadcrumb__current {
-  color: #0f172a;
-  font-weight: 500;
-}
-
-.sf-header__main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.sf-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0;
-}
-
-.sf-card {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  overflow: hidden;
-}
-
-.sf-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.sf-table th {
-  text-align: left;
-  padding: 12px 16px;
-  background: #f8fafc;
-  color: #64748b;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.sf-table td {
-  padding: 16px;
-  color: #334155;
-  font-size: 14px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.sf-table__row {
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.sf-table__row:hover {
-  background: #f8fafc;
-}
-
-.sf-badge {
-  padding: 4px 8px;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.sf-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-}
-
-.sf-btn--primary {
-  background: #2563eb;
-  color: white;
-}
-
-.sf-btn--primary:hover {
-  background: #1d4ed8;
-}
-
-.sf-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.sf-table__empty {
-  text-align: center;
-  padding: 48px !important;
-  color: #64748b;
+/* Responsive Action Bar */
+@media (max-width: 768px) {
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
