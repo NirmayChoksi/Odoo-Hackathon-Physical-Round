@@ -1,68 +1,60 @@
 <app-external-navbar [linkBase]="navLinkBase" />
 
-<main class="acc-main">
+<main class="internal-content">
 
-  <!-- Page head -->
-  <header class="sf-page-head">
-    <nav class="sf-breadcrumb" aria-label="Breadcrumb">
-      <span class="sf-breadcrumb__current">Account Settings</span>
-    </nav>
-    <div class="sf-page-head__row">
-      <div>
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-left">
+      <div class="title-group">
         <h1 class="sf-title">Account Settings</h1>
         <p class="sf-subtitle">Manage your personal information and preferences.</p>
       </div>
     </div>
-  </header>
-
-  <!-- Toolbar -->
-  <div class="sf-toolbar">
-    <div class="sf-toolbar__left">
+    <div class="action-right">
       @if (!isEditing() && profileStore.profile()) {
-        <button type="button" class="sf-btn btn-secondary" (click)="toggleEdit()">
+        <button type="button" class="btn-secondary" (click)="toggleEdit()">
           <span class="material-symbols-outlined">edit</span>
           Edit Profile
         </button>
       }
       @if (isEditing()) {
-        <button type="button" class="sf-btn btn-secondary" (click)="toggleEdit()">
+        <button type="button" class="btn-secondary" (click)="toggleEdit()">
           <span class="material-symbols-outlined">arrow_back</span>
           Back
         </button>
-        <span class="sf-toolbar__divider" aria-hidden="true"></span>
         <button
           type="button"
-          class="sf-btn btn-primary"
+          class="btn-primary"
           [disabled]="!profileForm().valid() || profileStore.isSaving()"
           (click)="save()">
-          <span class="material-symbols-outlined">save</span>
-          Save Changes
+          <span class="material-symbols-outlined">{{ profileStore.isSaving() ? 'hourglass_empty' : 'save' }}</span>
+          {{ profileStore.isSaving() ? 'Saving…' : 'Save' }}
         </button>
-        <div class="sf-toolbar__icons">
-          <button type="button" class="icon-btn" title="Discard changes" (click)="toggleEdit()">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-        @if (profileStore.saveError()) {
-          <span class="acc-inline-error">{{ profileStore.saveError() }}</span>
-        }
+        <button type="button" class="icon-btn" title="Discard changes" (click)="toggleEdit()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       }
     </div>
   </div>
 
-  <!-- Loading -->
-  @if (profileStore.isLoading()) {
-    <div class="sf-card acc-loading">
-      <div class="acc-spinner"></div>
-      <p>Loading profile…</p>
+  @if (isEditing() && profileStore.saveError()) {
+    <div class="pf-banner pf-banner--error">
+      <span class="material-symbols-outlined">error</span>
+      {{ profileStore.saveError() }}
     </div>
   }
 
-  <!-- Error -->
-  @else if (profileStore.loadError()) {
-    <div class="sf-card acc-error">
-      <p class="acc-error__msg">{{ profileStore.loadError() }}</p>
-      <button type="button" class="sf-btn btn-secondary" (click)="reloadProfile()">Retry</button>
+  <!-- Status States -->
+  @if (profileStore.isLoading()) {
+    <div class="pf-loading">
+      <div class="pf-spinner"></div>
+      <p>Loading profile…</p>
+    </div>
+  } @else if (profileStore.loadError()) {
+    <div class="pf-banner pf-banner--error">
+      <span class="material-symbols-outlined">error</span>
+      {{ profileStore.loadError() }}
+      <button type="button" class="btn-secondary" (click)="reloadProfile()" style="margin-left: 1rem;">Retry</button>
     </div>
   }
 
@@ -71,183 +63,217 @@
 
     <!-- ── VIEW MODE ── -->
     @if (!isEditing()) {
-      <section class="sf-card" aria-labelledby="acc-profile-heading">
+      <div class="form-container">
         <div class="sf-card__header">
-          <h2 id="acc-profile-heading" class="sf-card__title">Profile details</h2>
+          <h2 class="sf-card__title">Profile details</h2>
         </div>
-        <div class="acc-fields">
-          <div class="acc-row-group">
-            <span class="acc-form-label">Full Name</span>
+        <div class="fields-section">
+          <div class="field-row">
+            <label class="field-label">Full Name</label>
             <span class="acc-field-value">{{ profileStore.profile()?.full_name }}</span>
           </div>
-          <div class="acc-row-group">
-            <span class="acc-form-label">Email Address</span>
+          <div class="field-row">
+            <label class="field-label">Email Address</label>
             <span class="acc-field-value">{{ profileStore.profile()?.email }}</span>
           </div>
-          <div class="acc-row-group">
-            <span class="acc-form-label">Phone Number</span>
+          <div class="field-row">
+            <label class="field-label">Phone Number</label>
             <span class="acc-field-value">{{ profileStore.profile()?.phone || 'Not provided' }}</span>
           </div>
-          <div class="acc-row-group acc-row-group--wide">
-            <span class="acc-form-label">Shipping Address</span>
-            <span class="acc-field-value">{{ profileStore.addressSummary() }}</span>
-          </div>
-          <div class="acc-row-group">
-            <span class="acc-form-label">Member Since</span>
+          <div class="field-row">
+            <label class="field-label">Member Since</label>
             <span class="acc-field-value">{{ profileStore.profile()?.created_at | date: 'mediumDate' }}</span>
           </div>
+          <div class="field-row field-row--full">
+            <label class="field-label">Shipping Address</label>
+            <span class="acc-field-value">{{ profileStore.addressSummary() }}</span>
+          </div>
         </div>
-      </section>
+      </div>
     }
 
     <!-- ── EDIT MODE ── -->
     @else {
 
       <!-- Profile fields card -->
-      <section class="sf-card" aria-labelledby="acc-edit-heading">
+      <div class="form-container">
         <div class="sf-card__header">
-          <h2 id="acc-edit-heading" class="sf-card__title">Edit profile</h2>
+          <h2 class="sf-card__title">Edit profile</h2>
         </div>
-        <div class="acc-edit-grid">
-          <div class="acc-edit-row">
-            <div class="acc-edit-field">
-              <label class="acc-control-label">Full Name</label>
+        <div class="fields-section">
+          <div class="field-row">
+            <label class="field-label">Full Name</label>
+            <div style="flex: 1;">
               <input type="text" class="sf-control" [value]="editModel().fullName" (input)="updateField('fullName', $any($event.target).value)" />
               @if (fieldErrorMessage(fullNameState().errors())) {
                 <span class="acc-inline-error">{{ fieldErrorMessage(fullNameState().errors()) }}</span>
               }
             </div>
-            <div class="acc-edit-field">
-              <label class="acc-control-label">Email Address</label>
+          </div>
+          <div class="field-row">
+            <label class="field-label">Email Address</label>
+            <div style="flex: 1;">
               <input type="email" class="sf-control" [value]="editModel().email" (input)="updateField('email', $any($event.target).value)" />
               @if (fieldErrorMessage(emailState().errors())) {
                 <span class="acc-inline-error">{{ fieldErrorMessage(emailState().errors()) }}</span>
               }
             </div>
           </div>
-          <div class="acc-edit-field">
-            <label class="acc-control-label">Phone Number</label>
-            <input type="text" class="sf-control" [value]="editModel().phone" (input)="updateField('phone', $any($event.target).value)" />
-            @if (fieldErrorMessage(phoneState().errors())) {
-              <span class="acc-inline-error">{{ fieldErrorMessage(phoneState().errors()) }}</span>
-            }
+          <div class="field-row">
+            <label class="field-label">Phone Number</label>
+            <div style="flex: 1;">
+              <input type="text" class="sf-control" [value]="editModel().phone" (input)="updateField('phone', $any($event.target).value)" />
+              @if (fieldErrorMessage(phoneState().errors())) {
+                <span class="acc-inline-error">{{ fieldErrorMessage(phoneState().errors()) }}</span>
+              }
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
       <!-- Addresses card -->
-      <section class="sf-card" aria-labelledby="acc-addr-heading">
+      <div class="form-container">
         <div class="sf-card__header acc-addr-header">
-          <h2 id="acc-addr-heading" class="sf-card__title">Addresses</h2>
+          <h2 class="sf-card__title">Addresses</h2>
           @if (!isAddingAddress()) {
-            <button type="button" class="sf-btn btn-secondary sf-btn--sm" (click)="toggleAddAddress()">
+            <button type="button" class="btn-secondary sf-btn--sm" (click)="toggleAddAddress()">
               <span class="material-symbols-outlined">add</span>
               Add Address
             </button>
           }
         </div>
 
-        <!-- Add address form -->
-        @if (isAddingAddress()) {
-          <div class="acc-addr-form">
-            <p class="acc-section-label">New address</p>
-            <div class="acc-edit-grid">
-              <div class="acc-edit-field">
-                <label class="acc-control-label">Full Name</label>
-                <input type="text" class="sf-control" [value]="addressModel().fullName" (input)="updateAddressField('fullName', $any($event.target).value)" />
-                @if (fieldErrorMessage(addrFullNameState().errors())) {
-                  <span class="acc-inline-error">{{ fieldErrorMessage(addrFullNameState().errors()) }}</span>
-                }
+        <div class="acc-content">
+          <!-- Add address form -->
+          @if (isAddingAddress()) {
+            <div class="acc-addr-form">
+              <p class="acc-section-label">New address</p>
+              <div class="fields-section">
+                <div class="field-row">
+                  <label class="field-label">Full Name</label>
+                  <div style="flex: 1;">
+                    <input type="text" class="sf-control" [value]="addressModel().fullName" (input)="updateAddressField('fullName', $any($event.target).value)" />
+                    @if (fieldErrorMessage(addrFullNameState().errors())) {
+                      <span class="acc-inline-error">{{ fieldErrorMessage(addrFullNameState().errors()) }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="field-row">
+                  <label class="field-label">Phone Number</label>
+                  <div style="flex: 1;">
+                    <input type="text" class="sf-control" [value]="addressModel().phone" (input)="updateAddressField('phone', $any($event.target).value)" />
+                    @if (fieldErrorMessage(addrPhoneState().errors())) {
+                      <span class="acc-inline-error">{{ fieldErrorMessage(addrPhoneState().errors()) }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="field-row field-row--full">
+                  <label class="field-label">Address Line 1</label>
+                  <div style="flex: 1;">
+                    <input type="text" class="sf-control" [value]="addressModel().addressLine1" (input)="updateAddressField('addressLine1', $any($event.target).value)" />
+                    @if (fieldErrorMessage(addrLine1State().errors())) {
+                      <span class="acc-inline-error">{{ fieldErrorMessage(addrLine1State().errors()) }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="field-row field-row--full">
+                  <label class="field-label">Address Line 2 (Optional)</label>
+                  <div style="flex: 1;">
+                    <input type="text" class="sf-control" [value]="addressModel().addressLine2 || ''" (input)="updateAddressField('addressLine2', $any($event.target).value)" />
+                  </div>
+                </div>
+                <div class="field-row">
+                  <label class="field-label">City</label>
+                  <div style="flex: 1;">
+                    <input type="text" class="sf-control" [value]="addressModel().city" (input)="updateAddressField('city', $any($event.target).value)" />
+                    @if (fieldErrorMessage(addrCityState().errors())) {
+                      <span class="acc-inline-error">{{ fieldErrorMessage(addrCityState().errors()) }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="field-row">
+                  <label class="field-label">State</label>
+                  <div style="flex: 1;">
+                    <input type="text" class="sf-control" [value]="addressModel().state" (input)="updateAddressField('state', $any($event.target).value)" />
+                    @if (fieldErrorMessage(addrStateState().errors())) {
+                      <span class="acc-inline-error">{{ fieldErrorMessage(addrStateState().errors()) }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="field-row">
+                  <label class="field-label">Postal Code</label>
+                  <div style="flex: 1;">
+                    <input type="text" class="sf-control" [value]="addressModel().postalCode" (input)="updateAddressField('postalCode', $any($event.target).value)" />
+                    @if (fieldErrorMessage(addrPostalCodeState().errors())) {
+                      <span class="acc-inline-error">{{ fieldErrorMessage(addrPostalCodeState().errors()) }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="field-row">
+                  <label class="field-label">Country</label>
+                  <div style="flex: 1;">
+                    <input type="text" class="sf-control" [value]="addressModel().country" (input)="updateAddressField('country', $any($event.target).value)" />
+                    @if (fieldErrorMessage(addrCountryState().errors())) {
+                      <span class="acc-inline-error">{{ fieldErrorMessage(addrCountryState().errors()) }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="field-row">
+                  <label class="field-label">Set as Default</label>
+                  <label class="pf-toggle">
+                    <input type="checkbox" [checked]="addressModel().isDefault" (change)="updateAddressField('isDefault', $any($event.target).checked)" />
+                    <span class="pf-toggle-track">
+                      <span class="pf-toggle-thumb"></span>
+                    </span>
+                    <span class="pf-toggle-label">{{ addressModel().isDefault ? 'Yes' : 'No' }}</span>
+                  </label>
+                </div>
               </div>
-              <div class="acc-edit-field">
-                <label class="acc-control-label">Phone Number</label>
-                <input type="text" class="sf-control" [value]="addressModel().phone" (input)="updateAddressField('phone', $any($event.target).value)" />
-                @if (fieldErrorMessage(addrPhoneState().errors())) {
-                  <span class="acc-inline-error">{{ fieldErrorMessage(addrPhoneState().errors()) }}</span>
-                }
-              </div>
-              <div class="acc-edit-field acc-edit-field--full">
-                <label class="acc-control-label">Address Line 1</label>
-                <input type="text" class="sf-control" [value]="addressModel().addressLine1" (input)="updateAddressField('addressLine1', $any($event.target).value)" />
-                @if (fieldErrorMessage(addrLine1State().errors())) {
-                  <span class="acc-inline-error">{{ fieldErrorMessage(addrLine1State().errors()) }}</span>
-                }
-              </div>
-              <div class="acc-edit-field acc-edit-field--full">
-                <label class="acc-control-label">Address Line 2 (Optional)</label>
-                <input type="text" class="sf-control" [value]="addressModel().addressLine2 || ''" (input)="updateAddressField('addressLine2', $any($event.target).value)" />
-              </div>
-              <div class="acc-edit-field">
-                <label class="acc-control-label">City</label>
-                <input type="text" class="sf-control" [value]="addressModel().city" (input)="updateAddressField('city', $any($event.target).value)" />
-                @if (fieldErrorMessage(addrCityState().errors())) {
-                  <span class="acc-inline-error">{{ fieldErrorMessage(addrCityState().errors()) }}</span>
-                }
-              </div>
-              <div class="acc-edit-field">
-                <label class="acc-control-label">State</label>
-                <input type="text" class="sf-control" [value]="addressModel().state" (input)="updateAddressField('state', $any($event.target).value)" />
-                @if (fieldErrorMessage(addrStateState().errors())) {
-                  <span class="acc-inline-error">{{ fieldErrorMessage(addrStateState().errors()) }}</span>
-                }
-              </div>
-              <div class="acc-edit-field">
-                <label class="acc-control-label">Postal Code</label>
-                <input type="text" class="sf-control" [value]="addressModel().postalCode" (input)="updateAddressField('postalCode', $any($event.target).value)" />
-                @if (fieldErrorMessage(addrPostalCodeState().errors())) {
-                  <span class="acc-inline-error">{{ fieldErrorMessage(addrPostalCodeState().errors()) }}</span>
-                }
-              </div>
-              <div class="acc-edit-field">
-                <label class="acc-control-label">Country</label>
-                <input type="text" class="sf-control" [value]="addressModel().country" (input)="updateAddressField('country', $any($event.target).value)" />
-                @if (fieldErrorMessage(addrCountryState().errors())) {
-                  <span class="acc-inline-error">{{ fieldErrorMessage(addrCountryState().errors()) }}</span>
-                }
+              <div class="acc-addr-actions">
+                <button
+                  type="button"
+                  class="btn-primary"
+                  [disabled]="!addressForm().valid() || profileStore.isSaving()"
+                  (click)="saveAddress()">
+                  <span class="material-symbols-outlined">save</span>
+                  Save Address
+                </button>
+                <button type="button" class="btn-secondary" (click)="toggleAddAddress()">
+                  Cancel
+                </button>
               </div>
             </div>
-            <div class="acc-addr-actions">
-              <button
-                type="button"
-                class="sf-btn btn-primary"
-                [disabled]="!addressForm().valid() || profileStore.isSaving()"
-                (click)="saveAddress()">
-                <span class="material-symbols-outlined">save</span>
-                Save Address
-              </button>
-              <button type="button" class="sf-btn btn-secondary" (click)="toggleAddAddress()">
-                Cancel
-              </button>
-            </div>
-          </div>
-        }
+          }
 
-        <!-- Address list -->
-        @else {
-          <div class="acc-addr-list">
-            @for (address of profileStore.addresses(); track address.address_id) {
-              <div class="acc-addr-card">
-                @if (address.is_default) {
-                  <span class="acc-default-badge">Default</span>
-                }
-                <p class="acc-addr-line1">{{ address.address_line1 }}</p>
-                @if (address.address_line2) {
-                  <p class="acc-addr-line">{{ address.address_line2 }}</p>
-                }
-                <p class="acc-addr-line">{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
-                <p class="acc-addr-line">{{ address.country }}</p>
-              </div>
-            } @empty {
-              <div class="acc-hint">
-                <span class="material-symbols-outlined">info</span>
-                <p>You have not added any addresses yet.</p>
-              </div>
-            }
-          </div>
-        }
-      </section>
+          <!-- Address list -->
+          @else {
+            <div class="acc-addr-list">
+              @for (address of profileStore.addresses(); track address.address_id) {
+                <div class="acc-addr-card">
+                  @if (address.is_default) {
+                    <span class="acc-default-badge">Default</span>
+                  }
+                  <p class="acc-addr-line1">{{ address.address_line1 }}</p>
+                  @if (address.address_line2) {
+                    <p class="acc-addr-line">{{ address.address_line2 }}</p>
+                  }
+                  <p class="acc-addr-line">{{ address.city }}, {{ address.state }} {{ address.postal_code }}</p>
+                  <p class="acc-addr-line">{{ address.country }}</p>
+                </div>
+              } @empty {
+                <div class="acc-hint">
+                  <span class="material-symbols-outlined" style="color: var(--color-primary);">info</span>
+                  <p>You have not added any addresses yet.</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
 
     } <!-- end edit mode -->
   } <!-- end @else -->
 
 </main>
+
+

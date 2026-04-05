@@ -10,7 +10,9 @@ export class QuotationTemplateApiService {
   private readonly base = '/api/internal/quotation-templates';
 
   list(page = 1, limit = 100, search?: string, status?: string): Observable<ApiSuccess<any>> {
-    let params = new HttpParams().set('page', String(page)).set('limit', String(limit));
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('limit', String(limit));
     if (search?.trim()) params = params.set('search', search.trim());
     if (status) params = params.set('status', status);
     return this.http.get<ApiSuccess<any>>(this.base, { params });
