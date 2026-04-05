@@ -12,6 +12,7 @@ export const SUBSCRIPTION_APP_PATHS = {
   contacts: `${SUBSCRIPTION_APP_BASE}/contacts`,
   quotationTemplate: `${SUBSCRIPTION_APP_BASE}/quotation-template`,
   paymentTerm: `${SUBSCRIPTION_APP_BASE}/payment-term`,
+  paymentTermNew: `${SUBSCRIPTION_APP_BASE}/payment-term/new`,
   /** Discount rules list (Configuration). */
   discounts: `${SUBSCRIPTION_APP_BASE}/discounts`,
   /** Create / edit discount (`?id=` when editing). */
@@ -46,7 +47,7 @@ export const CONFIGURATION_DROPDOWN_ITEMS: readonly SubscriptionNavDropdownItem[
   { label: 'Attribute', path: SUBSCRIPTION_APP_PATHS.attribute, exactActive: false },
   { label: 'Recurring Plan', path: SUBSCRIPTION_APP_PATHS.recurringPlans, exactActive: false },
   { label: 'Quotation Template', path: SUBSCRIPTION_APP_PATHS.quotationTemplate, exactActive: true },
-  { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm, exactActive: true },
+  { label: 'Payment term', path: SUBSCRIPTION_APP_PATHS.paymentTerm, exactActive: false },
   { label: 'Discount', path: SUBSCRIPTION_APP_PATHS.discounts, exactActive: false },
   { label: 'Taxes', path: SUBSCRIPTION_APP_PATHS.taxes, exactActive: false },
 ];
@@ -98,4 +99,8 @@ export const CONFIGURATION_HUB_MODULES: readonly {
 
 export function subscriptionAttributeDetailPath(id: string | number): string {
   return `${SUBSCRIPTION_APP_BASE}/attribute/${id}`;
+}
+
+export function subscriptionPaymentTermFormPath(id: number | 'new'): string {
+  return `${SUBSCRIPTION_APP_BASE}/payment-term/${id === 'new' ? 'new' : String(id)}`;
 }

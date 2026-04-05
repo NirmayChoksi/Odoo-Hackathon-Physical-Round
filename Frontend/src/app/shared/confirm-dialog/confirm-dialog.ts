@@ -53,9 +53,9 @@ export class ConfirmDialogComponent {
   readonly uid = Math.random().toString(36).slice(2, 8);
 
   // Inputs
-  open         = input(false);
-  title        = input('Are you sure?');
-  message      = input('This action cannot be undone.');
+  open = input(false);
+  title = input('Are you sure?');
+  message = input('This action cannot be undone.');
   confirmLabel = input('Confirm');
   cancelLabel  = input('Cancel');
   confirmIcon  = input('check');
@@ -70,7 +70,7 @@ export class ConfirmDialogComponent {
 
   iconName() {
     const map: Record<string, string> = {
-      danger:  'delete_forever',
+      danger: 'delete_forever',
       warning: 'warning',
       primary: 'info',
     };
@@ -78,5 +78,5 @@ export class ConfirmDialogComponent {
   }
 
   onConfirm() { this.confirmed.emit(); }
-  onCancel()  { this.cancelled.emit(); }
+  onCancel() { this.cancelled.emit(); }
 }

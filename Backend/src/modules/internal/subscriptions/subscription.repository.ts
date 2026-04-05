@@ -22,6 +22,17 @@ async function recalcTotals(conn: { query: typeof pool.query }, subscriptionId: 
 }
 
 export const subscriptionRepository = {
+  /** Returns the next subscription number (based on AUTO_INCREMENT) formatted as "SO-XXXX". */
+  async getNextNumber(): Promise<string> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT AUTO_INCREMENT AS next_id
+       FROM information_schema.TABLES
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'subscriptions'`
+    );
+    const nextId = Number(rows[0]?.next_id ?? 1);
+    return `SO-${String(nextId).padStart(4, '0')}`;
+  },
+
   async list(q: SubscriptionListQuery): Promise<{ rows: RowDataPacket[]; total: number }> {
     const off = offset(q.page, q.limit);
     const where: string[] = ["1=1"];
@@ -35,7 +46,7 @@ export const subscriptionRepository = {
       params.push(q.customerId);
     }
     if (q.search) {
-      where.push(`(s.subscription_number LIKE ? OR c.full_name LIKE ?)`);
+      where.push(`(s.subscription_number LIKE ? OR c.customer_name LIKE ?)`);
       const s = `%${q.search}%`;
       params.push(s, s);
     }
@@ -43,15 +54,15 @@ export const subscriptionRepository = {
     const [countRows] = await pool.query<RowDataPacket[]>(
       `SELECT COUNT(*) AS c 
        FROM subscriptions s 
-       LEFT JOIN users c ON c.user_id = s.customer_id
+       LEFT JOIN customers c ON c.customer_id = s.customer_id
        WHERE ${w}`,
       params
     );
     const total = Number(countRows[0]?.c ?? 0);
     const [rows] = await pool.query<RowDataPacket[]>(
-      `SELECT s.*, c.full_name AS customer_name
+      `SELECT s.*, c.customer_name
        FROM subscriptions s
-       LEFT JOIN users c ON c.user_id = s.customer_id
+       LEFT JOIN customers c ON c.customer_id = s.customer_id
        WHERE ${w}
        ORDER BY s.subscription_id DESC
        LIMIT ? OFFSET ?`,

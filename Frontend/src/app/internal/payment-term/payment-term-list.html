@@ -1,0 +1,59 @@
+<main class="internal-content">
+  <div class="action-bar">
+    <div class="action-left">
+      <a class="btn-new" [routerLink]="formPath('new')">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </a>
+    </div>
+    <div class="action-right">
+      <div class="search-bar">
+        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search payment terms…"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)" />
+      </div>
+    </div>
+  </div>
+
+  @if (store.error()) {
+    <p class="banner banner--err">{{ store.error() }}</p>
+  }
+
+  <div class="data-container">
+    @if (store.loading()) {
+      <p class="helper-text">Loading…</p>
+    } @else if (store.termsList().length === 0) {
+      <p class="helper-text ptl-empty">
+        No payment terms yet.
+        <a [routerLink]="formPath('new')" class="ptl-empty__link">Create one</a>.
+      </p>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Due type</th>
+            <th>Status</th>
+            <th class="table-header--narrow" aria-hidden="true"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (t of filteredTerms(); track t.paymentTermId) {
+            <tr class="data-row" [routerLink]="formPath(t.paymentTermId)">
+              <td class="accent-text">{{ t.termName }}</td>
+              <td>{{ t.dueType }}</td>
+              <td>{{ t.status }}</td>
+              <td class="ptl-chevron">
+                <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</main>

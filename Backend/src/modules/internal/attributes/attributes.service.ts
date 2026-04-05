@@ -36,8 +36,10 @@ export const attributesService = {
   },
 
   async create(body: CreateAttributeBody) {
+    console.log("CREATING ATTRIBUTE", JSON.stringify(body));
     const attributeId = await attributesRepository.insert(body.name);
     if (body.values?.length) {
+      console.log("INSERTING VALUES", body.values.length);
       for (const v of body.values) {
         await attributesRepository.insertValue(attributeId, v.value, v.extraPrice || 0);
       }

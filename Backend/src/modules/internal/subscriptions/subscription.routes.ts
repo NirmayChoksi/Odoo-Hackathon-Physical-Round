@@ -14,6 +14,7 @@ const router = Router();
 
 router.use(requireInternalStaffSync);
 
+router.get("/next-number", asyncHandler(subscriptionController.nextNumber.bind(subscriptionController)));
 router.get("/", asyncHandler(subscriptionController.list.bind(subscriptionController)));
 router.post(
   "/",

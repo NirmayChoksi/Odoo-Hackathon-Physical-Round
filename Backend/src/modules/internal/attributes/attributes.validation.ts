@@ -7,12 +7,13 @@ export function parseCreateAttribute(req: Request): { ok: true; value: CreateAtt
   const name = str(b.name);
   if (!name) return { ok: false, errors: ["name is required"] };
 
-  const values: { valueName: string; extraPrice: number }[] = [];
+  const values: { value: string; extraPrice: number }[] = [];
   if (Array.isArray(b.values)) {
     for (const v of b.values) {
-      if (v.valueName) {
+      const vStr = str(v.valueName) || str(v.value);
+      if (vStr) {
         values.push({
-          valueName: str(v.valueName)!,
+          value: vStr,
           extraPrice: num(v.extraPrice) || 0
         });
       }
@@ -31,12 +32,12 @@ export function parsePatchAttribute(req: Request): { ok: true; value: PatchAttri
 
   if (b.name !== undefined) out.name = str(b.name);
   if (Array.isArray(b.values)) {
-    out.values = b.values
-      .filter((v: any) => v.valueName)
-      .map((v: any) => ({
-        valueName: str(v.valueName)!,
-        extraPrice: num(v.extraPrice) || 0
-      }));
+    out.values = b.values.map((v: any) => ({
+      value_id: num(v.value_id) || undefined,
+      value: str(v.valueName || v.value) || "",
+      extraPrice: num(v.extraPrice) || 0,
+      delete: Boolean(v.delete)
+    }));
   }
 
   if (Object.keys(out).length === 0) return { ok: false, errors: ["At least one field is required"] };

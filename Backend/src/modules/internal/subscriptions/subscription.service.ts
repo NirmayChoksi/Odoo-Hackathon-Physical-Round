@@ -21,6 +21,10 @@ async function planExists(id: number): Promise<boolean> {
 }
 
 export const subscriptionService = {
+  async getNextNumber() {
+    return subscriptionRepository.getNextNumber();
+  },
+
   async list(q: SubscriptionListQuery) {
     const { rows, total } = await subscriptionRepository.list(q);
     return {

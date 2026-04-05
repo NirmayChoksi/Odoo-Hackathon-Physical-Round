@@ -1,54 +1,55 @@
 <main class="internal-content">
-
-    <!-- Action Bar -->
-    <div class="action-bar">
-      <div class="action-left">
-        <button class="btn-new" [routerLink]="paths.attributeNew">
-          <span class="material-symbols-outlined">add</span>
-          New
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-left">
+      <button class="btn-new" [routerLink]="paths.attributeNew">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
+      <div class="action-icons">
+        <button class="icon-btn" title="Delete">
+          <span class="material-symbols-outlined">delete</span>
         </button>
-        <div class="action-icons">
-          <button class="icon-btn" title="Delete">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
-          <button class="icon-btn" title="Save">
-            <span class="material-symbols-outlined">save</span>
-          </button>
-        </div>
-      </div>
-      <div class="action-right">
-        <div class="search-bar">
-          <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Search attributes..."
-            [ngModel]="searchQuery()"
-            (ngModelChange)="searchQuery.set($event)" />
-        </div>
+        <button class="icon-btn" title="Save">
+          <span class="material-symbols-outlined">save</span>
+        </button>
       </div>
     </div>
+    <div class="action-right">
+      <div class="search-bar">
+        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search attributes..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+        />
+      </div>
+    </div>
+  </div>
 
-    <!-- Attribute List Table -->
-    <div class="data-container">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th class="checkbox-cell"><input type="checkbox" /></th>
-            <th class="table-header">Name</th>
-            <th class="table-header">Values</th>
+  <!-- Attribute List Table -->
+  <div class="data-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="checkbox-cell"><input type="checkbox" /></th>
+          <th class="table-header">Name</th>
+          <th class="table-header">Values</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (attr of attributes(); track attr.id) {
+          <tr class="data-row" [routerLink]="attributeDetailPath(attr.id)">
+            <td class="checkbox-cell">
+              <input type="checkbox" (click)="$event.stopPropagation()" />
+            </td>
+            <td class="accent-text">{{ attr.name }}</td>
+            <td>{{ attr.values }}</td>
           </tr>
-        </thead>
-        <tbody>
-          @for(attr of attributes(); track attr.id) {
-            <tr [routerLink]="attributeDetailPath(attr.id)">
-              <td class="checkbox-cell"><input type="checkbox" (click)="$event.stopPropagation()" /></td>
-              <td class="accent-text">{{ attr.name }}</td>
-              <td>{{ attr.values }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-  </main>
+        }
+      </tbody>
+    </table>
+  </div>
+</main>

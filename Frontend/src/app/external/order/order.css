@@ -67,6 +67,64 @@
   border-color: color-mix(in srgb, var(--pal-lavender) 35%, transparent);
 }
 
+.badge-active {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.badge-closed {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.badge-confirmed {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.badge-draft {
+  background: rgba(156, 163, 175, 0.2);
+  color: var(--color-on-surface-variant, #9ca3af);
+}
+
+/* ── Loading / Error States ─────────────────────────────────────────────── */
+
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.state-text {
+  color: var(--color-on-surface-variant);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+}
+
+.state-error {
+  color: #ef4444;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  text-align: center;
+  max-width: 480px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .info-group {
   display: flex;
   gap: 8px;

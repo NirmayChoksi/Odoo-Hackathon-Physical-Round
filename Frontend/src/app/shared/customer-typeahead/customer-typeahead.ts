@@ -8,6 +8,7 @@ import {
   ChangeDetectionStrategy,
   ElementRef,
   ViewChild,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -92,9 +93,18 @@ export interface CustomerOption {
               <span class="cta-empty__msg">
                 No customers found for <strong>"{{ query() }}"</strong>
               </span>
-              <button type="button" class="cta-create-btn" (click)="onCreateNew()">
-                <span class="material-symbols-outlined">person_add</span>
-                Create "{{ query() }}" as new customer
+              <button
+                type="button"
+                class="cta-create-btn"
+                [disabled]="createBusy()"
+                (click)="onCreateNew()">
+                @if (createBusy()) {
+                  <span class="cta-spinner" aria-hidden="true"></span>
+                  Creating…
+                } @else {
+                  <span class="material-symbols-outlined">person_add</span>
+                  Create "{{ query() }}" as new customer
+                }
               </button>
             </li>
           }
@@ -129,6 +139,8 @@ export class CustomerTypeaheadComponent implements OnDestroy {
   /** Pre-selected customer label (for edit mode display) */
   customerLabel = input<string>('');
   disabled = input(false);
+  /** Parent is creating a customer (disable create CTA + show progress). */
+  createBusy = input(false);
 
   customerSelected = output<{ id: string; label: string }>();
   createNew = output<string>(); // emits the query string
@@ -148,6 +160,25 @@ export class CustomerTypeaheadComponent implements OnDestroy {
   protected readonly String = String;
 
   constructor() {
+    effect(() => {
+      const id = this.customerId();
+      const label = this.customerLabel();
+      if (id) {
+        if (this.selectedId() !== id) {
+          this.selectedId.set(id);
+          this.selectedLabel.set(label);
+          this.query.set(label);
+        } else if (label && this.selectedLabel() !== label) {
+          this.selectedLabel.set(label);
+          this.query.set(label);
+        }
+      } else if (!id && this.selectedId()) {
+        this.selectedId.set('');
+        this.selectedLabel.set('');
+        this.query.set('');
+      }
+    });
+
     this.search$
       .pipe(
         debounceTime(280),
@@ -170,19 +201,6 @@ export class CustomerTypeaheadComponent implements OnDestroy {
         },
         error: () => { this.loading.set(false); },
       });
-
-    // Sync selectedId/label from inputs when they change (edit mode init)
-    // We watch via effect-like pattern using ngOnChanges substitute:
-    // resolved in ngOnInit by the parent calling selectById
-  }
-
-  ngOnChanges() {
-    // When parent sets customerId + customerLabel (edit mode load)
-    if (this.customerId() && this.customerId() !== this.selectedId()) {
-      this.selectedId.set(this.customerId());
-      this.selectedLabel.set(this.customerLabel());
-      this.query.set(this.customerLabel()); // show name in input
-    }
   }
 
   ngOnDestroy() {

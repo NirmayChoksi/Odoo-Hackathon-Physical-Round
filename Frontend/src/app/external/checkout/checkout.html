@@ -1,7 +1,7 @@
 <app-external-navbar [linkBase]="navLinkBase" />
 
 <main class="page-container">
-  
+
   @if (step() !== 'success') {
     <!-- ── Breadcrumb Steps ── -->
     <div class="steps-nav">
@@ -13,36 +13,87 @@
     </div>
 
     <div class="chk-layout">
-      
+
       <!-- ── Left: Form Area ── -->
       <div class="chk-form-area">
-        @if (step() === 'address') {
+        @if (isLoading()) {
+          <div class="state-container">
+            <div class="spinner"></div>
+            <p>Loading addresses...</p>
+          </div>
+        }
+
+        @else if (step() === 'address') {
           <div class="chk-card">
             <h2 class="chk-title">Shipping & Billing Address</h2>
-            
-            <div class="chk-option">
-              <input type="checkbox" id="useDef" [checked]="useDefaultAddress()" (change)="useDefaultAddress.set(!useDefaultAddress())" />
-              <label for="useDef">Use Default User Address</label>
-            </div>
 
-            @if (useDefaultAddress()) {
-              <div class="chk-address-box">
-                {{ address() }}
-              </div>
-            } @else {
-              <div class="chk-grid">
-                <input type="text" class="sf-control" placeholder="Full Name" />
-                <input type="text" class="sf-control" placeholder="Phone Number" />
-                <div style="grid-column: 1 / -1;">
-                  <input type="text" class="sf-control" placeholder="Street Address" />
+            <!-- Existing Addresses -->
+            @if (addresses().length > 0) {
+              <div class="address-picker">
+                <p class="section-label">Select Saved Address</p>
+                <div class="address-grid">
+                  @for (addr of addresses(); track addr.address_id) {
+                    <div 
+                      class="address-card" 
+                      [class.address-card--selected]="selectedAddressId() === addr.address_id"
+                      (click)="selectAddress(addr.address_id)">
+                      <div class="address-card__header">
+                        <span class="address-card__name">{{ addr.full_name }}</span>
+                        @if (addr.is_default) { <span class="badge badge-draft">Default</span> }
+                      </div>
+                      <p class="address-card__text">{{ addr.address_line1 }}</p>
+                      <p class="address-card__text">{{ addr.city }}, {{ addr.state }} {{ addr.postal_code }}</p>
+                      <p class="address-card__text">{{ addr.country }}</p>
+                    </div>
+                  }
                 </div>
-                <input type="text" class="sf-control" placeholder="City" />
-                <input type="text" class="sf-control" placeholder="Postal Code" />
               </div>
+              
+              <div class="summary-divider"></div>
             }
 
-            <div style="margin-top: 32px">
-              <button type="button" class="sf-btn btn-primary" (click)="goToPayment()">Continue to Payment</button>
+            <!-- New Address Form -->
+            <div class="new-address-form">
+              <p class="section-label">{{ addresses().length > 0 ? 'Or Add New' : 'Add New Address' }}</p>
+              <div class="chk-grid">
+                <div class="form-group">
+                  <label>Full Name</label>
+                  <input type="text" class="sf-control" [(ngModel)]="newAddress.fullName" placeholder="Rahul Sharma" />
+                </div>
+                <div class="form-group">
+                  <label>Phone Number</label>
+                  <input type="text" class="sf-control" [(ngModel)]="newAddress.phone" placeholder="+91 98765 43210" />
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                  <label>Street Address</label>
+                  <input type="text" class="sf-control" [(ngModel)]="newAddress.addressLine1" placeholder="123 Odoo Street" />
+                </div>
+                <div class="form-group">
+                  <label>City</label>
+                  <input type="text" class="sf-control" [(ngModel)]="newAddress.city" placeholder="Gandhinagar" />
+                </div>
+                <div class="form-group">
+                  <label>State</label>
+                  <input type="text" class="sf-control" [(ngModel)]="newAddress.state" placeholder="Gujarat" />
+                </div>
+                <div class="form-group">
+                  <label>Postal Code</label>
+                  <input type="text" class="sf-control" [(ngModel)]="newAddress.postalCode" placeholder="382007" />
+                </div>
+                <div class="form-group">
+                  <label>Country</label>
+                  <input type="text" class="sf-control" [(ngModel)]="newAddress.country" />
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 32px; display: flex; gap: 16px;">
+              @if (selectedAddressId()) {
+                <button type="button" class="sf-btn btn-primary" (click)="goToPayment()">Continue to Payment</button>
+              }
+              @else {
+                <button type="button" class="sf-btn btn-primary" (click)="saveNewAddress()" [disabled]="!newAddress.fullName">Save & Continue</button>
+              }
             </div>
           </div>
         }
@@ -50,22 +101,39 @@
         @if (step() === 'payment') {
           <div class="chk-card">
             <h2 class="chk-title">Payment Information</h2>
-            <p >Note: For payment any demo or testing beta version payment gate will work. This is a frontend prototype.</p>
-            
+            <div class="info-banner">
+              <span class="material-symbols-outlined">info</span>
+              <p>Demo payment gateway active. Entry details will not be validated.</p>
+            </div>
+
             <div class="chk-grid">
               <div style="grid-column: 1 / -1;">
-                <input type="text" class="sf-control" placeholder="Card Number" />
+                <label>Card Number</label>
+                <input type="text" class="sf-control" [(ngModel)]="dummyCard.number" placeholder="4242 4242 4242 4242" />
               </div>
-              <input type="text" class="sf-control" placeholder="MM/YY" />
-              <input type="text" class="sf-control" placeholder="CVC" />
+              <div>
+                <label>Expiry (MM/YY)</label>
+                <input type="text" class="sf-control" [(ngModel)]="dummyCard.expiry" placeholder="12/28" />
+              </div>
+              <div>
+                <label>CVC</label>
+                <input type="text" class="sf-control" [(ngModel)]="dummyCard.cvc" placeholder="123" />
+              </div>
               <div style="grid-column: 1 / -1;">
-                <input type="text" class="sf-control" placeholder="Name on Card" />
+                <label>Name on Card</label>
+                <input type="text" class="sf-control" [(ngModel)]="dummyCard.name" placeholder="John Doe" />
               </div>
             </div>
 
+            @if (error()) {
+              <p class="error-msg">{{ error() }}</p>
+            }
+
             <div style="margin-top: 32px; display: flex; gap: 16px;">
-              <button type="button" class="sf-btn btn-secondary" (click)="step.set('address')">Back to Address</button>
-              <button type="button" class="sf-btn btn-primary" (click)="processPayment()">Complete Checkout</button>
+              <button type="button" class="sf-btn btn-secondary" (click)="step.set('address')" [disabled]="isPlacingOrder()">Back to Address</button>
+              <button type="button" class="sf-btn btn-primary" (click)="processPayment()" [disabled]="isPlacingOrder()">
+                {{ isPlacingOrder() ? 'Processing...' : 'Complete Checkout' }}
+              </button>
             </div>
           </div>
         }
@@ -73,57 +141,67 @@
 
       <!-- ── Right: Summary Box ── -->
       <div class="summary-box">
-        <h3 >Order Summary</h3>
+        <h3>Order Summary</h3>
+        <div class="summary-items">
+          @for (item of items(); track item.id) {
+            <div class="summary-item-mini">
+              <span>{{ item.quantity }}x {{ item.productName }}</span>
+              <span>₹{{ item.price * item.quantity | number }}</span>
+            </div>
+          }
+        </div>
+        <div class="summary-divider"></div>
         <div class="summary-row">
           <span>Subtotal</span>
-          <span>{{ subtotal() | number }}</span>
+          <span>₹{{ subtotal() | number }}</span>
         </div>
         <div class="summary-row">
           <span>Taxes</span>
-          <span>{{ taxes() | number:'1.0-0' }}</span>
+          <span>₹{{ taxes() | number:'1.2-2' }}</span>
         </div>
         <div class="summary-divider"></div>
         <div class="summary-row summary-row--total">
           <span>Total</span>
-          <span>{{ total() | number:'1.0-0' }}</span>
+          <span>₹{{ total() | number:'1.2-2' }}</span>
         </div>
       </div>
     </div>
   }
 
   @if (step() === 'success') {
-    <!-- Success Area (matches right side wireframe of Image 1) -->
+    <!-- Success Area -->
     <div class="success-layout">
-      
+
       <div class="success-main">
         <h1 class="success-title">Thank you for your order</h1>
-        <p class="success-subtitle" (click)="goToOrder()" >Order {{ finalOrderNumber() }}</p>
+        <p class="success-subtitle" (click)="goToOrder()" style="cursor: pointer;">
+          Order #{{ placedOrder()?.order_number }} <span class="material-symbols-outlined">arrow_outward</span>
+        </p>
 
         <div class="success-box">
-          Your payment has been processed. A confirmation email has been sent to your registered address.
+          <p>Your payment has been successfully processed.</p>
+          <p style="margin-top: 8px; opacity: 0.8;">A confirmation email has been sent to your registered address.</p>
         </div>
       </div>
-      
+
       <div class="success-actions">
         <button type="button" class="sf-btn btn-secondary" (click)="printOrder()">
-          <span class="material-symbols-outlined" style="font-size: 1.1rem;">print</span> Print Invoice
+          <span class="material-symbols-outlined" style="font-size: 1.1rem;">print</span> Print Receipt
         </button>
       </div>
 
       <div class="summary-box success-sidebar">
-        <!-- Products List -->
+        <!-- Products List from orderLines signal -->
+        <h3 style="margin-bottom: 24px;">Order Details</h3>
         <div class="success-items">
-          @for (item of finalItems(); track item.id) {
+          @for (line of orderLines(); track line.subscription_item_id) {
             <div class="success-item">
-              <div class="success-item-img-wrap">
-                <img [src]="item.image" [alt]="item.productName" class="success-item-img" />
-                <span class="success-item-qty">{{ item.quantity }}</span>
-              </div>
               <div class="success-item-details">
-                <span class="success-item-name">{{ item.productName }}</span>
+                <span class="success-item-name">{{ line.product_name }}</span>
+                <span class="success-item-qty-text">{{ line.quantity }} Units</span>
               </div>
               <div class="success-item-price">
-                {{ item.price * item.quantity | number }}
+                ₹{{ line.amount | number }}
               </div>
             </div>
           }
@@ -131,24 +209,9 @@
 
         <div class="summary-divider"></div>
 
-        <div class="summary-row">
-          <span>Subtotal</span>
-          <span>{{ finalSubtotal() | number }}</span>
-        </div>
-        <div class="summary-row">
-          <span>Taxes</span>
-          <span>{{ finalTaxes() | number:'1.0-0' }}</span>
-        </div>
-        @if (finalDiscountAmount() > 0) {
-          <div class="summary-row" >
-            <span>Discount</span>
-            <span>-{{ finalDiscountAmount() | number:'1.0-0' }}</span>
-          </div>
-        }
-        <div class="summary-divider"></div>
         <div class="summary-row summary-row--total">
-          <span>Total</span>
-          <span>{{ finalTotal() | number:'1.0-0' }}</span>
+          <span>Total Paid</span>
+          <span>₹{{ placedOrder()?.total_amount | number:'1.2-2' }}</span>
         </div>
       </div>
 

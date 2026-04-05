@@ -7,24 +7,78 @@
     </div>
 
     <div class="orders__content">
-      <table class="orders-table">
-        <thead>
-          <tr>
-            <th>Order</th>
-            <th>Order Date</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (order of orders(); track order.id) {
-            <tr (click)="goToOrder(order.id)" class="orders-row">
-              <td class="text-primary font-bold">{{ order.id }}</td>
-              <td>{{ order.date }}</td>
-              <td>{{ order.total }}</td>
+
+      <!-- Loading State -->
+      @if (isLoading()) {
+        <div class="state-container">
+          <div class="spinner"></div>
+          <p class="state-text">Loading orders…</p>
+        </div>
+      }
+
+      <!-- Error State -->
+      @else if (error()) {
+        <div class="state-container">
+          <p class="state-error">{{ error() }}</p>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @else if (orders().length === 0) {
+        <div class="state-container">
+          <p class="state-text">No orders found.</p>
+        </div>
+      }
+
+      <!-- Orders Table -->
+      @else {
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Plan</th>
+              <th>Status</th>
+              <th>Order Date</th>
+              <th>Total</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (order of orders(); track order.order_number) {
+              <tr (click)="goToOrder(order.order_number)" class="orders-row">
+                <td class="text-primary font-bold">{{ order.order_number }}</td>
+                <td>{{ order.plan_name ?? '—' }}</td>
+                <td>
+                  <span [class]="getStatusClass(order.status)">{{ order.status }}</span>
+                </td>
+                <td>{{ formatDate(order.start_date) }}</td>
+                <td class="font-bold">{{ formatAmount(order.total_amount) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        @if (pagination() && (pagination()!.totalPages > 1)) {
+          <div class="pagination">
+            <button
+              class="page-btn"
+              [disabled]="pagination()!.page <= 1"
+              (click)="loadPage(pagination()!.page - 1)">
+              ‹ Prev
+            </button>
+            <span class="page-info">
+              Page {{ pagination()!.page }} of {{ pagination()!.totalPages }}
+            </span>
+            <button
+              class="page-btn"
+              [disabled]="pagination()!.page >= pagination()!.totalPages"
+              (click)="loadPage(pagination()!.page + 1)">
+              Next ›
+            </button>
+          </div>
+        }
+      }
+
     </div>
   </div>
 </main>

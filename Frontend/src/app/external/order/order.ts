@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../shared/navbar/navbar';
 import { ButtonComponent } from '../../components/button/button';
 import { ecommerceCommands } from '../ecommerce-navigation';
+import { OrdersStore } from '../orders/orders.store';
 
 @Component({
   selector: 'app-order',
@@ -12,61 +13,87 @@ import { ecommerceCommands } from '../ecommerce-navigation';
   templateUrl: './order.html',
   styleUrl: './order.css',
 })
-export class OrderComponent {
+export class OrderComponent implements OnInit, OnDestroy {
   readonly navLinkBase: string | undefined;
+  readonly store = inject(OrdersStore);
 
-  orderId = signal('S0001');
-  
-  orderDetail = signal({
-    subscriptionId: 'S00022',
-    status: 'In Progress',
-    plan: 'Premium Yearly',
-    startDate: '06/02/2026',
-    endDate: '06/02/2027',
-    address: {
-      name: 'Rohit Sharma',
-      line: '123 Odoo Street',
-      email: 'rohit@example.com',
-      phone: '+91 98765 43210'
-    },
-    invoices: [
-      { id: 'INV0015', status: 'Paid' }
-    ],
-    products: [
-      { name: 'Product Name', qty: 2, price: 1200, tax: '15%', amount: 2400 },
-      { name: '10% on your order', qty: 1, price: -120, tax: '', amount: -120 }
-    ],
-    subtotal: 2280,
-    taxAmount: 360,
-    total: 2640
-  });
+  // Expose store signals
+  readonly order = this.store.currentOrder;
+  readonly isLoading = this.store.isLoading;
+  readonly isActionLoading = this.store.isActionLoading;
+  readonly error = this.store.error;
+
+  orderNumber = '';
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
   ) {
     this.navLinkBase = this.route.snapshot.data['navLinkBase'] as string | undefined;
-    this.route.params.subscribe((params) => {
+  }
+
+  async ngOnInit() {
+    this.route.params.subscribe(async (params) => {
       if (params['id']) {
-        this.orderId.set(params['id']);
+        this.orderNumber = params['id'];
+        this.store.resetCurrentOrder();
+        await this.store.loadDetail(this.orderNumber);
       }
     });
   }
 
-  goToInvoice(invId: string) {
-    this.router.navigate(ecommerceCommands(this.navLinkBase, 'invoice', invId));
+  ngOnDestroy() {
+    this.store.resetCurrentOrder();
+  }
+
+  goToInvoice(invoiceNumber: string) {
+    this.router.navigate(ecommerceCommands(this.navLinkBase, 'invoice', invoiceNumber));
   }
 
   download() {
     window.print();
   }
 
-  renew() {
-    alert('New order created successfully!');
-    this.router.navigate(ecommerceCommands(this.navLinkBase, 'orders'));
+  async renew() {
+    const result = await this.store.renew(this.orderNumber);
+    if (result.success) {
+      alert('Order renewed successfully!');
+      this.router.navigate(ecommerceCommands(this.navLinkBase, 'orders'));
+    } else {
+      alert(result.error ?? 'Failed to renew order.');
+    }
   }
 
-  close() {
-    this.router.navigate(ecommerceCommands(this.navLinkBase, 'orders'));
+  async close() {
+    if (!confirm('Are you sure you want to close this order?')) return;
+    const result = await this.store.close(this.orderNumber);
+    if (result.success) {
+      this.router.navigate(ecommerceCommands(this.navLinkBase, 'orders'));
+    } else {
+      alert(result.error ?? 'Failed to close order.');
+    }
+  }
+
+  formatDate(dateStr: string | null | undefined): string {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  }
+
+  formatAmount(amount: number | null | undefined): string {
+    if (amount == null) return '—';
+    return `₹${Number(amount).toFixed(2)}`;
+  }
+
+  getStatusClass(status: string): string {
+    const s = (status || '').toUpperCase();
+    if (s === 'ACTIVE') return 'badge badge-active';
+    if (s === 'CLOSED') return 'badge badge-closed';
+    if (s === 'CONFIRMED') return 'badge badge-confirmed';
+    if (s === 'DRAFT' || s === 'QUOTATION') return 'badge badge-draft';
+    return 'badge';
   }
 }

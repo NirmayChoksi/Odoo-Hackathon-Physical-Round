@@ -17,6 +17,11 @@ import {
 import { subscriptionService } from "./subscription.service";
 
 export const subscriptionController = {
+  async nextNumber(_req: Request, res: Response): Promise<void> {
+    const nextNumber = await subscriptionService.getNextNumber();
+    res.json(success({ nextNumber }));
+  },
+
   async list(req: Request, res: Response): Promise<void> {
     const r = parseSubscriptionListQuery(req);
     if (!r.ok) {

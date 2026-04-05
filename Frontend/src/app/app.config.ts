@@ -14,6 +14,7 @@ import { AuthStore } from './auth/auth.store';
 import { authUserIdInterceptor } from './auth/auth-user-id.interceptor';
 import { ProfileStore } from './profile/profile.store';
 import { ShopStore } from './external/shop/shop.store';
+import { PaymentTermStore } from './internal/payment-term/payment-term.store';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -29,6 +30,7 @@ export const appConfig: ApplicationConfig = {
       inject(AuthStore);
       inject(ProfileStore);
       inject(ShopStore);
+      inject(PaymentTermStore);
     }),
   ],
 };

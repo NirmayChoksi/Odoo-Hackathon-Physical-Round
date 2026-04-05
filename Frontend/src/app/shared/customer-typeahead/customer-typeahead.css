@@ -163,7 +163,11 @@
   width: 100%;
   text-align: left;
 }
-.cta-create-btn:hover { background: rgba(241,145,109,0.14); border-color: rgba(241,145,109,0.65); }
+.cta-create-btn:hover:not(:disabled) { background: rgba(241,145,109,0.14); border-color: rgba(241,145,109,0.65); }
+.cta-create-btn:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
 .cta-create-btn .material-symbols-outlined { font-size: 1.1rem; }
 
 .cta-hint,

@@ -154,6 +154,7 @@
                 [customerId]="customerId()"
                 [customerLabel]="selectedCustomerLabel()"
                 [disabled]="isEditMode()"
+                [createBusy]="isCreatingCustomer()"
                 (customerSelected)="onCustomerSelected($event)"
                 (createNew)="onCreateCustomer($event)">
               </app-customer-typeahead>
@@ -163,8 +164,8 @@
               <select
                 id="sf-template"
                 class="sf-control sf-control--select"
-                [value]="templateId()"
-                (change)="templateId.set($any($event.target).value)">
+                [ngModel]="templateId()"
+                (ngModelChange)="templateId.set($event)">
                 @for (opt of templateOptions(); track opt.value) {
                   <option [value]="opt.value">{{ opt.label }}</option>
                 }
@@ -192,8 +193,8 @@
               <select
                 id="sf-plan"
                 class="sf-control sf-control--select"
-                [value]="recurringPlanId()"
-                (change)="recurringPlanId.set($any($event.target).value)">
+                [ngModel]="recurringPlanId()"
+                (ngModelChange)="recurringPlanId.set($event)">
                 @for (opt of recurringPlanOptions(); track opt.value) {
                   <option [value]="opt.value" [disabled]="opt.value === ''">{{ opt.label }}</option>
                 }
@@ -204,8 +205,8 @@
               <select
                 id="sf-payment-term"
                 class="sf-control sf-control--select"
-                [value]="paymentTermId()"
-                (change)="paymentTermId.set($any($event.target).value)">
+                [ngModel]="paymentTermId()"
+                (ngModelChange)="paymentTermId.set($event)">
                 @for (opt of paymentTermOptions(); track $index) {
                   <option [value]="opt.value" [disabled]="opt.value === ''">{{ opt.label }}</option>
                 }
@@ -256,7 +257,51 @@
 
         @if (activeTab() === 'order-lines') {
           <div class="sf-tab-panel sf-tab-panel--lines" role="tabpanel">
-            @if (orderLines().length > 0) {
+            @if (!isEditMode()) {
+              <div class="sf-add-line" aria-label="Add subscription line">
+                <div class="sf-add-line__field sf-add-line__field--product">
+                  <label class="sf-add-line__label" for="sf-draft-product">Product</label>
+                  <select
+                    id="sf-draft-product"
+                    class="sf-control sf-control--select"
+                    [value]="draftProductId()"
+                    (change)="onDraftProductSelect($event)">
+                    <option value="">Select product</option>
+                    @for (p of productCatalog(); track p.product_id) {
+                      <option [value]="p.product_id">{{ p.product_name }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="sf-add-line__field">
+                  <label class="sf-add-line__label" for="sf-draft-qty">Qty</label>
+                  <input
+                    id="sf-draft-qty"
+                    type="number"
+                    class="sf-control"
+                    min="1"
+                    step="1"
+                    [ngModel]="draftQuantity()"
+                    (ngModelChange)="draftQuantity.set($event)" />
+                </div>
+                <div class="sf-add-line__field">
+                  <label class="sf-add-line__label" for="sf-draft-price">Unit price</label>
+                  <input
+                    id="sf-draft-price"
+                    type="number"
+                    class="sf-control"
+                    min="0"
+                    step="0.01"
+                    [ngModel]="draftUnitPrice()"
+                    (ngModelChange)="draftUnitPrice.set($event)" />
+                </div>
+                <button type="button" class="sf-btn sf-btn--outline sf-add-line__btn" (click)="addDraftLine()">
+                  <span class="material-symbols-outlined">add</span>
+                  Add line
+                </button>
+              </div>
+            }
+
+            @if (isEditMode() && orderLines().length > 0) {
               <div class="sf-lines-table-wrap">
                 <table class="data-table sf-lines-table">
                   <thead>
@@ -285,13 +330,56 @@
                   </tfoot>
                 </table>
               </div>
-            } @else {
+            } @else if (!isEditMode() && draftLines().length > 0) {
+              <div class="sf-lines-table-wrap sf-lines-table-wrap--draft">
+                <table class="data-table sf-lines-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Product</th>
+                      <th scope="col">Quantity</th>
+                      <th scope="col">Unit price</th>
+                      <th class="col-amount" scope="col">Amount</th>
+                      <th scope="col" class="sf-col-actions" aria-label="Actions"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (line of draftLines(); track line.key) {
+                      <tr class="data-row">
+                        <td class="col-product">{{ line.product_name }}</td>
+                        <td>{{ line.quantity }}</td>
+                        <td>{{ line.unit_price | currency:'INR' }}</td>
+                        <td class="col-amount">{{ draftLineAmount(line) | currency:'INR' }}</td>
+                        <td class="sf-col-actions">
+                          <button
+                            type="button"
+                            class="sf-icon-btn"
+                            title="Remove line"
+                            (click)="removeDraftLine(line.key)">
+                            <span class="material-symbols-outlined">delete</span>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                  <tfoot>
+                    <tr class="sf-lines-total">
+                      <td colspan="3" class="sf-lines-total__label">Total</td>
+                      <td class="col-amount">{{ draftTotalAmount() | currency:'INR' }}</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            }
+
+            @if (isEditMode() && orderLines().length === 0) {
               <p class="sf-tab-hint">
-                @if (isEditMode()) {
-                  No order lines yet. Add items via the subscription items API.
-                } @else {
-                  Save the subscription first, then add order lines.
-                }
+                No order lines yet. Add items via the subscription items API.
+              </p>
+            }
+            @if (!isEditMode() && draftLines().length === 0) {
+              <p class="sf-tab-hint">
+                Add products above; they will be saved when you create the subscription.
               </p>
             }
           </div>

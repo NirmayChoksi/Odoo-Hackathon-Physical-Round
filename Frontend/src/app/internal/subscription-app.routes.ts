@@ -57,8 +57,14 @@ export const subscriptionAppChildRoutes: Routes = [
     ]
   },
   {
+    path: 'payment-term/:id',
+    loadComponent: () =>
+      import('./payment-term/payment-term-form').then((m) => m.PaymentTermFormComponent),
+  },
+  {
     path: 'payment-term',
-    loadComponent: () => import('./payment-term/payment-term').then((m) => m.PaymentTermComponent),
+    loadComponent: () =>
+      import('./payment-term/payment-term-list').then((m) => m.PaymentTermListComponent),
   },
   {
     path: 'quotation-template',
