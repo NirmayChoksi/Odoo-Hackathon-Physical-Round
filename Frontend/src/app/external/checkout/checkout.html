@@ -42,7 +42,7 @@
             }
 
             <div style="margin-top: 32px">
-              <button type="button" class="sf-btn sf-btn--primary" (click)="goToPayment()">Continue to Payment</button>
+              <button type="button" class="sf-btn btn-primary" (click)="goToPayment()">Continue to Payment</button>
             </div>
           </div>
         }
@@ -50,7 +50,7 @@
         @if (step() === 'payment') {
           <div class="chk-card">
             <h2 class="chk-title">Payment Information</h2>
-            <p style="color: var(--color-on-surface-variant); margin-bottom: 24px;">Note: For payment any demo or testing beta version payment gate will work. This is a frontend prototype.</p>
+            <p >Note: For payment any demo or testing beta version payment gate will work. This is a frontend prototype.</p>
             
             <div class="chk-grid">
               <div style="grid-column: 1 / -1;">
@@ -64,8 +64,8 @@
             </div>
 
             <div style="margin-top: 32px; display: flex; gap: 16px;">
-              <button type="button" class="sf-btn sf-btn--ghost" (click)="step.set('address')">Back to Address</button>
-              <button type="button" class="sf-btn sf-btn--primary" (click)="processPayment()">Complete Checkout</button>
+              <button type="button" class="sf-btn btn-secondary" (click)="step.set('address')">Back to Address</button>
+              <button type="button" class="sf-btn btn-primary" (click)="processPayment()">Complete Checkout</button>
             </div>
           </div>
         }
@@ -73,7 +73,7 @@
 
       <!-- ── Right: Summary Box ── -->
       <div class="summary-box">
-        <h3 style="margin-top: 0; margin-bottom: 24px; color: var(--color-primary);">Order Summary</h3>
+        <h3 >Order Summary</h3>
         <div class="summary-row">
           <span>Subtotal</span>
           <span>{{ subtotal() | number }}</span>
@@ -97,7 +97,7 @@
       
       <div class="success-main">
         <h1 class="success-title">Thank you for your order</h1>
-        <p class="success-subtitle" (click)="goToOrder()" style="cursor: pointer; transition: color 0.2s; text-decoration: underline;">Order {{ finalOrderNumber() }}</p>
+        <p class="success-subtitle" (click)="goToOrder()" >Order {{ finalOrderNumber() }}</p>
 
         <div class="success-box">
           Your payment has been processed. A confirmation email has been sent to your registered address.
@@ -105,7 +105,7 @@
       </div>
       
       <div class="success-actions">
-        <button type="button" class="sf-btn sf-btn--outline" (click)="printOrder()">
+        <button type="button" class="sf-btn btn-secondary" (click)="printOrder()">
           <span class="material-symbols-outlined" style="font-size: 1.1rem;">print</span> Print Invoice
         </button>
       </div>
@@ -140,7 +140,7 @@
           <span>{{ finalTaxes() | number:'1.0-0' }}</span>
         </div>
         @if (finalDiscountAmount() > 0) {
-          <div class="summary-row" style="color: var(--color-primary);">
+          <div class="summary-row" >
             <span>Discount</span>
             <span>-{{ finalDiscountAmount() | number:'1.0-0' }}</span>
           </div>

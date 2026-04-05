@@ -1,4 +1,3 @@
-/* ── Auth Page Shell ── */
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -20,7 +19,6 @@
   pointer-events: none;
 }
 
-/* ── Card ── */
 .auth-card {
   width: 100%;
   max-width: 420px;
@@ -33,7 +31,6 @@
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
 }
 
-/* ── Brand ── */
 .auth-brand {
   font-family: var(--font-headline);
   font-size: 0.75rem;
@@ -43,7 +40,6 @@
   margin-bottom: 2rem;
 }
 
-/* ── Title / Subtitle ── */
 .auth-title {
   font-family: var(--font-headline);
   font-size: 1.75rem;
@@ -59,31 +55,16 @@
   line-height: 1.5;
 }
 
-/* ── Form ── */
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-/* ── Field ── */
 .field {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-.field-label {
-  font-family: var(--font-label);
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--color-outline);
-}
-.field-label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
 }
 .field-link {
   font-family: var(--font-body);
@@ -97,7 +78,6 @@
   color: var(--color-primary-fixed);
 }
 
-/* ── Input ── */
 .field-input-wrap {
   position: relative;
   display: flex;
@@ -141,7 +121,6 @@
   font-size: 1.125rem;
 }
 
-/* ── Field Errors ── */
 .field-input--error {
   border-color: var(--color-error) !important;
 }
@@ -153,7 +132,6 @@
   margin-top: -0.125rem;
 }
 
-/* ── Error ── */
 .auth-error {
   display: flex;
   align-items: center;
@@ -170,7 +148,6 @@
   font-size: 1rem;
 }
 
-/* ── Success ── */
 .auth-success {
   display: flex;
   align-items: center;
@@ -187,7 +164,6 @@
   font-size: 1rem;
 }
 
-/* ── Primary Button ── */
 .auth-btn-primary {
   width: 100%;
   padding: 0.875rem 1.5rem;
@@ -217,7 +193,6 @@
   cursor: not-allowed;
 }
 
-/* ── Spinner ── */
 .spinner {
   display: inline-block;
   width: 18px;
@@ -231,7 +206,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── Divider ── */
 .auth-divider {
   display: flex;
   align-items: center;
@@ -255,7 +229,6 @@
   white-space: nowrap;
 }
 
-/* ── Outline Button ── */
 .auth-btn-outline {
   flex: 1;
   display: flex;
@@ -288,7 +261,6 @@
   gap: 0.75rem;
 }
 
-/* ── Footer ── */
 .auth-footer {
   text-align: center;
   font-family: var(--font-body);
@@ -307,7 +279,6 @@
   text-underline-offset: 3px;
 }
 
-/* ── Note box ── */
 .auth-note {
   padding: 1rem;
   border: 1px dashed var(--color-outline-variant);

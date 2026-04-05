@@ -2,13 +2,9 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import {
-  CONFIGURATION_DROPDOWN_ITEMS,
-  SUBSCRIPTION_APP_PATHS,
-  USERS_CONTACTS_DROPDOWN_ITEMS,
-} from '../subscription-app.constants';
+import { SUBSCRIPTION_APP_PATHS } from '../subscription-app.constants';
 import { PaymentTermApiService } from './payment-term-api.service';
 import type {
   DueType,
@@ -28,7 +24,7 @@ interface EditableInstallment {
 @Component({
   selector: 'app-payment-term',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './payment-term.html',
   styleUrl: './payment-term.css',
 })
@@ -36,26 +32,6 @@ export class PaymentTermComponent {
   private readonly api = inject(PaymentTermApiService);
   private readonly router = inject(Router);
 
-  navItems = signal([
-    { label: 'Subscriptions', active: false, path: SUBSCRIPTION_APP_PATHS.subscriptions },
-    { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
-    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
-    {
-      label: 'Users/Contacts',
-      active: false,
-      path: SUBSCRIPTION_APP_PATHS.users,
-      isDropdown: true,
-      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
-    },
-    {
-      label: 'Configuration',
-      active: true,
-      isDropdown: true,
-      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
-    },
-  ]);
-
-  isConfigOpen = signal(false);
   termsList = signal<PaymentTermDto[]>([]);
   selectedId = signal<number | null>(null);
   loading = signal(false);
@@ -98,17 +74,7 @@ export class PaymentTermComponent {
   methodCodes: PaymentMethodCode[] = ['CARD', 'BANK_TRANSFER', 'UPI', 'CASH'];
 
   constructor() {
-    window.addEventListener('click', () => this.isConfigOpen.set(false));
     void this.refreshList();
-  }
-
-  toggleConfig(event: Event) {
-    event.stopPropagation();
-    this.isConfigOpen.set(!this.isConfigOpen());
-  }
-
-  onNavClick(item: { label: string }) {
-    this.navItems.set(this.navItems().map((i) => ({ ...i, active: i.label === item.label })));
   }
 
   showSplitSection(): boolean {

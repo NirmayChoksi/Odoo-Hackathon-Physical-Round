@@ -1,4 +1,3 @@
-/* ── Page wrapper ── */
 .acc-main {
   flex: 1;
   padding: 1.5rem 2rem 2.5rem;
@@ -7,7 +6,6 @@
   margin: 0 auto;
 }
 
-/* ── Breadcrumb ── */
 .sf-breadcrumb {
   display: flex;
   align-items: center;
@@ -20,7 +18,6 @@
   font-weight: 600;
 }
 
-/* ── Page head ── */
 .sf-page-head { margin-bottom: 1.5rem; }
 .sf-page-head__row {
   display: flex;
@@ -45,7 +42,6 @@
   line-height: 1.5;
 }
 
-/* ── Toolbar ── */
 .sf-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -64,47 +60,8 @@
   gap: 0.75rem;
 }
 
-/* ── Buttons ── */
-.sf-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.55rem 1.1rem;
-  border-radius: 10px;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
-  border: none;
-  text-decoration: none;
-}
-.sf-btn .material-symbols-outlined { font-size: 1.125rem; }
-.sf-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-
-.sf-btn--sm { padding: 0.4rem 0.85rem; font-size: 0.75rem; }
-
-.sf-btn--primary {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  box-shadow: 0 4px 12px rgba(241, 145, 109, 0.25);
-}
 .sf-btn--primary:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); }
-
-.sf-btn--outline {
-  background: transparent;
-  color: var(--color-primary);
-  border: 1px solid rgba(241, 145, 109, 0.55);
-}
 .sf-btn--outline:hover:not(:disabled) { background: rgba(241, 145, 109, 0.10); }
-
-.sf-btn--ghost {
-  background: transparent;
-  color: var(--color-on-surface-variant);
-  border: 1px solid var(--color-outline-variant);
-}
-.sf-btn--ghost:hover { color: var(--color-on-surface); border-color: var(--color-on-surface-variant); background: var(--color-surface-container-highest); }
 
 .sf-toolbar__divider {
   width: 1px;
@@ -122,22 +79,6 @@
   border-left: 1px solid var(--color-outline-variant);
 }
 
-.icon-btn {
-  background: transparent;
-  border: none;
-  color: var(--color-on-surface-variant);
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.icon-btn:hover { background: var(--color-surface-container-highest); color: var(--color-on-surface); }
-
-/* ── Card ── */
 .sf-card {
   background: var(--color-surface-container-low);
   border: 1px solid var(--color-outline-variant);
@@ -169,20 +110,11 @@
   letter-spacing: -0.01em;
 }
 
-/* ── View mode fields ── */
 .acc-fields {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.25rem 2.5rem;
 }
-.acc-field-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding-bottom: 1.1rem;
-  border-bottom: 1px solid var(--color-outline-variant);
-}
-.acc-field-row--wide { grid-column: 1 / -1; }
 .acc-field-label {
   font-size: 0.75rem;
   font-weight: 700;
@@ -197,7 +129,6 @@
   word-break: break-word;
 }
 
-/* ── Edit mode ── */
 .acc-edit-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -218,26 +149,6 @@
   margin-bottom: 0.25rem;
 }
 
-.sf-control {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid var(--color-primary);
-  color: var(--color-on-surface);
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 0.4rem 0rem;
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.2s, background-color 0.2s;
-  border-radius: 4px 4px 0 0;
-}
-.sf-control:focus {
-  background: rgba(241, 145, 109, 0.05); /* very light primary for focus */
-  border-bottom-color: var(--color-primary);
-}
-
-/* ── Addresses section ── */
 .acc-addr-header { gap: 1rem; }
 
 .acc-addr-form {
@@ -298,7 +209,6 @@
   color: var(--color-on-surface-variant);
 }
 
-/* ── Hint note ── */
 .acc-hint {
   display: flex;
   align-items: flex-start;
@@ -311,13 +221,11 @@
 .acc-hint .material-symbols-outlined { font-size: 1rem; color: var(--color-primary); margin-top: 2px; flex-shrink: 0; }
 .acc-hint p { margin: 0; }
 
-/* ── Inline error ── */
 .acc-inline-error {
   font-size: 0.8125rem;
   color: var(--color-error, #ff6b6b);
 }
 
-/* ── Loading / Error states ── */
 .acc-loading {
   display: flex;
   flex-direction: column;
@@ -350,7 +258,6 @@
 }
 @keyframes acc-spin { to { transform: rotate(360deg); } }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
   .acc-main { padding: 1.25rem; }
   .acc-edit-grid { grid-template-columns: 1fr; }

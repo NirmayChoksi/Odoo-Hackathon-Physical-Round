@@ -1,14 +1,10 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import {
-  CONFIGURATION_DROPDOWN_ITEMS,
-  SUBSCRIPTION_APP_PATHS,
-  USERS_CONTACTS_DROPDOWN_ITEMS,
-} from '../../subscription-app.constants';
+import { SUBSCRIPTION_APP_PATHS } from '../../subscription-app.constants';
 
 const API = '/api/internal/products';
 
@@ -34,7 +30,7 @@ interface ApiResponse<T> {
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './product-list.html',
   styleUrl: './product-list.css',
 })
@@ -43,27 +39,6 @@ export class ProductListComponent implements OnInit {
   private readonly http = inject(HttpClient);
 
   readonly paths = SUBSCRIPTION_APP_PATHS;
-
-  // Navigation
-  navItems = signal([
-    { label: 'Subscriptions', active: false, path: SUBSCRIPTION_APP_PATHS.subscriptions },
-    { label: 'Products', active: true, path: SUBSCRIPTION_APP_PATHS.products },
-    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
-    {
-      label: 'Users/Contacts',
-      active: false,
-      path: SUBSCRIPTION_APP_PATHS.users,
-      isDropdown: true,
-      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
-    },
-    {
-      label: 'Configuration',
-      active: false,
-      isDropdown: true,
-      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
-    },
-  ]);
-  navDropdownOpenKey = signal<string | null>(null);
 
   // Data
   products = signal<ProductRow[]>([]);
@@ -141,16 +116,4 @@ export class ProductListComponent implements OnInit {
     return first || null;
   }
 
-  toggleNavDropdown(event: Event, label: string) {
-    event.stopPropagation();
-    this.navDropdownOpenKey.update(k => (k === label ? null : label));
-  }
-
-  onNavClick(item: any) {
-    this.navItems.set(this.navItems().map(i => ({ ...i, active: i.label === item.label })));
-  }
-
-  constructor() {
-    window.addEventListener('click', () => this.navDropdownOpenKey.set(null));
-  }
 }

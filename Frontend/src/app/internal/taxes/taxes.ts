@@ -1,19 +1,15 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import {
-  CONFIGURATION_DROPDOWN_ITEMS,
-  SUBSCRIPTION_APP_PATHS,
-  USERS_CONTACTS_DROPDOWN_ITEMS,
-} from '../subscription-app.constants';
+import { SUBSCRIPTION_APP_PATHS } from '../subscription-app.constants';
 import { TaxApiService } from './tax-api.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-taxes',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './taxes.html',
   styleUrl: './taxes.css'
 })
@@ -24,26 +20,6 @@ export class TaxesComponent implements OnInit {
 
   taxId = signal<number | null>(null);
   isLoading = signal(false);
-
-  // Navigation State
-  navItems = signal([
-    { label: 'Subscriptions', active: false, path: SUBSCRIPTION_APP_PATHS.subscriptions },
-    { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
-    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
-    {
-      label: 'Users/Contacts',
-      active: false,
-      path: SUBSCRIPTION_APP_PATHS.users,
-      isDropdown: true,
-      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
-    },
-    {
-      label: 'Configuration',
-      active: true,
-      isDropdown: true,
-      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
-    },
-  ]);
 
   // Form State
   taxName = signal<string>('');
@@ -119,21 +95,4 @@ export class TaxesComponent implements OnInit {
     }
   }
 
-  isConfigOpen = signal(false);
-
-  toggleConfig(event: Event) {
-    event.stopPropagation();
-    this.isConfigOpen.set(!this.isConfigOpen());
-  }
-
-  constructor() {
-    window.addEventListener('click', () => {
-      this.isConfigOpen.set(false);
-    });
-  }
-
-  onNavClick(item: any) {
-    const items = this.navItems().map((i: any) => ({ ...i, active: i.label === item.label }));
-    this.navItems.set(items);
-  }
 }

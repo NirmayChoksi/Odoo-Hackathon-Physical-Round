@@ -36,7 +36,6 @@
   align-items: flex-start;
 }
 
-/* ── Sidebar ── */
 .shop__sidebar {
   width: 240px;
   flex-shrink: 0;
@@ -120,7 +119,6 @@
 }
 .filter-reset-btn:hover { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-surface-container); }
 
-/* ── Main ── */
 .shop__main { flex: 1; min-width: 0; }
 
 .shop__type-bar {
@@ -475,4 +473,3 @@
 @media (max-width: 600px) {
   .shop__grid { grid-template-columns: 1fr; }
 }
-

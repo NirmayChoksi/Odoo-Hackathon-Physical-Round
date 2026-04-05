@@ -19,20 +19,20 @@
   <div class="sf-toolbar">
     <div class="sf-toolbar__left">
       @if (!isEditing() && profileStore.profile()) {
-        <button type="button" class="sf-btn sf-btn--ghost" (click)="toggleEdit()">
+        <button type="button" class="sf-btn btn-secondary" (click)="toggleEdit()">
           <span class="material-symbols-outlined">edit</span>
           Edit Profile
         </button>
       }
       @if (isEditing()) {
-        <button type="button" class="sf-btn sf-btn--ghost" (click)="toggleEdit()">
+        <button type="button" class="sf-btn btn-secondary" (click)="toggleEdit()">
           <span class="material-symbols-outlined">arrow_back</span>
           Back
         </button>
         <span class="sf-toolbar__divider" aria-hidden="true"></span>
         <button
           type="button"
-          class="sf-btn sf-btn--primary"
+          class="sf-btn btn-primary"
           [disabled]="!profileForm().valid() || profileStore.isSaving()"
           (click)="save()">
           <span class="material-symbols-outlined">save</span>
@@ -62,7 +62,7 @@
   @else if (profileStore.loadError()) {
     <div class="sf-card acc-error">
       <p class="acc-error__msg">{{ profileStore.loadError() }}</p>
-      <button type="button" class="sf-btn sf-btn--outline" (click)="reloadProfile()">Retry</button>
+      <button type="button" class="sf-btn btn-secondary" (click)="reloadProfile()">Retry</button>
     </div>
   }
 
@@ -76,24 +76,24 @@
           <h2 id="acc-profile-heading" class="sf-card__title">Profile details</h2>
         </div>
         <div class="acc-fields">
-          <div class="acc-field-row">
-            <span class="acc-field-label">Full Name</span>
+          <div class="acc-row-group">
+            <span class="acc-form-label">Full Name</span>
             <span class="acc-field-value">{{ profileStore.profile()?.full_name }}</span>
           </div>
-          <div class="acc-field-row">
-            <span class="acc-field-label">Email Address</span>
+          <div class="acc-row-group">
+            <span class="acc-form-label">Email Address</span>
             <span class="acc-field-value">{{ profileStore.profile()?.email }}</span>
           </div>
-          <div class="acc-field-row">
-            <span class="acc-field-label">Phone Number</span>
+          <div class="acc-row-group">
+            <span class="acc-form-label">Phone Number</span>
             <span class="acc-field-value">{{ profileStore.profile()?.phone || 'Not provided' }}</span>
           </div>
-          <div class="acc-field-row acc-field-row--wide">
-            <span class="acc-field-label">Shipping Address</span>
+          <div class="acc-row-group acc-row-group--wide">
+            <span class="acc-form-label">Shipping Address</span>
             <span class="acc-field-value">{{ profileStore.addressSummary() }}</span>
           </div>
-          <div class="acc-field-row">
-            <span class="acc-field-label">Member Since</span>
+          <div class="acc-row-group">
+            <span class="acc-form-label">Member Since</span>
             <span class="acc-field-value">{{ profileStore.profile()?.created_at | date: 'mediumDate' }}</span>
           </div>
         </div>
@@ -140,7 +140,7 @@
         <div class="sf-card__header acc-addr-header">
           <h2 id="acc-addr-heading" class="sf-card__title">Addresses</h2>
           @if (!isAddingAddress()) {
-            <button type="button" class="sf-btn sf-btn--outline sf-btn--sm" (click)="toggleAddAddress()">
+            <button type="button" class="sf-btn btn-secondary sf-btn--sm" (click)="toggleAddAddress()">
               <span class="material-symbols-outlined">add</span>
               Add Address
             </button>
@@ -209,13 +209,13 @@
             <div class="acc-addr-actions">
               <button
                 type="button"
-                class="sf-btn sf-btn--primary"
+                class="sf-btn btn-primary"
                 [disabled]="!addressForm().valid() || profileStore.isSaving()"
                 (click)="saveAddress()">
                 <span class="material-symbols-outlined">save</span>
                 Save Address
               </button>
-              <button type="button" class="sf-btn sf-btn--ghost" (click)="toggleAddAddress()">
+              <button type="button" class="sf-btn btn-secondary" (click)="toggleAddAddress()">
                 Cancel
               </button>
             </div>

@@ -1,17 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ReportingApiService, type ReportFilterParams } from './reporting-api.service';
 import type { ReportingPageData, ReportMeta, StatusCountItem, RevenueTrendItem } from './reporting.models';
-import {
-  CONFIGURATION_DROPDOWN_ITEMS,
-  SUBSCRIPTION_APP_PATHS,
-  USERS_CONTACTS_DROPDOWN_ITEMS,
-} from '../subscription-app.constants';
 
-const CHART_COLORS = ['#f1916d', '#8b7cf6', '#38bdf8', '#34d399', '#fbbf24', '#f472b6', '#94a3b8'];
+/** Strict palette rotation for charts */
+const CHART_COLORS = ['#f1916d', '#ae7dac', '#19305c', '#413b61', '#f3dadf'];
 
 function localYmd(d: Date): string {
   const y = d.getFullYear();
@@ -30,35 +25,12 @@ function defaultRange(): { from: string; to: string } {
 @Component({
   selector: 'app-reporting',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule],
   templateUrl: './reporting.html',
   styleUrl: './reporting.css',
 })
 export class ReportingComponent {
   private readonly api = inject(ReportingApiService);
-
-  readonly paths = SUBSCRIPTION_APP_PATHS;
-
-  navItems = signal([
-    { label: 'Subscriptions', active: false, path: SUBSCRIPTION_APP_PATHS.subscriptions },
-    { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
-    { label: 'Reporting', active: true, path: SUBSCRIPTION_APP_PATHS.reporting },
-    {
-      label: 'Users/Contacts',
-      active: false,
-      path: SUBSCRIPTION_APP_PATHS.users,
-      isDropdown: true,
-      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
-    },
-    {
-      label: 'Configuration',
-      active: false,
-      isDropdown: true,
-      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
-    },
-  ]);
-
-  navDropdownOpenKey = signal<string | null>(null);
 
   meta = signal<ReportMeta | null>(null);
   pageData = signal<ReportingPageData | null>(null);
@@ -92,7 +64,6 @@ export class ReportingComponent {
   });
 
   constructor() {
-    window.addEventListener('click', () => this.navDropdownOpenKey.set(null));
     void this.bootstrap();
   }
 
@@ -150,15 +121,6 @@ export class ReportingComponent {
     this.paymentStatus.set('');
     this.billingPeriod.set('');
     void this.applyFilters();
-  }
-
-  toggleNavDropdown(event: Event, label: string) {
-    event.stopPropagation();
-    this.navDropdownOpenKey.update((k) => (k === label ? null : label));
-  }
-
-  onNavClick(item: { label: string }) {
-    this.navItems.set(this.navItems().map((i) => ({ ...i, active: i.label === item.label })));
   }
 
   barHeight(item: RevenueTrendItem): number {

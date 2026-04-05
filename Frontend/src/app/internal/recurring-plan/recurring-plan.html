@@ -1,47 +1,4 @@
-<div class="internal-container">
-
-  <!-- Navigation Header -->
-  <nav class="internal-nav">
-    <div class="nav-brand">
-      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
-    </div>
-    <div class="nav-links">
-      @for(item of navItems(); track item.label) {
-        @if(item.isDropdown) {
-          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
-            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active" (click)="toggleConfig($event)">
-              {{ item.label }}
-              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
-            </button>
-            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
-              @for(sub of item.dropdownItems; track sub.label) {
-                <a
-                  [routerLink]="sub.path"
-                  class="dropdown-item"
-                  routerLinkActive="dropdown-item--current"
-                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
-                  {{ sub.label }}
-                </a>
-              }
-            </div>
-          </div>
-        } @else {
-          <a [routerLink]="item.path" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item)">
-            {{ item.label }}
-          </a>
-        }
-      }
-    </div>
-    <div class="nav-profile">
-      <a routerLink="/login" class="profile-btn">
-        <span class="material-symbols-outlined">person</span>
-        My Profile
-      </a>
-    </div>
-  </nav>
-
-  <!-- Main Content Body -->
-  <main class="internal-content">
+<main class="internal-content">
 
     <!-- Action Bar -->
     <div class="action-bar">
@@ -79,22 +36,22 @@
       </div>
 
       <!-- Fields Section -->
-      <div class="fields-section">
+      <div class="form-layout">
 
         <!-- Billing Period Row -->
-        <div class="field-row">
-          <label class="field-label" for="billingValue">Billing Period</label>
+        <div class="row-group">
+          <label class="form-label" for="billingValue">Billing Period</label>
           <div class="dual-input">
             <input
               type="number"
               id="billingValue"
-              class="short-input"
+              class="text-input"
               [ngModel]="billingValue()"
               (ngModelChange)="billingValue.set($event)"
               placeholder="" />
             <select
               id="billingUnit"
-              class="unit-select"
+              class="type-select"
               [value]="billingUnit()"
               (change)="billingUnit.set($any($event.target).value)">
               @for(unit of units; track unit) {
@@ -105,13 +62,13 @@
         </div>
 
         <!-- Automatic Close Row -->
-        <div class="field-row">
-          <label class="field-label" for="autoCloseDays">Automatic Close.</label>
+        <div class="row-group">
+          <label class="form-label" for="autoCloseDays">Automatic Close.</label>
           <div class="unit-group">
             <input
               type="number"
               id="autoCloseDays"
-              class="short-input"
+              class="text-input"
               [ngModel]="autoCloseDays()"
               (ngModelChange)="autoCloseDays.set($event)"
               placeholder="" />
@@ -142,7 +99,7 @@
         </div>
 
         <!-- Product Table -->
-        <div class="table-wrapper">
+        <div class="data-container">
            <table class="products-table">
               <thead>
                 <tr>
@@ -170,4 +127,3 @@
     </div>
 
   </main>
-</div>

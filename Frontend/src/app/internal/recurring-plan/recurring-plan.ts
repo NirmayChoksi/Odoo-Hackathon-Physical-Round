@@ -1,20 +1,15 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { RecurringPlanApiService } from './recurring-plan-api.service';
 import { firstValueFrom } from 'rxjs';
-import {
-  CONFIGURATION_DROPDOWN_ITEMS,
-  SUBSCRIPTION_APP_PATHS,
-  USERS_CONTACTS_DROPDOWN_ITEMS,
-} from '../subscription-app.constants';
+import { SUBSCRIPTION_APP_PATHS } from '../subscription-app.constants';
 
 @Component({
   selector: 'app-recurring-plan',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './recurring-plan.html',
   styleUrl: './recurring-plan.css'
 })
@@ -25,26 +20,6 @@ export class RecurringPlanComponent implements OnInit {
 
   planId = signal<number | null>(null);
   isLoading = signal(false);
-
-  // Navigation State
-  navItems = signal([
-    { label: 'Subscriptions', active: false, path: SUBSCRIPTION_APP_PATHS.subscriptions },
-    { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
-    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
-    {
-      label: 'Users/Contacts',
-      active: false,
-      path: SUBSCRIPTION_APP_PATHS.users,
-      isDropdown: true,
-      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
-    },
-    {
-      label: 'Configuration',
-      active: true,
-      isDropdown: true,
-      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
-    },
-  ]);
 
   // Form State
   planName = signal<string>('');
@@ -60,8 +35,6 @@ export class RecurringPlanComponent implements OnInit {
 
   // Table Data (linked products - read-only for now or simple mock)
   products = signal<any[]>([]);
-
-  isConfigOpen = signal(false);
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -153,25 +126,8 @@ export class RecurringPlanComponent implements OnInit {
     }
   }
 
-  toggleConfig(event: Event) {
-    event.stopPropagation();
-    this.isConfigOpen.set(!this.isConfigOpen());
-  }
-
-  // Close dropdown when clicking elsewhere
-  constructor() {
-    window.addEventListener('click', () => {
-      this.isConfigOpen.set(false);
-    });
-  }
-
   onSubscriptionClick() {
     alert('View Linked Subscriptions');
-  }
-
-  onNavClick(item: any) {
-    const items = this.navItems().map((i: any) => ({ ...i, active: i.label === item.label }));
-    this.navItems.set(items);
   }
 
   addProductRow() {

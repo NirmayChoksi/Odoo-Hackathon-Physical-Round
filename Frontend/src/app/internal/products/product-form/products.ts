@@ -1,15 +1,11 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, ActivatedRoute } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog';
-import {
-  CONFIGURATION_DROPDOWN_ITEMS,
-  SUBSCRIPTION_APP_PATHS,
-  USERS_CONTACTS_DROPDOWN_ITEMS,
-} from '../../subscription-app.constants';
+import { SUBSCRIPTION_APP_PATHS } from '../../subscription-app.constants';
 
 const API = '/api/internal/products';
 
@@ -30,7 +26,7 @@ interface ProductDetail {
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, ConfirmDialogComponent],
+  imports: [CommonModule, RouterLink, FormsModule, ConfirmDialogComponent],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })
@@ -52,27 +48,6 @@ export class ProductsComponent implements OnInit {
   saveError = signal<string | null>(null);
   saveSuccess = signal(false);
   showDeleteDialog = signal(false);
-
-  // Navigation
-  navItems = signal([
-    { label: 'Subscriptions', active: false, path: SUBSCRIPTION_APP_PATHS.subscriptions },
-    { label: 'Products', active: true, path: SUBSCRIPTION_APP_PATHS.products },
-    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
-    {
-      label: 'Users/Contacts',
-      active: false,
-      path: SUBSCRIPTION_APP_PATHS.users,
-      isDropdown: true,
-      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
-    },
-    {
-      label: 'Configuration',
-      active: false,
-      isDropdown: true,
-      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
-    },
-  ]);
-  navDropdownOpenKey = signal<string | null>(null);
 
   // Form fields
   productName = signal('');
@@ -197,16 +172,4 @@ export class ProductsComponent implements OnInit {
       : 'Are you sure you want to delete this product? This action cannot be undone.';
   }
 
-  toggleNavDropdown(event: Event, label: string) {
-    event.stopPropagation();
-    this.navDropdownOpenKey.update(k => (k === label ? null : label));
-  }
-
-  onNavClick(item: any) {
-    this.navItems.set(this.navItems().map(i => ({ ...i, active: i.label === item.label })));
-  }
-
-  constructor() {
-    window.addEventListener('click', () => this.navDropdownOpenKey.set(null));
-  }
 }

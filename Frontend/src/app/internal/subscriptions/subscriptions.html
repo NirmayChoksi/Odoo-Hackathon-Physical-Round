@@ -1,159 +1,119 @@
-<div class="internal-container">
+<main class="internal-content">
 
-  <!-- Navigation Header -->
-  <nav class="internal-nav">
-    <div class="nav-brand">
-      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
-    </div>
-    <div class="nav-links">
-      @for(item of navItems(); track item.label) {
-        @if(item.isDropdown) {
-          <div class="nav-dropdown" [class.nav-dropdown--open]="navDropdownOpenKey() === item.label">
-            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active"
-              (click)="toggleNavDropdown($event, item.label)">
-              {{ item.label }}
-              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
-            </button>
-            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
-              @for(sub of item.dropdownItems; track sub.label) {
-                <a [routerLink]="sub.path" class="dropdown-item" routerLinkActive="dropdown-item--current"
-                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
-                  {{ sub.label }}
-                </a>
-              }
-            </div>
-          </div>
-        } @else {
-          <a [routerLink]="item.path" class="nav-link" [class.nav-link--active]="item.active"
-            (click)="onNavClick(item)">{{ item.label }}</a>
-        }
-      }
-    </div>
-    <div class="nav-profile">
-      <a [routerLink]="accountLink()" class="profile-btn">
-        <span class="material-symbols-outlined">person</span>
-        My Profile
-      </a>
-    </div>
-  </nav>
-
-  <!-- Main Content Body -->
-  <main class="internal-content">
-
-    <!-- Action Bar -->
-    <div class="action-bar">
-      <div class="action-left">
-        <button class="btn-new" (click)="onNewSubscription()">
-          <span class="material-symbols-outlined">add</span>
-          New
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-left">
+      <button class="btn-new" (click)="onNewSubscription()">
+        <span class="material-symbols-outlined">add</span>
+        New
+      </button>
+      <div class="action-icons">
+        <button class="icon-btn" (click)="onDelete()" title="Delete">
+          <span class="material-symbols-outlined">delete</span>
         </button>
-        <div class="action-icons">
-          <button class="icon-btn" (click)="onDelete()" title="Delete">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
-          <button class="icon-btn" (click)="onSettings()" title="Configuration">
-            <span class="material-symbols-outlined">settings</span>
-          </button>
-        </div>
-      </div>
-      <div class="action-right">
-        <!-- Status filter pills -->
-        <div class="subs-status-filters">
-          <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === ''"
-            (click)="onStatusFilter('')">All</button>
-          <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'DRAFT'"
-            (click)="onStatusFilter('DRAFT')">Draft</button>
-          <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'QUOTATION'"
-            (click)="onStatusFilter('QUOTATION')">Quotation</button>
-          <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'CONFIRMED'"
-            (click)="onStatusFilter('CONFIRMED')">Confirmed</button>
-          <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'ACTIVE'"
-            (click)="onStatusFilter('ACTIVE')">Active</button>
-          <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'CLOSED'"
-            (click)="onStatusFilter('CLOSED')">Closed</button>
-        </div>
-        <div class="search-box">
-          <span class="material-symbols-outlined">search</span>
-          <input
-            type="text"
-            placeholder="Search number, customer…"
-            (input)="onSearch($event)"
-            title="Search bar" />
-        </div>
+        <button class="icon-btn" (click)="onSettings()" title="Configuration">
+          <span class="material-symbols-outlined">settings</span>
+        </button>
       </div>
     </div>
-
-    <!-- Error banner -->
-    @if (loadError()) {
-      <div class="subs-banner subs-banner--error" role="alert">
-        <span class="material-symbols-outlined">error</span>
-        {{ loadError() }}
+    <div class="action-right">
+      <!-- Status filter pills -->
+      <div class="subs-status-filters">
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === ''"
+          (click)="onStatusFilter('')">All</button>
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'DRAFT'"
+          (click)="onStatusFilter('DRAFT')">Draft</button>
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'QUOTATION'"
+          (click)="onStatusFilter('QUOTATION')">Quotation</button>
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'CONFIRMED'"
+          (click)="onStatusFilter('CONFIRMED')">Confirmed</button>
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'ACTIVE'"
+          (click)="onStatusFilter('ACTIVE')">Active</button>
+        <button class="subs-filter-pill" [class.subs-filter-pill--active]="selectedStatus() === 'CLOSED'"
+          (click)="onStatusFilter('CLOSED')">Closed</button>
       </div>
-    }
-
-    <!-- Loading spinner -->
-    @if (isLoading()) {
-      <div class="subs-loading">
-        <div class="subs-spinner"></div>
-        <p>Loading subscriptions…</p>
+      <div class="search-bar">
+        <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search number, customer…"
+          (input)="onSearch($event)"
+          title="Search bar" />
       </div>
-    }
+    </div>
+  </div>
 
-    <!-- Data Table Container -->
-    @if (!isLoading()) {
-      <div class="data-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th class="col-check"><input type="checkbox" /></th>
-              <th>Number</th>
-              <th>Customer</th>
-              <th>Start Date</th>
-              <th>Expiration</th>
-              <th class="col-right">Total</th>
-              <th>Status</th>
+  <!-- Error banner -->
+  @if (loadError()) {
+    <div class="subs-banner subs-banner--error" role="alert">
+      <span class="material-symbols-outlined">error</span>
+      {{ loadError() }}
+    </div>
+  }
+
+  <!-- Loading spinner -->
+  @if (isLoading()) {
+    <div class="subs-loading">
+      <div class="subs-spinner"></div>
+      <p>Loading subscriptions…</p>
+    </div>
+  }
+
+  <!-- Data Table Container -->
+  @if (!isLoading()) {
+    <div class="data-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="col-check"><input type="checkbox" /></th>
+            <th>Number</th>
+            <th>Customer</th>
+            <th>Start Date</th>
+            <th>Expiration</th>
+            <th class="col-right">Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(sub of filteredSubscriptions(); track sub.subscription_id) {
+            <tr class="data-row" (click)="goToSubscription(sub.subscription_id)" style="cursor:pointer">
+              <td class="col-check" (click)="$event.stopPropagation()"><input type="checkbox" /></td>
+              <td class="col-number">{{ formatSubscriptionNumber(sub.subscription_number) }}</td>
+              <td>{{ sub.customer_name ?? '—' }}</td>
+              <td>{{ sub.start_date | date:'mediumDate' }}</td>
+              <td>{{ sub.expiration_date ? (sub.expiration_date | date:'mediumDate') : '—' }}</td>
+              <td class="col-right">{{ sub.total_amount | currency:'INR' }}</td>
+              <td>
+                <span class="status-pill" [attr.data-status]="sub.status">
+                  {{ statusLabel(sub.status) }}
+                </span>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            @for(sub of filteredSubscriptions(); track sub.subscription_id) {
-              <tr class="data-row" (click)="goToSubscription(sub.subscription_id)" style="cursor:pointer">
-                <td class="col-check" (click)="$event.stopPropagation()"><input type="checkbox" /></td>
-                <td class="col-number">{{ formatSubscriptionNumber(sub.subscription_number) }}</td>
-                <td>{{ sub.customer_name ?? '—' }}</td>
-                <td>{{ sub.start_date | date:'mediumDate' }}</td>
-                <td>{{ sub.expiration_date ? (sub.expiration_date | date:'mediumDate') : '—' }}</td>
-                <td class="col-right">{{ sub.total_amount | currency:'INR' }}</td>
-                <td>
-                  <span class="status-pill" [attr.data-status]="sub.status">
-                    {{ statusLabel(sub.status) }}
-                  </span>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+          }
+        </tbody>
+      </table>
 
-        @if (filteredSubscriptions().length === 0 && !isLoading()) {
-          <div class="empty-state">
-            <span class="material-symbols-outlined emoji">search_off</span>
-            <p>No subscriptions found.</p>
-          </div>
-        }
-      </div>
-
-      <!-- Pagination -->
-      @if (totalPages() > 1) {
-        <div class="subs-pagination">
-          <button class="subs-page-btn" [disabled]="page() <= 1" (click)="prevPage()">
-            <span class="material-symbols-outlined">chevron_left</span>
-          </button>
-          <span class="subs-page-info">Page {{ page() }} of {{ totalPages() }} · {{ total() }} records</span>
-          <button class="subs-page-btn" [disabled]="page() >= totalPages()" (click)="nextPage()">
-            <span class="material-symbols-outlined">chevron_right</span>
-          </button>
+      @if (filteredSubscriptions().length === 0 && !isLoading()) {
+        <div class="empty-state">
+          <span class="material-symbols-outlined emoji">search_off</span>
+          <p>No subscriptions found.</p>
         </div>
       }
-    }
+    </div>
 
-  </main>
-</div>
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="subs-pagination">
+        <button class="subs-page-btn" [disabled]="page() <= 1" (click)="prevPage()">
+          <span class="material-symbols-outlined">chevron_left</span>
+        </button>
+        <span class="subs-page-info">Page {{ page() }} of {{ totalPages() }} · {{ total() }} records</span>
+        <button class="subs-page-btn" [disabled]="page() >= totalPages()" (click)="nextPage()">
+          <span class="material-symbols-outlined">chevron_right</span>
+        </button>
+      </div>
+    }
+  }
+
+</main>

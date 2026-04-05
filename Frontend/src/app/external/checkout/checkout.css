@@ -1,33 +1,4 @@
-.page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 24px;
-}
-
 /* Breadcrumbs */
-.steps-nav {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 40px;
-  font-family: var(--font-headline);
-}
-.step {
-  color: var(--color-on-surface-variant);
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-.step.step--active {
-  color: var(--color-primary);
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-.step-sep {
-  width: 40px;
-  height: 1px;
-  background: var(--color-outline);
-}
 
 /* Layout */
 .chk-layout {
@@ -198,69 +169,8 @@
   color: var(--color-on-surface);
 }
 
-/* ── Standardized UI Elements ── */
-.sf-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.55rem 1.1rem;
-  border-radius: 10px;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
-  border: none;
-  text-decoration: none;
-}
-.sf-btn--sm { padding: 0.4rem 0.85rem; font-size: 0.75rem; }
-.sf-btn--lg { padding: 0.85rem 1.75rem; font-size: 1.05rem; }
-.sf-btn--full { width: 100%; }
-
-.sf-btn--primary {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  box-shadow: 0 4px 12px rgba(241, 145, 109, 0.25);
-}
 .sf-btn--primary:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); }
-
-.sf-btn--outline {
-  background: transparent;
-  color: var(--color-primary);
-  border: 1px solid rgba(241, 145, 109, 0.55);
-}
 .sf-btn--outline:hover:not(:disabled) { background: rgba(241, 145, 109, 0.10); }
-
-.sf-btn--ghost {
-  background: transparent;
-  color: var(--color-on-surface-variant);
-  border: 1px solid var(--color-outline-variant);
-}
-.sf-btn--ghost:hover {
-  color: var(--color-on-surface);
-  border-color: var(--color-on-surface-variant);
-  background: var(--color-surface-container-highest);
-}
-
-.sf-control {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid var(--color-primary);
-  color: var(--color-on-surface);
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 0.4rem 0rem;
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.2s, background-color 0.2s;
-  border-radius: 4px 4px 0 0;
-}
-.sf-control:focus {
-  background: rgba(241, 145, 109, 0.05);
-  border-bottom-color: var(--color-primary);
-}
 
 @media (max-width: 900px) {
   .chk-layout,

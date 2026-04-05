@@ -18,7 +18,7 @@ type BadgeSize = 'sm' | 'md' | 'lg';
         <span *ngIf="label()">{{ label() }}</span>
       </div>
     </mat-chip>
-  `
+  `,
 })
 export class BadgeComponent {
   variant = input<BadgeVariant>('default');
@@ -28,43 +28,52 @@ export class BadgeComponent {
 
   dotColor = computed(() => {
     switch (this.variant()) {
-      case 'success': return 'bg-green-400';
-      case 'warning': return 'bg-yellow-400';
-      case 'error': return 'bg-[#f1916d]';
-      case 'info': return 'bg-blue-400';
-      default: return 'bg-primary';
+      case 'success':
+        return 'bg-[#19305c] ring-1 ring-[#ae7dac]/40';
+      case 'warning':
+        return 'bg-[#f1916d]';
+      case 'error':
+        return 'bg-[#f1916d] opacity-90';
+      case 'info':
+        return 'bg-[#ae7dac]';
+      default:
+        return 'bg-[#413b61]';
     }
   });
 
   computedClasses = computed(() => {
-    // Basic size logic
     let classes = '!font-bold !tracking-wide uppercase !rounded-full ';
-    
+
     switch (this.size()) {
-      case 'sm': classes += '!text-[0.65rem] !px-2 !min-h-[20px] '; break;
-      case 'lg': classes += '!text-sm !px-4 !min-h-[32px] '; break;
-      default: classes += '!text-xs !px-3 !min-h-[24px] '; break;
+      case 'sm':
+        classes += '!text-[0.65rem] !px-2 !min-h-[20px] ';
+        break;
+      case 'lg':
+        classes += '!text-sm !px-4 !min-h-[32px] ';
+        break;
+      default:
+        classes += '!text-xs !px-3 !min-h-[24px] ';
+        break;
     }
 
-    // Colors mapping to Subsync dark palette
     switch (this.variant()) {
       case 'default':
-        classes += '!bg-surface-container-highest !text-on-surface ';
+        classes += '!bg-[#413b61]/90 !text-[#f3dadf] border border-[#ae7dac]/25 ';
         break;
       case 'success':
-        classes += '!bg-green-400/10 !text-green-400 border !border-green-400/20 ';
+        classes += '!bg-[#19305c]/85 !text-[#f3dadf] border border-[#ae7dac]/30 ';
         break;
       case 'warning':
-        classes += '!bg-yellow-400/10 !text-yellow-400 border !border-yellow-400/20 ';
+        classes += '!bg-[#f1916d]/18 !text-[#f1916d] border border-[#f1916d]/35 ';
         break;
       case 'error':
-        classes += '!bg-[#f1916d]/15 !text-[#f1916d] border !border-[#f1916d]/35 ';
+        classes += '!bg-[#f1916d]/22 !text-[#f3dadf] border border-[#f1916d]/45 ';
         break;
       case 'info':
-        classes += '!bg-blue-400/10 !text-blue-400 border !border-blue-400/20 ';
+        classes += '!bg-[#ae7dac]/16 !text-[#ae7dac] border border-[#ae7dac]/35 ';
         break;
       case 'outline':
-        classes += '!bg-transparent border !border-outline !text-outline ';
+        classes += '!bg-transparent border border-[#ae7dac]/45 !text-[#ae7dac] ';
         break;
     }
 

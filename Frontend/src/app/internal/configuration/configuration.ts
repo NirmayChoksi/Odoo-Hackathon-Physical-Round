@@ -1,20 +1,15 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import {
-  CONFIGURATION_DROPDOWN_ITEMS,
-  CONFIGURATION_HUB_MODULES,
-  SUBSCRIPTION_APP_PATHS,
-  USERS_CONTACTS_DROPDOWN_ITEMS,
-} from '../subscription-app.constants';
+import { CONFIGURATION_HUB_MODULES, SUBSCRIPTION_APP_PATHS } from '../subscription-app.constants';
 import { AttributeApiService } from '../attribute/attribute-api.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-configuration',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './configuration.html',
   styleUrl: './configuration.css'
 })
@@ -23,25 +18,6 @@ export class ConfigurationComponent implements OnInit {
 
   readonly paths = SUBSCRIPTION_APP_PATHS;
   readonly hubModules = CONFIGURATION_HUB_MODULES;
-
-  navItems = signal([
-    { label: 'Subscriptions', active: false, path: SUBSCRIPTION_APP_PATHS.subscriptions },
-    { label: 'Products', active: false, path: SUBSCRIPTION_APP_PATHS.products },
-    { label: 'Reporting', active: false, path: SUBSCRIPTION_APP_PATHS.reporting },
-    {
-      label: 'Users/Contacts',
-      active: false,
-      path: SUBSCRIPTION_APP_PATHS.users,
-      isDropdown: true,
-      dropdownItems: [...USERS_CONTACTS_DROPDOWN_ITEMS],
-    },
-    {
-      label: 'Configuration',
-      active: true,
-      isDropdown: true,
-      dropdownItems: [...CONFIGURATION_DROPDOWN_ITEMS],
-    },
-  ]);
 
   searchQuery = signal('');
   isLoading = signal(false);
@@ -98,24 +74,6 @@ export class ConfigurationComponent implements OnInit {
         r.extraPrice.toLowerCase().includes(q)
     );
   });
-
-  isConfigOpen = signal(false);
-
-  toggleConfig(event: Event) {
-    event.stopPropagation();
-    this.isConfigOpen.set(!this.isConfigOpen());
-  }
-
-  constructor() {
-    window.addEventListener('click', () => {
-      this.isConfigOpen.set(false);
-    });
-  }
-
-  onNavClick(item: { label: string }) {
-    const items = this.navItems().map((i: any) => ({ ...i, active: i.label === item.label }));
-    this.navItems.set(items);
-  }
 
   onDelete() {
     /* placeholder */

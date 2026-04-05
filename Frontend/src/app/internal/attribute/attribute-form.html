@@ -1,47 +1,4 @@
-<div class="internal-container">
-
-  <!-- Navigation Header -->
-  <nav class="internal-nav">
-    <div class="nav-brand">
-      <img src="/images/logo/subsync-logo.svg" alt="SubSync" class="brand-logo" />
-    </div>
-    <div class="nav-links">
-      @for(item of navItems(); track item.label) {
-        @if(item.isDropdown) {
-          <div class="nav-dropdown" [class.nav-dropdown--open]="isConfigOpen()">
-            <button type="button" class="nav-link nav-dropdown-btn" [class.nav-link--active]="item.active" (click)="toggleConfig($event)">
-              {{ item.label }}
-              <span class="material-symbols-outlined dropdown-icon">arrow_drop_down</span>
-            </button>
-            <div class="nav-dropdown-content" (click)="$event.stopPropagation()">
-              @for(sub of item.dropdownItems; track sub.label) {
-                <a
-                  [routerLink]="sub.path"
-                  class="dropdown-item"
-                  routerLinkActive="dropdown-item--current"
-                  [routerLinkActiveOptions]="{ exact: sub.exactActive }">
-                  {{ sub.label }}
-                </a>
-              }
-            </div>
-          </div>
-        } @else {
-          <a [routerLink]="item.path" class="nav-link" [class.nav-link--active]="item.active" (click)="onNavClick(item)">
-            {{ item.label }}
-          </a>
-        }
-      }
-    </div>
-    <div class="nav-profile">
-      <a routerLink="/login" class="profile-btn">
-        <span class="material-symbols-outlined">person</span>
-        My Profile
-      </a>
-    </div>
-  </nav>
-
-  <!-- Main Content Body -->
-  <main class="internal-content">
+<main class="internal-content">
 
     <!-- Action Bar -->
     <div class="action-bar">
@@ -80,8 +37,8 @@
           <span class="section-label">Attribute Values</span>
         </div>
         
-        <div class="table-wrapper">
-          <table class="values-table">
+        <div class="data-container">
+          <table class="data-table">
             <thead>
               <tr>
                 <th class="table-header">Value</th>
@@ -104,4 +61,3 @@
     </div>
 
   </main>
-</div>
