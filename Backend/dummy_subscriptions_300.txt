@@ -1,0 +1,53 @@
+-- Dummy data: up to 300 subscriptions (one per dummy customer row)
+-- Prerequisites:
+--   1) customers from dummy_data_300.txt (emails dummy.customer.N@example.test),
+--   2) at least one ACTIVE row in recurring_plans.
+-- subscription_number is set by trigger before_insert_subscription (SOxxx).
+--
+-- If you have no plans yet, run once before the INSERT below:
+-- INSERT INTO recurring_plans (plan_name, price, billing_period, minimum_quantity, status)
+-- VALUES ('Dummy Default Monthly', 99.00, 'MONTHLY', 1, 'ACTIVE');
+--
+-- Requires MySQL 8+ (ROW_NUMBER).
+
+SET FOREIGN_KEY_CHECKS=0;
+INSERT INTO subscriptions (
+  customer_id,
+  plan_id,
+  template_id,
+  start_date,
+  expiration_date,
+  payment_terms,
+  status,
+  subtotal,
+  discount_amount,
+  tax_amount,
+  total_amount,
+  created_by
+)
+SELECT
+  d.customer_id,
+  p.plan_id,
+  NULL,
+  DATE_SUB(CURDATE(), INTERVAL (MOD(d.rn, 400)) DAY),
+  DATE_ADD(CURDATE(), INTERVAL (100 + MOD(d.rn, 500)) DAY),
+  'Net 30',
+  ELT(1 + MOD(d.rn, 5), 'DRAFT', 'QUOTATION', 'CONFIRMED', 'ACTIVE', 'CLOSED'),
+  99.00 + MOD(d.rn, 200),
+  MOD(d.rn, 20) * 0.50,
+  MOD(d.rn, 15) * 1.25,
+  120.00 + MOD(d.rn, 300),
+  NULL
+FROM (
+  SELECT customer_id, ROW_NUMBER() OVER (ORDER BY customer_id) AS rn
+  FROM customers
+  WHERE email LIKE 'dummy.customer.%@example.test'
+  LIMIT 300
+) d
+CROSS JOIN (
+  SELECT plan_id FROM recurring_plans WHERE status = 'ACTIVE' ORDER BY plan_id LIMIT 1
+) p;
+SET FOREIGN_KEY_CHECKS=1;
+
+-- If 0 rows inserted: add a recurring plan or fix the dummy customer email filter.
+-- End dummy_subscriptions_300.txt
